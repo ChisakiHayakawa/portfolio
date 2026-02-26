@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v3 / 2026.02.27 — ヘッダー重複修正, フッター回遊導線追加 -->
+<!-- v4 / 2026.02.27 — 6 Viewpoints テキスト全面改稿, 問いリスト呼応 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -62,15 +62,14 @@ body {
 
 ::selection { background: var(--black); color: var(--white); }
 
-a { color: var(--black); text-decoration: none; border-bottom: var(--rule) solid transparent; transition: border-color 0.2s; }
-a:hover { border-bottom-color: var(--black); }
+a { color: var(--black); text-decoration: none; border-bottom: var(--rule) solid var(--black); }
 a:hover { opacity: 0.5; }
 
 /* ── CONTAINER ── */
 .container {
   max-width: var(--max);
   margin: 0 auto;
-  padding: var(--s6) var(--s5);
+  padding: var(--s8) var(--s5);
 }
 
 /* ── SITE NAV ── */
@@ -395,7 +394,7 @@ a:hover { opacity: 0.5; }
 }
 
 @media (max-width: 640px) {
-  .container { padding: var(--s5) var(--s3); }
+  .container { padding: var(--s6) var(--s3); }
   .site-nav { flex-direction: column; gap: var(--s1); }
   .header { grid-template-columns: 1fr; gap: var(--s3); }
   .meta { text-align: left; }
@@ -424,8 +423,9 @@ a:hover { opacity: 0.5; }
 
   <header class="header">
     <div>
+      <div class="bside-id">B-Side — No. 001</div>
       <h1 class="hero-title">ジャッド｜マーファ展</h1>
-      <div class="hero-sub">JUDD | Marfa — WATARI-UM, The Museum of Contemporary Art, Tokyo</div>
+      <div class="hero-sub">Donald Judd — Watari-Um Museum, Tokyo</div>
     </div>
     <div class="meta">
       <span class="meta-status">Now Open</span>
@@ -445,8 +445,8 @@ a:hover { opacity: 0.5; }
       <img class="vp-img" src="images/material.jpg" alt="Material — 亜鉛メッキ鉄スタックの影とスパングル" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1967, Galvanized iron. Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</div>
-    <div class="vp-catch">亜鉛メッキ鉄の結晶模様が「素材そのもの」を語る</div>
-    <div class="vp-short">ジャッドの強さは寸法の厳密さ・素材の反復・配置の必然性にある。光がどこに当たり、どう反射するかが作品の意味そのものになっている。</div>
+    <div class="vp-catch">亜鉛メッキ鉄の表面に浮かぶ結晶模様——工業素材がそのまま視覚になる</div>
+    <div class="vp-short">1967年の亜鉛メッキ鉄スタック。表面に浮かぶスパングルと呼ばれる結晶模様は、雪の結晶や星のような幾何学模様で、純粋に綺麗だった。塗装でもテクスチャでもなく、亜鉛という素材が自ら生み出したもの。ジャッドはこの種の素材を「ありふれた商業用材料」と呼びながら、それ自体が色であり質感であることを見ていた。</div>
   </section>
 
   <div class="modal-overlay" id="modal-material">
@@ -455,10 +455,10 @@ a:hover { opacity: 0.5; }
       <img class="modal-img" src="images/material.jpg" alt="Material">
       <div class="modal-text">
         <div class="modal-axis">01 / Material</div>
-        <div class="modal-title">亜鉛メッキ鉄の結晶模様が「素材そのもの」を語る</div>
+        <div class="modal-title">亜鉛メッキ鉄の表面に浮かぶ結晶模様——工業素材がそのまま視覚になる</div>
         <div class="modal-body">
-          <p>アルミニウム、鉄、プレキシグラス。ジャッドの強さは余白の大きさではなく、寸法の厳密さ・素材の反復・配置の必然性にある。</p>
-          <p>光がどこに当たり、どう反射するかが作品の意味そのものになっている空間を、フォトグラファーとして体で経験できる。</p>
+          <p>1967年の亜鉛メッキ鉄スタック。表面に浮かぶスパングルと呼ばれる結晶模様は、雪の結晶や星のような幾何学模様で、純粋に綺麗だった。塗装でもテクスチャでもなく、亜鉛という素材が自ら生み出したもの。</p>
+          <p>ジャッドはこの種の素材を「ありふれた商業用材料」と呼びながら、それ自体が色であり質感であることを見ていた。手仕事の痕跡はどこにもない。64年からジャッドは加工業者に製造を委ねている。</p>
         </div>
         <div class="modal-caption">Untitled, 1967, Galvanized iron.<br>Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</div>
       </div>
@@ -473,8 +473,8 @@ a:hover { opacity: 0.5; }
       <img class="vp-img" src="images/light.jpg" alt="Light — コンクリート梁のV字の光と影" loading="lazy">
     </div>
     <div class="vp-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
-    <div class="vp-catch">雨の日のグレーの光がコンクリートと金属を調和させる</div>
-    <div class="vp-short">光がどこに当たり、どう反射するかが作品の意味そのものになっている空間。雨の日の柔らかいグレーの光が、コンクリートと金属素材を静かに調和させていた。</div>
+    <div class="vp-catch">雨のグレーの光が、金属の表面を静かにしていた</div>
+    <div class="vp-short">訪問日は雨だった。ボッタの建築が取り込むグレーがかった外光は、コンクリートの陰影と金属表面の反射を穏やかに統合していた。天井のダイヤ格子から落ちる光、縦長3連窓から入る光。晴れた日に来ていたら、同じ作品がまったく違って見えていたと思う。</div>
   </section>
 
   <div class="modal-overlay" id="modal-light">
@@ -483,10 +483,10 @@ a:hover { opacity: 0.5; }
       <img class="modal-img" src="images/light.jpg" alt="Light">
       <div class="modal-text">
         <div class="modal-axis">02 / Light</div>
-        <div class="modal-title">雨の日のグレーの光がコンクリートと金属を調和させる</div>
+        <div class="modal-title">雨のグレーの光が、金属の表面を静かにしていた</div>
         <div class="modal-body">
-          <p>光がどこに当たり、どう反射するかが作品の意味そのものになっている空間。雨の日の柔らかいグレーの光が、コンクリートと金属素材を静かに調和させていた。</p>
-          <p>ボッタの建築が作り出す光の質——天井のダイヤ格子グリッド、縦長3連窓からの光——がジャッドの作品と共鳴する。</p>
+          <p>訪問日は雨だった。ボッタの建築が取り込むグレーがかった外光は、コンクリートの陰影と金属表面の反射を穏やかに統合していた。天井のダイヤ格子から落ちる光、縦長3連窓から入る光。</p>
+          <p>晴れた日に来ていたら、同じ作品がまったく違って見えていたと思う。マーファの乾いた砂漠の光の下では、なおさら。</p>
         </div>
         <div class="modal-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
       </div>
@@ -501,8 +501,8 @@ a:hover { opacity: 0.5; }
       <img class="vp-img" src="images/color.jpg" alt="Color — グレー×オレンジボックス正面" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass. Collection: Judd Foundation</div>
-    <div class="vp-catch">色を物質のように扱う——ジャッドの色彩は「塗る」のではなく「在る」</div>
-    <div class="vp-short">RALカラーチャートに基づくスイスの焼付塗装が、ジャッドに色彩を物質として扱う自由を与えた。調和でも不調和でもなく、ただ全ての色を同時に存在させること。</div>
+    <div class="vp-catch">プレキシグラスの色は、素材に最初からある色だった</div>
+    <div class="vp-short">金属に塗料を重ねると素材の本質を偽る——そう考えたジャッドは、プレキシグラスという「それ自体が色を持つ素材」に至った。3階にはRALカラーチャートの実物が展示されていて、色の選択が抽象的な判断ではなく物質的な比較のプロセスだったことがわかる。アンバーのプレキシグラスの奥から、不思議なオレンジの光が底面に漏れていた。</div>
   </section>
 
   <div class="modal-overlay" id="modal-color">
@@ -511,10 +511,10 @@ a:hover { opacity: 0.5; }
       <img class="modal-img" src="images/color.jpg" alt="Color">
       <div class="modal-text">
         <div class="modal-axis">03 / Color</div>
-        <div class="modal-title">色を物質のように扱う——ジャッドの色彩は「塗る」のではなく「在る」</div>
+        <div class="modal-title">プレキシグラスの色は、素材に最初からある色だった</div>
         <div class="modal-body">
-          <p>RALカラーチャートに基づくスイスの焼付塗装が、ジャッドに色彩を物質として扱う自由を与えた。</p>
-          <p>調和でも不調和でもなく、ヨーロッパの絵画的伝統から距離を置くために、ただ全ての色を同時に存在させたかった——そうジャッドは語っている。</p>
+          <p>金属に塗料を重ねると素材の本質を偽る——そう考えたジャッドは、プレキシグラスという「それ自体が色を持つ素材」に至った。3階にはRALカラーチャートの実物が展示されていて、色の選択が抽象的な判断ではなく物質的な比較のプロセスだったことがわかる。</p>
+          <p>工業用の色見本帳がアート作品の思考プロセスとして額装されている。アンバーのプレキシグラスの奥から、不思議なオレンジの光が底面に漏れていた。</p>
         </div>
         <div class="modal-caption">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass.<br>Collection: Judd Foundation</div>
       </div>
@@ -529,8 +529,8 @@ a:hover { opacity: 0.5; }
       <img class="vp-img" src="images/space.jpg" alt="Space — 外螺旋階段とグリッドガラスのシルエット" loading="lazy">
     </div>
     <div class="vp-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
-    <div class="vp-catch">直線と曲線の対比——ボッタの建築がジャッドの反復構造と共鳴する</div>
-    <div class="vp-short">マリオ・ボッタ設計のワタリウム自体が彫刻的建築。外壁の御影石ストライプ、螺旋階段の曲線、グリッドガラスの直線がジャッドの反復構造と共鳴する。</div>
+    <div class="vp-catch">この建物は中性的な容器ではなく、ジャッドの作品を見る体験の一部だった</div>
+    <div class="vp-short">マリオ・ボッタ設計のワタリウムは初訪問だった。三角形の平面、吹き抜けと通常天井の使い分け、外階段の曲線とグリッドガラスの直線。「ニュートラルな空間など存在しない」と書いたジャッドの作品が、この建築の中で見えている。マーファからの仮住まいであっても、この空間は中性的な容器ではなかった。</div>
   </section>
 
   <div class="modal-overlay" id="modal-space">
@@ -539,10 +539,10 @@ a:hover { opacity: 0.5; }
       <img class="modal-img" src="images/space.jpg" alt="Space">
       <div class="modal-text">
         <div class="modal-axis">04 / Space</div>
-        <div class="modal-title">直線と曲線の対比——ボッタの建築がジャッドの反復構造と共鳴する</div>
+        <div class="modal-title">この建物は中性的な容器ではなく、ジャッドの作品を見る体験の一部だった</div>
         <div class="modal-body">
-          <p>マリオ・ボッタ設計のワタリウム自体が彫刻的建築で、外壁の御影石ストライプはジャッドの反復構造と共鳴する。</p>
-          <p>コンクリート・石・ガラスの素材選択とモジュールの繰り返しは、建築とプロダクト双方に通じるデザイン原則の実例として観察できる。</p>
+          <p>マリオ・ボッタ設計のワタリウムは初訪問だった。三角形の平面、吹き抜けと通常天井の使い分け、外階段の曲線とグリッドガラスの直線。「ニュートラルな空間など存在しない」と書いたジャッドの作品が、この建築の中で見えている。</p>
+          <p>マーファからの仮住まいであっても、この空間は中性的な容器ではなかった。建物自体がもうひとつの展示物だった。</p>
         </div>
         <div class="modal-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
       </div>
@@ -557,8 +557,8 @@ a:hover { opacity: 0.5; }
       <img class="vp-img" src="images/repetition.jpg" alt="Repetition — 黒アノダイズドアルミの壁付きスタック正面" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units). Collection: Shizuoka Prefectural Museum of Art</div>
-    <div class="vp-catch">「一つのものが次に続く」——反復が構造になる瞬間</div>
-    <div class="vp-short">10ユニットの壁付きスタック。等間隔で積み重なるアルミニウムとプレキシグラスが、反復そのものを構造に変える。ジャッドの「one thing after another」を最も体感できる作品。</div>
+    <div class="vp-catch">展示室で一番長くいた作品。3メートルの反復が体に入ってくる</div>
+    <div class="vp-short">黒アノダイズドアルミとブロンズのプレキシグラス、10ユニット。2階の吹き抜けに3メートルを超えて積み重なるスタックは、この展示で一番足が止まった作品だった。不透明な金属と半透明な樹脂が等間隔で交替する。壁から突き出した金属の重さが体に伝わってくる。見上げているうちに、反復は数えるものではなく、体が受け取るものだとわかる。</div>
   </section>
 
   <div class="modal-overlay" id="modal-repetition">
@@ -567,10 +567,10 @@ a:hover { opacity: 0.5; }
       <img class="modal-img" src="images/repetition.jpg" alt="Repetition">
       <div class="modal-text">
         <div class="modal-axis">05 / Repetition</div>
-        <div class="modal-title">「一つのものが次に続く」——反復が構造になる瞬間</div>
+        <div class="modal-title">展示室で一番長くいた作品。3メートルの反復が体に入ってくる</div>
         <div class="modal-body">
-          <p>10ユニットの壁付きスタック。等間隔で積み重なるアルミニウムとプレキシグラスが、反復そのものを構造に変える。</p>
-          <p>ジャッドの「one thing after another」を最も体感できる作品。3メートルを超える高さで展示室に存在するとき、反復は数学的な概念ではなく身体的な経験になる。</p>
+          <p>黒アノダイズドアルミとブロンズのプレキシグラス、10ユニット。2階の吹き抜けに3メートルを超えて積み重なるスタックは、この展示で一番足が止まった作品だった。不透明な金属と半透明な樹脂が等間隔で交替する。</p>
+          <p>壁から突き出した金属の重さが体に伝わってくる。見上げているうちに、反復は数えるものではなく、体が受け取るものだとわかる。</p>
         </div>
         <div class="modal-caption">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units).<br>Collection: Shizuoka Prefectural Museum of Art</div>
       </div>
@@ -585,8 +585,8 @@ a:hover { opacity: 0.5; }
       <img class="vp-img" src="images/time.jpg" alt="Time — 赤×黄の壁付き作品を3Fから見下ろした構図" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1989, Painted aluminum. Collection: Kirishima Open-Air Museum</div>
-    <div class="vp-catch">同じ作品を、別の時点から見る——視点の移動が時間になる</div>
-    <div class="vp-short">2Fで正面から見た作品を、3Fから見下ろす。同じ作品が、自分の体験の中の別の時点から見えている。展示空間の中で移動すること自体が、時間の経験になっている。</div>
+    <div class="vp-catch">2Fで正面から見た作品を、3Fから見下ろしている</div>
+    <div class="vp-short">階を移動するたびに、さっき見た作品が別の角度から見えてくる。ボッタの吹き抜け構造がそれを可能にしている。同じ作品が、自分の体験の中の別の時点として存在する。グラフィックデザインやPCの中で仕事をしてきた自分にとって、3メートルの金属を見上げ、光の中で素材を見る体験は画面では得られないものだった。この展示は2026年6月に終わる。ジャッドが「その場限りのパフォーマンスにしてはならない」と書いた作品を、一時的な企画展で見ている。その矛盾がずっと残っている。</div>
   </section>
 
   <div class="modal-overlay" id="modal-time">
@@ -595,10 +595,10 @@ a:hover { opacity: 0.5; }
       <img class="modal-img" src="images/time.jpg" alt="Time">
       <div class="modal-text">
         <div class="modal-axis">06 / Time</div>
-        <div class="modal-title">同じ作品を、別の時点から見る——視点の移動が時間になる</div>
+        <div class="modal-title">2Fで正面から見た作品を、3Fから見下ろしている</div>
         <div class="modal-body">
-          <p>2Fで正面から見た作品を、3Fから見下ろす。同じ作品が、自分の体験の中の別の時点から見えている。</p>
-          <p>展示空間の中で移動すること自体が、時間の経験になっている。ジャッドが「恒久展示」に拘った理由が、この体験の中に見える。</p>
+          <p>階を移動するたびに、さっき見た作品が別の角度から見えてくる。ボッタの吹き抜け構造がそれを可能にしている。同じ作品が、自分の体験の中の別の時点として存在する。</p>
+          <p>グラフィックデザインやPCの中で仕事をしてきた自分にとって、3メートルの金属を見上げ、光の中で素材を見る体験は画面では得られないものだった。この展示は2026年6月に終わる。ジャッドが「その場限りのパフォーマンスにしてはならない」と書いた作品を、一時的な企画展で見ている。その矛盾がずっと残っている。</p>
         </div>
         <div class="modal-caption">Untitled, 1989, Painted aluminum.<br>Collection: Kirishima Open-Air Museum</div>
       </div>
@@ -628,15 +628,8 @@ a:hover { opacity: 0.5; }
 
   <!-- ── FOOTER ── -->
   <footer class="footer">
-    <span>B-Side — <a href="../../index.html">Chisaki</a></span>
-    <div style="display:flex; gap:var(--s4); align-items:center;">
-      <a href="https://github.com/chisakihayakawa" target="_blank" rel="noopener" aria-label="GitHub">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      </a>
-      <a href="https://www.instagram.com/ch15aki/" target="_blank" rel="noopener" aria-label="Instagram">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-      </a>
-    </div>
+    <span>B-Side — by Chisaki / 2026.02</span>
+    <span>All photos by the author</span>
   </footer>
 
   <div class="disclaimer">
