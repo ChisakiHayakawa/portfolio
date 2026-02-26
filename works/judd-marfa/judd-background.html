@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Background — Donald Judd の周辺</title>
+<!-- v3 / 2026.02.26 — Context Map → Background改名、ナビ追加 -->
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #000;
+  --white: #fff;
+  --grey: #666;
+  --light: #e8e8e8;
+  --font: 'Helvetica Neue', 'Libre Franklin', 'Noto Sans JP', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  background: var(--white);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 4rem 2rem 6rem;
+}
+
+h1 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  border-bottom: 1px solid var(--black);
+  padding-bottom: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--grey);
+  margin-bottom: 3rem;
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  margin-bottom: 4rem;
+  position: relative;
+}
+
+.timeline-title {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--black);
+}
+
+.tl-row {
+  display: grid;
+  grid-template-columns: 5rem 1fr;
+  gap: 1.5rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--light);
+  align-items: baseline;
+}
+
+.tl-year {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.tl-event {
+  font-size: 0.85rem;
+  font-weight: 300;
+}
+
+.tl-event strong {
+  font-weight: 500;
+}
+
+/* ── RELATIONSHIP MAP (CSS only) ── */
+.map-section {
+  margin-bottom: 4rem;
+}
+
+.map-title {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--black);
+}
+
+.map-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: var(--light);
+  border: 1px solid var(--black);
+}
+
+.map-center {
+  grid-column: 1 / -1;
+  background: var(--black);
+  color: var(--white);
+  padding: 2rem;
+  text-align: center;
+}
+
+.map-center-name {
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.map-center-dates {
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  margin-top: 0.25rem;
+  opacity: 0.6;
+}
+
+.map-center-desc {
+  font-size: 0.8rem;
+  font-weight: 300;
+  margin-top: 0.75rem;
+  line-height: 1.6;
+  opacity: 0.8;
+}
+
+.map-group-label {
+  grid-column: 1 / -1;
+  background: var(--white);
+  padding: 0.75rem 1rem 0.25rem;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--grey);
+}
+
+.map-card {
+  background: var(--white);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-card-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.15rem;
+}
+
+.map-card-dates {
+  font-size: 0.65rem;
+  font-weight: 300;
+  color: var(--grey);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.map-card-relation {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px solid var(--black);
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.map-card-desc {
+  font-size: 0.75rem;
+  font-weight: 300;
+  line-height: 1.65;
+  color: #333;
+  flex: 1;
+}
+
+.map-card-medium {
+  font-size: 0.65rem;
+  font-weight: 300;
+  color: var(--grey);
+  margin-top: 0.5rem;
+  letter-spacing: 0.05em;
+}
+
+.map-card-link {
+  margin-top: 0.75rem;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
+.map-card-link a {
+  color: var(--black);
+  text-decoration: none;
+  border-bottom: 1px solid var(--black);
+}
+
+.map-card-link a:hover { opacity: 0.5; }
+
+/* ── KEY LINKS ── */
+.links-section {
+  margin-bottom: 4rem;
+}
+
+.links-title {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--black);
+}
+
+.link-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--light);
+  font-size: 0.8rem;
+  align-items: baseline;
+}
+
+.link-label {
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.link-row a {
+  color: var(--black);
+  text-decoration: none;
+  border-bottom: 1px solid var(--black);
+  font-weight: 300;
+}
+
+.link-row a:hover { opacity: 0.5; }
+
+.link-note {
+  font-size: 0.7rem;
+  color: var(--grey);
+  font-weight: 300;
+}
+
+/* ── SITE NAV ── */
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.site-nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.site-nav-links a {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--black);
+  text-decoration: none;
+  border-bottom: 1px solid var(--black);
+}
+.site-nav-links a:hover { opacity: 0.5; }
+
+.site-nav-current {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  opacity: 0.3;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: 4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--black);
+  font-size: 0.7rem;
+  font-weight: 300;
+  color: var(--grey);
+  letter-spacing: 0.05em;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .container { padding: 2rem 1.25rem 4rem; }
+  .site-nav { flex-direction: column; gap: 0.25rem; }
+  .map-grid { grid-template-columns: 1fr; }
+  .tl-row { grid-template-columns: 4rem 1fr; gap: 1rem; }
+  .link-row { grid-template-columns: 1fr; gap: 0.25rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<nav class="site-nav">
+  <span>B-Side No.001</span>
+  <div class="site-nav-links">
+    <a href="index.html">Home</a>
+    <span class="site-nav-current">Background</span>
+    <a href="judd-viewpoints.html">Viewpoints</a>
+  </div>
+</nav>
+
+<h1>Background — Donald Judd の周辺</h1>
+<div class="subtitle">ジャッド｜マーファ展を見る前に知っておくと視界が広がる人物と文脈</div>
+
+<!-- ━━━━ TIMELINE ━━━━ -->
+<div class="timeline">
+  <div class="timeline-title">Timeline — ジャッドの生涯と時代</div>
+
+  <div class="tl-row"><div class="tl-year">1928</div><div class="tl-event">ミズーリ州エクセルシオール・スプリングス生まれ</div></div>
+  <div class="tl-row"><div class="tl-year">1948–53</div><div class="tl-event"><strong>コロンビア大学で哲学を学ぶ。</strong>同時にアート・スチューデンツ・リーグで絵画も学ぶ</div></div>
+  <div class="tl-row"><div class="tl-year">1950s</div><div class="tl-event">抽象表現主義（ポロック、ロスコ、ニューマン）が全盛。ジャッドは画家として活動開始</div></div>
+  <div class="tl-row"><div class="tl-year">1959–65</div><div class="tl-event"><strong>美術批評家として『Arts Magazine』等に寄稿。</strong>同時代のアーティストを鋭く論評</div></div>
+  <div class="tl-row"><div class="tl-year">1962</div><div class="tl-event">絵画を放棄し、三次元の作品制作へ移行</div></div>
+  <div class="tl-row"><div class="tl-year">1963</div><div class="tl-event">初の立体作品を発表。ポップアート（ウォーホル、リキテンスタイン）が台頭する中、真逆の方向へ</div></div>
+  <div class="tl-row"><div class="tl-year">1965</div><div class="tl-event"><strong>論文「Specific Objects」発表。</strong>絵画でも彫刻でもない「特定の物体」を提唱——ミニマリズムの理論的基盤に</div></div>
+  <div class="tl-row"><div class="tl-year">1968</div><div class="tl-event">NY SoHoの101 Spring Streetを購入。生活と制作を一体化した空間設計を開始</div></div>
+  <div class="tl-row"><div class="tl-year">1971</div><div class="tl-event">初めてマーファを訪問</div></div>
+  <div class="tl-row"><div class="tl-year">1973</div><div class="tl-event"><strong>マーファの「The Block」を購入。</strong>NYのアートシーンに幻滅し、テキサスの荒野へ</div></div>
+  <div class="tl-row"><div class="tl-year">1978</div><div class="tl-event"><strong>ギャルリー・ワタリ（東京）が日本初招聘。</strong>和多利志津子との関係が始まる</div></div>
+  <div class="tl-row"><div class="tl-year">1979</div><div class="tl-event">旧フォート・ラッセル軍用基地を取得。恒久展示の構想が本格化</div></div>
+  <div class="tl-row"><div class="tl-year">1986</div><div class="tl-event"><strong>Chinati Foundation開館。</strong>ジャッド、フレイヴィン、チェンバレンの恒久展示を公開</div></div>
+  <div class="tl-row"><div class="tl-year">1994</div><div class="tl-event">リンパ腫により死去（65歳）。マーファにて</div></div>
+  <div class="tl-row"><div class="tl-year">2020</div><div class="tl-event">MoMA（NY）にて30年ぶりの大規模回顧展</div></div>
+  <div class="tl-row"><div class="tl-year">2026</div><div class="tl-event"><strong>ワタリウム美術館「ジャッド｜マーファ展」開催。</strong>1978年から48年目</div></div>
+</div>
+
+<!-- ━━━━ RELATIONSHIP MAP ━━━━ -->
+<div class="map-section">
+  <div class="map-title">Relationship Map — 人物相関</div>
+  <div class="map-grid">
+
+    <!-- CENTER: JUDD -->
+    <div class="map-center">
+      <div class="map-center-name">Donald Judd</div>
+      <div class="map-center-dates">1928 – 1994 / アメリカ</div>
+      <div class="map-center-desc">画家→批評家→彫刻家→建築家・家具デザイナー。<br>「展示は恒久的でなければならない」を実践した人。</div>
+    </div>
+
+    <!-- GROUP: 同時代の作家 -->
+    <div class="map-group-label">同時代 — 並走した作家たち</div>
+
+    <div class="map-card">
+      <div class="map-card-name">Dan Flavin</div>
+      <div class="map-card-dates">1933–1996 / アメリカ</div>
+      <div class="map-card-relation">親友・マーファの共同体</div>
+      <div class="map-card-desc">蛍光灯だけで作品を作った。市販の既製品を「そのまま」使う姿勢がジャッドと共通。マーファのChinati Foundationにも6棟の恒久展示がある。ジャッドもフレイヴィンも完成を見ずに死去。</div>
+      <div class="map-card-medium">素材：蛍光灯（市販品）、光、色</div>
+      <div class="map-card-link"><a href="https://chinati.org/collection/dan-flavin/" target="_blank" rel="noopener">Chinati — Dan Flavin</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Carl Andre</div>
+      <div class="map-card-dates">1935–2024 / アメリカ</div>
+      <div class="map-card-relation">同世代・床の探求者</div>
+      <div class="map-card-desc">金属板を床に並べるだけの作品。ジャッドが「壁と床の間」を攻めたのに対し、アンドレは徹底的に「床」にこだわった。Chinatiにも恒久展示がある。</div>
+      <div class="map-card-medium">素材：銅板、鉛板、鉄板、木材</div>
+      <div class="map-card-link"><a href="https://www.diaart.org/collection/collection/andre-carl-144-magnesium-square-1969-2005-003" target="_blank" rel="noopener">Dia Art Foundation — Carl Andre</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Sol LeWitt</div>
+      <div class="map-card-dates">1928–2007 / アメリカ</div>
+      <div class="map-card-relation">理論的対極</div>
+      <div class="map-card-desc">「アイデアが作品」と宣言したコンセプチュアル・アートの旗手。ジャッドが物体そのものにこだわったのに対し、ルウィットは「指示書」があれば誰が作っても作品だと考えた。同い年。</div>
+      <div class="map-card-medium">素材：壁面ドローイング、白い立方体構造</div>
+      <div class="map-card-link"><a href="https://massmoca.org/sol-lewitt/" target="_blank" rel="noopener">MASS MoCA — Sol LeWitt</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Frank Stella</div>
+      <div class="map-card-dates">1936–2024 / アメリカ</div>
+      <div class="map-card-relation">絵画内の同志</div>
+      <div class="map-card-desc">「見えるものが見えるものだ」と宣言。ジャッドが絵画を捨てて立体に向かった同じ時期に、ステラは絵画の中で同じ問題（イリュージョンの排除）と格闘した。後に立体的な絵画へ展開。</div>
+      <div class="map-card-medium">素材：ブラック・ペインティング、成形キャンバス</div>
+      <div class="map-card-link"><a href="https://www.moma.org/artists/5640" target="_blank" rel="noopener">MoMA — Frank Stella</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Robert Morris</div>
+      <div class="map-card-dates">1931–2018 / アメリカ</div>
+      <div class="map-card-relation">論敵</div>
+      <div class="map-card-desc">ミニマリズムの理論化に貢献したが、後にプロセスアートやパフォーマンスに転向。ジャッドはこの「変節」を嫌い、一貫性のなさを批判した。</div>
+      <div class="map-card-medium">素材：フェルト、鉄、合板（時期により変化）</div>
+      <div class="map-card-link"><a href="https://www.guggenheim.org/artwork/artist/robert-morris" target="_blank" rel="noopener">Guggenheim — Robert Morris</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">John Chamberlain</div>
+      <div class="map-card-dates">1927–2011 / アメリカ</div>
+      <div class="map-card-relation">マーファの仲間</div>
+      <div class="map-card-desc">廃車のボディパーツを圧縮・溶接した彫刻で知られる。ジャッドの厳密な幾何学とは対照的にエネルギッシュ。Chinatiに25点の恒久展示がある。</div>
+      <div class="map-card-medium">素材：自動車の塗装済み鉄板、クロームメッキ鉄</div>
+      <div class="map-card-link"><a href="https://chinati.org/collection/john-chamberlain/" target="_blank" rel="noopener">Chinati — John Chamberlain</a></div>
+    </div>
+
+    <!-- GROUP: 先行者 -->
+    <div class="map-group-label">先行者 — ジャッドが敬意を持っていた人物</div>
+
+    <div class="map-card">
+      <div class="map-card-name">Constantin Brancusi</div>
+      <div class="map-card-dates">1876–1957 / ルーマニア→フランス</div>
+      <div class="map-card-relation">彫刻の原点</div>
+      <div class="map-card-desc">彫刻から装飾を剥ぎ取り、形の本質に向かった。素材（木、石、ブロンズ）をそのものとして見せる姿勢がジャッドの「素材の誠実さ」の原点。</div>
+      <div class="map-card-medium">素材：大理石、ブロンズ、木</div>
+      <div class="map-card-link"><a href="https://www.moma.org/artists/728" target="_blank" rel="noopener">MoMA — Brancusi</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Barnett Newman</div>
+      <div class="map-card-dates">1905–1970 / アメリカ</div>
+      <div class="map-card-relation">批評家時代に高く評価</div>
+      <div class="map-card-desc">巨大な色面と「ジップ（zip）」と呼ばれる縦線だけの絵画。絵画の要素を極限まで削り、色彩と空間の関係だけを残した。ジャッドが批評で最も擁護した画家の一人。</div>
+      <div class="map-card-medium">素材：キャンバスに油彩、巨大スケール</div>
+      <div class="map-card-link"><a href="https://www.moma.org/artists/4285" target="_blank" rel="noopener">MoMA — Barnett Newman</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Mark Rothko</div>
+      <div class="map-card-dates">1903–1970 / ラトビア→アメリカ</div>
+      <div class="map-card-relation">色彩と空間の先行者</div>
+      <div class="map-card-desc">ぼんやりとした矩形の色面で「崇高な経験」を追求した画家。ジャッドとは方法が全く異なるが、「作品と鑑賞者の間の空間体験」を重視する姿勢は共通している。</div>
+      <div class="map-card-medium">素材：キャンバスに油彩</div>
+      <div class="map-card-link"><a href="https://www.moma.org/artists/5047" target="_blank" rel="noopener">MoMA — Mark Rothko</a></div>
+    </div>
+
+    <!-- GROUP: 建築・デザイン・思想 -->
+    <div class="map-group-label">建築・デザイン・思想 — ジャッドの空間設計の背景</div>
+
+    <div class="map-card">
+      <div class="map-card-name">Mies van der Rohe</div>
+      <div class="map-card-dates">1886–1969 / ドイツ→アメリカ</div>
+      <div class="map-card-relation">建築思想の参照軸</div>
+      <div class="map-card-desc">「Less is more」のモダニズム建築家。ジャッドはミースの建築を深く研究し、マーファの空間設計に影響が見える。ただし「美的な洗練」には批判的で、自分の方が「誠実」だと考えた。</div>
+      <div class="map-card-medium">代表作：ファンズワース邸、シーグラムビル</div>
+      <div class="map-card-link"><a href="https://www.moma.org/artists/7166" target="_blank" rel="noopener">MoMA — Mies van der Rohe</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Alvar Aalto</div>
+      <div class="map-card-dates">1898–1976 / フィンランド</div>
+      <div class="map-card-relation">家具デザインの師</div>
+      <div class="map-card-desc">フィンランドの建築家・家具デザイナー。ジャッドはアアルトの家具を自宅で実際に使い、自身も家具デザインを開始した。「素材に対する正直さ」を共有。</div>
+      <div class="map-card-medium">代表作：パイミオチェア、スツール60</div>
+      <div class="map-card-link"><a href="https://www.alvaraalto.fi/en/" target="_blank" rel="noopener">Alvar Aalto Foundation</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Ludwig Wittgenstein</div>
+      <div class="map-card-dates">1889–1951 / オーストリア→イギリス</div>
+      <div class="map-card-relation">哲学的態度の共鳴</div>
+      <div class="map-card-desc">「語り得ぬものについては沈黙しなければならない」。作品は説明するものではなく存在するもの、というジャッドの態度と共鳴する。ジャッドはコロンビア大学で哲学を学んでおり、触れた可能性は高いが、本人がウィトゲンシュタインの影響を明言した記録は筆者未確認。</div>
+      <div class="map-card-medium">主著：『論理哲学論考』</div>
+      <div class="map-card-link"><a href="https://plato.stanford.edu/entries/wittgenstein/" target="_blank" rel="noopener">Stanford Encyclopedia — Wittgenstein</a></div>
+    </div>
+
+    <!-- GROUP: 日本との接点 -->
+    <div class="map-group-label">日本との接点</div>
+
+    <div class="map-card">
+      <div class="map-card-name">和多利志津子</div>
+      <div class="map-card-dates">ワタリウム美術館 創設者</div>
+      <div class="map-card-relation">日本での最初の理解者</div>
+      <div class="map-card-desc">1972年に青山で「ギャルリー・ワタリ」を開廊。1978年に日本初のジャッド個展を開催。この関係が48年後のワタリウム「ジャッド｜マーファ展」（2026年）に結実。</div>
+      <div class="map-card-medium">画廊→美術館への発展</div>
+      <div class="map-card-link"><a href="http://www.watarium.co.jp/" target="_blank" rel="noopener">ワタリウム美術館</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Mario Botta</div>
+      <div class="map-card-dates">1943– / スイス</div>
+      <div class="map-card-relation">ワタリウムの建築家</div>
+      <div class="map-card-desc">ワタリウム美術館（1990年竣工）を設計。御影石ストライプの外壁はジャッドの反復構造と共鳴する。ル・コルビュジエとカルロ・スカルパに師事。</div>
+      <div class="map-card-medium">代表作：ワタリウム美術館、SF MoMA</div>
+      <div class="map-card-link"><a href="https://www.bfrenz.com/" target="_blank" rel="noopener">ボッタ建築事務所</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">中原慎一郎</div>
+      <div class="map-card-dates">1971– / 鹿児島→東京</div>
+      <div class="map-card-relation">ジャッドの家具のコレクター</div>
+      <div class="map-card-desc">ランドスケーププロダクツ創業者。ミッドセンチュリーデザインをルーツにオリジナル家具・空間デザインを手がける。ジャッドがデザインした椅子「Front Shelf Chair 84-6」（1978年設計）を個人で所蔵し、本展に出品。ジャッドが「良い椅子とは良い椅子なのだ」と語った家具観を、日本のデザイン文脈で実践的に受け継いでいる人物。</div>
+      <div class="map-card-medium">Playmountain / Tas Yard / The Conran Shop Japan 代表</div>
+      <div class="map-card-link"><a href="https://www.landscape-products.net/" target="_blank" rel="noopener">Landscape Products</a></div>
+    </div>
+
+    <div class="map-card">
+      <div class="map-card-name">Chinati Foundation</div>
+      <div class="map-card-dates">1986– / テキサス州マーファ</div>
+      <div class="map-card-relation">ジャッドが設立した美術館</div>
+      <div class="map-card-desc">旧軍用基地340エーカーに恒久展示を設置。ジャッドの100点のアルミ作品、15点のコンクリート作品、フレイヴィンの6棟の蛍光灯展示、チェンバレンの25点の彫刻を収蔵。これらは貸出不可。</div>
+      <div class="map-card-medium">恒久展示専用美術館</div>
+      <div class="map-card-link"><a href="https://chinati.org/" target="_blank" rel="noopener">Chinati Foundation</a></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ━━━━ KEY LINKS ━━━━ -->
+<div class="links-section">
+  <div class="links-title">Key Links — 一次情報へのアクセス</div>
+
+  <div class="link-row">
+    <div class="link-label">Judd Foundation</div>
+    <div><a href="https://juddfoundation.org/" target="_blank" rel="noopener">juddfoundation.org</a><br><span class="link-note">NY 101 Spring Street + マーファの生活空間・アーカイブを管理。可搬作品の貸出元。</span></div>
+  </div>
+  <div class="link-row">
+    <div class="link-label">Chinati Foundation</div>
+    <div><a href="https://chinati.org/" target="_blank" rel="noopener">chinati.org</a><br><span class="link-note">マーファの恒久展示専用美術館。ジャッド、フレイヴィン、チェンバレン他。貸出なし。</span></div>
+  </div>
+  <div class="link-row">
+    <div class="link-label">MoMA — Judd</div>
+    <div><a href="https://www.moma.org/artists/2956" target="_blank" rel="noopener">moma.org/artists/2956</a><br><span class="link-note">2020年の回顧展の記録と所蔵作品一覧。</span></div>
+  </div>
+  <div class="link-row">
+    <div class="link-label">Dia Art Foundation</div>
+    <div><a href="https://www.diaart.org/collection/collection/judd-donald-background-information" target="_blank" rel="noopener">diaart.org — Judd</a><br><span class="link-note">Chinati設立前にジャッドを支援した財団。フレイヴィンのマーファ作品もDia委託。</span></div>
+  </div>
+  <div class="link-row">
+    <div class="link-label">Tate — Specific Objects</div>
+    <div><a href="https://www.tate.org.uk/art/art-terms/s/specific-objects" target="_blank" rel="noopener">tate.org.uk — Specific Objects</a><br><span class="link-note">ジャッドの代表的論文「Specific Objects」（1965年）の解説。</span></div>
+  </div>
+  <div class="link-row">
+    <div class="link-label">ワタリウム美術館</div>
+    <div><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp</a><br><span class="link-note">今回の展覧会の公式ページ。</span></div>
+  </div>
+</div>
+
+<!-- ━━━━ 2組織の違い ━━━━ -->
+<div class="links-section">
+  <div class="links-title">注意 — 2つの財団の違い</div>
+
+  <div class="link-row">
+    <div class="link-label">Judd Foundation</div>
+    <div><span class="link-note">ジャッドの生活空間・私的コレクション・アーカイブ・可搬作品を管理。NY + マーファ。<br>→ 今回のワタリウム展への貸出元の可能性が高い。</span></div>
+  </div>
+  <div class="link-row">
+    <div class="link-label">Chinati Foundation</div>
+    <div><span class="link-note">恒久展示専用の美術館。マーファの旧軍用基地。<br>→ ここの作品は動かせない・貸し出されない。今回の展示には含まれていないはず。</span></div>
+  </div>
+</div>
+
+<div class="footer">
+  B-Side No. 001 — Background / Chisaki / 2026.02<br>
+  ※ 2026.02.25 展示を観覧。パネルのキャプションで所蔵元を確認済み：Judd Foundation、霧島アートの森（鹿児島）、大原美術館（倉敷）、静岡県立美術館、ワタリウム美術館、中原慎一郎（個人蔵）。チナティ財団からの貸出作品はなし（資料協力のみ）。<br><br>
+  <strong>謝辞</strong><br>
+  本資料の作成にあたり、ワタリウム美術館、ジャッド財団、チナティ財団の公開情報、ならびに展覧会の会場構成・テキストを担当された寺田慎平さん（w/）による解説パネルを参照しています。展覧会を実現された関係者の皆さまに感謝いたします。<br>
+  ※ 本資料中の人名はすべて敬称略とさせていただいています。<br><br>
+  <strong>Disclaimer</strong><br>
+  本ページは展覧会「ジャッド｜マーファ展」（ワタリウム美術館、2026年）の鑑賞準備として作成した調査資料です。記載内容は公式サイト（chinati.org、juddfoundation.org、watarium.co.jp）、美術館データベース（MoMA、Tate、Dia Art Foundation）、展示パネルの写真記録、および筆者の美術史的知識に基づいています。各人物の関係性や影響関係の記述には筆者の解釈が含まれており、事実と推測は可能な限り区別して記載していますが、学術論文としての厳密性を保証するものではありません。引用文の出典はすべて明記しています。
+</div>
+
+</div>
+</body>
+</html>

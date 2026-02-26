@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
+<meta name="description" content="ミニマリズムの巨匠ドナルド・ジャッドが「場所を作る」ことに賭けた思想を、素材・光・色・空間・反復・時間の6つの視点で読む。ワタリウム美術館 2026年2月–6月。">
+<meta name="author" content="Chisaki">
+
+<!-- OGP -->
+<meta property="og:type" content="article">
+<meta property="og:title" content="B-Side No.001 — ジャッド｜マーファ展">
+<meta property="og:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。ワタリウム美術館 2026.02–06。">
+<meta property="og:image" content="images/og-image.jpg">
+<meta property="og:url" content="">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="B-Side by Chisaki">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="B-Side No.001 — ジャッド｜マーファ展">
+<meta name="twitter:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。">
+<meta name="twitter:image" content="images/og-image.jpg">
+
+<link rel="canonical" href="">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   B-SIDE — No. 001
+   Donald Judd | Marfa
+
+   Design principle:
+   "One thing after another."
+   — No hierarchy between parts.
+   — Two colours only: black and white.
+   — One typeface family. Weight is the only variable.
+   — Equal intervals. Spacing is structure.
+   — Material honesty. Nothing pretends to be something else.
+   ═══════════════════════════════════════════════ */
+
+:root {
+  --black: #000;
+  --white: #fff;
+
+  --font: 'Helvetica Neue', 'Libre Franklin', 'Noto Sans JP', sans-serif;
+
+  /* Spacing scale — based on 8px with Judd-like equal increments */
+  --unit:  8px;
+  --s1:    8px;    /* 1 unit  */
+  --s2:   16px;    /* 2 units */
+  --s3:   24px;    /* 3 units */
+  --s4:   32px;    /* 4 units */
+  --s5:   48px;    /* 6 units */
+  --s6:   64px;    /* 8 units */
+  --s7:   96px;    /* 12 units */
+  --s8:  128px;    /* 16 units */
+
+  /* Type scale — restrained, weight-driven */
+  --t-xs:   0.75rem;     /* 12px — labels */
+  --t-sm:   0.875rem;    /* 14px — secondary */
+  --t-md:   1rem;        /* 16px — body */
+  --t-lg:   1.375rem;    /* 22px — insight heads */
+  --t-xl:   1.75rem;     /* 28px — hero */
+  --t-2xl:  2.5rem;      /* 40px — hero large */
+
+  --lh:     1.7;
+  --lh-tight: 1.2;
+
+  --max:    56rem;
+  --rule:   1px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: var(--lh);
+  background: var(--white);
+  color: var(--black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--black);
+  color: var(--white);
+}
+
+a {
+  color: var(--black);
+  text-decoration: none;
+  border-bottom: var(--rule) solid var(--black);
+}
+
+a:hover { opacity: 0.5; }
+
+/* ── CONTAINER ── */
+.container {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: var(--s8) var(--s5);
+}
+
+/* ── SITE NAV ── */
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--s5);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.site-nav-links {
+  display: flex;
+  gap: var(--s3);
+}
+
+.site-nav-links a {
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+}
+
+.site-nav-current {
+  font-size: var(--t-xs);
+  letter-spacing: 0.12em;
+  opacity: 0.3;
+  border-bottom: none;
+}
+
+/* ── HEADER ──
+   Two columns, no decoration. The title and meta
+   exist as equal facts on the same plane. */
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s5);
+  align-items: end;
+  padding-bottom: var(--s4);
+  border-bottom: var(--rule) solid var(--black);
+}
+
+.bside-id {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: var(--s2);
+}
+
+.hero-title {
+  font-size: clamp(var(--t-xl), 4vw, var(--t-2xl));
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  letter-spacing: -0.01em;
+}
+
+.hero-sub {
+  margin-top: var(--s1);
+  font-size: var(--t-sm);
+  font-weight: 300;
+}
+
+.meta {
+  text-align: right;
+  font-size: var(--t-sm);
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+.meta-status {
+  display: inline-block;
+  padding: 4px var(--s2);
+  border: var(--rule) solid var(--black);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: var(--s1);
+}
+
+/* ── BRIEF SUMMARY ── */
+.bside-summary {
+  padding: var(--s7) 0;
+  font-size: var(--t-lg);
+  font-weight: 300;
+  line-height: 1.9;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+
+/* ── SECTION ── */
+.section {
+  margin-bottom: var(--s7);
+}
+
+.section-id {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  padding-bottom: var(--s2);
+  border-bottom: var(--rule) solid var(--black);
+  margin-bottom: var(--s5);
+}
+
+/* ── FACT LIST ──
+   No cards, no grid cells, no background variation.
+   Each fact is a horizontal rule + label + value.
+   All facts are structurally equal — one thing after another. */
+.fact-list {
+  border-top: var(--rule) solid var(--black);
+}
+
+.fact-row {
+  display: grid;
+  grid-template-columns: 10rem 1fr;
+  gap: var(--s4);
+  padding: var(--s3) 0;
+  border-bottom: var(--rule) solid var(--black);
+  align-items: baseline;
+}
+
+.fact-label {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+
+.fact-value {
+  font-size: var(--t-md);
+  font-weight: 300;
+  line-height: var(--lh);
+}
+
+.fact-note {
+  margin-top: var(--s1);
+  font-size: var(--t-sm);
+  font-weight: 300;
+  line-height: var(--lh);
+}
+
+.fact-status {
+  display: inline-block;
+  margin-top: var(--s1);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.fact-status::before {
+  content: '— ';
+}
+
+.fact-status.warn {
+  /* no color change — black only. indicated by text content */
+}
+
+/* ── QUOTE ──
+   Full-width. Generous vertical space.
+   The quote exists in its own atmosphere,
+   like a Judd piece on a wall — nothing else around it. */
+.quote-block {
+  padding: var(--s7) 0;
+}
+
+.quote-text {
+  font-size: var(--t-lg);
+  font-weight: 300;
+  line-height: 1.8;
+  text-indent: -0.4em;
+}
+
+.quote-text::before {
+  content: '"';
+}
+
+.quote-text::after {
+  content: '"';
+}
+
+.quote-attr {
+  margin-top: var(--s3);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── INSIGHT ──
+   Vertical stack — one thing after another.
+   Equal spacing between each. No cards, no grid.
+   Like Judd's wall-mounted stacks: same interval, same weight. */
+.insight-stack {
+  border-top: var(--rule) solid var(--black);
+}
+
+.insight-item {
+  padding: var(--s5) 0;
+  border-bottom: var(--rule) solid var(--black);
+}
+
+.insight-num {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  margin-bottom: var(--s3);
+}
+
+.insight-head {
+  font-size: var(--t-lg);
+  font-weight: 400;
+  line-height: var(--lh-tight);
+  margin-bottom: var(--s3);
+}
+
+.insight-body {
+  font-size: var(--t-sm);
+  font-weight: 300;
+  line-height: var(--lh);
+  max-width: 44rem;
+}
+
+.insight-tag {
+  display: block;
+  margin-top: var(--s3);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* ── GALLERY ──
+   Each photograph occupies the full width independently.
+   Like Judd's insistence that each work commands its own wall.
+   Equal vertical rhythm between images. */
+.gallery-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s5);
+}
+
+.gallery-figure {
+  margin: 0;
+}
+
+.gallery-figure.hero-img .gallery-placeholder,
+.gallery-figure.hero-img img {
+  min-height: 24rem;
+}
+
+.gallery-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 16rem;
+  border: var(--rule) solid var(--black);
+  background: var(--white);
+}
+
+.gallery-placeholder-label {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.gallery-placeholder-note {
+  margin-top: var(--s1);
+  font-size: var(--t-xs);
+  font-weight: 300;
+  text-align: center;
+  line-height: 1.7;
+}
+
+.gallery-caption {
+  margin-top: var(--s2);
+  font-size: var(--t-xs);
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  line-height: var(--lh);
+}
+
+.gallery-figure img {
+  width: 100%;
+  display: block;
+}
+
+/* ── ACTION ── */
+.tabs {
+  display: flex;
+  border-bottom: var(--rule) solid var(--black);
+  margin-bottom: 0;
+}
+
+.tab {
+  appearance: none;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: var(--s2) var(--s3);
+  font-family: var(--font);
+  font-size: var(--t-xs);
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: var(--black);
+  margin-bottom: -1px;
+}
+
+.tab[aria-pressed="true"] {
+  font-weight: 400;
+  border-bottom-color: var(--black);
+}
+
+.tab:hover { opacity: 0.5; }
+
+.panel {
+  display: none;
+  padding: var(--s4) 0;
+}
+
+.panel.active { display: block; }
+
+.checklist {
+  list-style: none;
+}
+
+.checklist li {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  gap: var(--s2);
+  align-items: baseline;
+  padding: var(--s2) 0;
+  border-bottom: var(--rule) solid var(--black);
+  font-size: var(--t-sm);
+  font-weight: 300;
+}
+
+.checklist li:last-child { border-bottom: none; }
+
+.cl-num {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+}
+
+.cl-flag {
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.checklist a {
+  font-size: var(--t-xs);
+}
+
+/* ── TAGS + COPY ── */
+.tag-block {
+  padding: var(--s4) 0;
+  border-top: var(--rule) solid var(--black);
+  margin-top: var(--s5);
+}
+
+.tags {
+  font-size: var(--t-sm);
+  font-weight: 300;
+  line-height: var(--lh);
+  margin-bottom: var(--s3);
+}
+
+.btn-copy {
+  appearance: none;
+  background: var(--black);
+  border: none;
+  color: var(--white);
+  padding: var(--s1) var(--s3);
+  font-family: var(--font);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.btn-copy:hover { opacity: 0.7; }
+
+.note {
+  margin-top: var(--s3);
+  font-size: var(--t-xs);
+  font-weight: 300;
+}
+
+/* ── FOOTER ── */
+.footer {
+  margin-top: var(--s8);
+  padding-top: var(--s3);
+  border-top: var(--rule) solid var(--black);
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .container { padding: var(--s6) var(--s3); }
+  .site-nav { flex-direction: column; gap: var(--s1); }
+  .header { grid-template-columns: 1fr; gap: var(--s3); }
+  .meta { text-align: left; }
+  .fact-row { grid-template-columns: 1fr; gap: var(--s1); }
+  .fact-label { padding-bottom: 0; }
+  .footer { flex-direction: column; gap: var(--s1); }
+  .bside-summary { padding: var(--s6) 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+
+@media print {
+  .tabs, .btn-copy, .note, .gallery-placeholder-note { display: none !important; }
+  .panel { display: block !important; }
+  body { background: #fff; }
+  .container { padding: 2rem; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <nav class="site-nav">
+    <span>B-Side No.001</span>
+    <div class="site-nav-links">
+      <span class="site-nav-current">Home</span>
+      <a href="judd-background.html">Background</a>
+      <a href="judd-viewpoints.html">Viewpoints</a>
+    </div>
+  </nav>
+
+  <header class="header">
+    <div>
+      <div class="bside-id">B-Side — No. 001</div>
+      <h1 class="hero-title">ジャッド｜マーファ展</h1>
+      <div class="hero-sub">Donald Judd — Watari-Um Museum, Tokyo</div>
+    </div>
+    <div class="meta">
+      <span class="meta-status">Now Open</span>
+      <div>2026.02.15 → 06.07</div>
+      <div>月曜休（2/23, 5/4 は開館）</div>
+    </div>
+  </header>
+
+  <div class="bside-summary">
+    ミニマリズムの巨匠が「場所を作る」ことに賭けた思想を、<br>
+    素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。
+  </div>
+
+  <!-- 01 FACT -->
+  <section class="section" aria-labelledby="lbl-fact">
+    <div class="section-id" id="lbl-fact">01 / Fact</div>
+    <div class="fact-list">
+
+      <div class="fact-row">
+        <div class="fact-label">Location</div>
+        <div>
+          <div class="fact-value">ワタリウム美術館</div>
+          <div class="fact-note">東京都渋谷区神宮前3-7-6 / 外苑前駅 徒歩8分</div>
+          <span class="fact-status">Verified — 公式サイト 2026.02</span>
+        </div>
+      </div>
+
+      <div class="fact-row">
+        <div class="fact-label">Hours</div>
+        <div>
+          <div class="fact-value">11:00 – 19:00</div>
+          <div class="fact-note">月曜休館 / 2/23（月・祝）、5/4（月・祝）は開館</div>
+          <span class="fact-status">Verified</span>
+        </div>
+      </div>
+
+      <div class="fact-row">
+        <div class="fact-label">Admission</div>
+        <div>
+          <div class="fact-value">一般 ¥1,500</div>
+          <div class="fact-note">学生（25歳以下）¥1,300 / ペア ¥2,600 / 小中学生 ¥500</div>
+          <span class="fact-status">Verified</span>
+        </div>
+      </div>
+
+      <div class="fact-row">
+        <div class="fact-label">Photography</div>
+        <div>
+          <div class="fact-value">現地確認が必要</div>
+          <div class="fact-note">公式サイトに撮影可否の記載なし。ジャッド財団は著作権管理が厳格なため不可の可能性あり。入場時にスタッフへ確認すること。</div>
+          <span class="fact-status warn">要現地確認</span>
+        </div>
+      </div>
+
+      <div class="fact-row">
+        <div class="fact-label">Prior Knowledge</div>
+        <div>
+          <div class="fact-value">予備知識なしでも楽しめる</div>
+          <div class="fact-note">初期絵画→立体作品→マーファの空間へと時系列で構成。ジャッドの思考の変遷を展示動線で自然に辿れる。素材・空間への解像度を上げたいデザイン学習者に最適。</div>
+          <span class="fact-status">Beginner-friendly</span>
+        </div>
+      </div>
+
+      <div class="fact-row">
+        <div class="fact-label">Overview</div>
+        <div>
+          <div class="fact-value" style="font-size:var(--t-sm);">ミニマリズムの先駆者ドナルド・ジャッド（1928–1994）が1970年代にニューヨークを離れ、テキサス州マーファに構築した理想の芸術環境に焦点を当てた展覧会。1950年代の初期絵画、1960–90年代の立体作品、ドローイング・図面・映像資料を通じて「展示は恒久的でなければならない」というジャッドの思想を辿る。ワタリウムの創設者・和多利志津子による1978年の日本初招聘を記録したドキュメントコーナーも設置。</div>
+          <span class="fact-status">Source: 公式サイト / 美術手帖 / artscape — 2026.02</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote-block">
+    <div class="quote-text">私にとって、ここは何もない田舎ではない。世界の中心なんだ。</div>
+    <div class="quote-attr">Donald Judd — TV番組「ルーレンド・グート」ハンス・ケラーによるインタビュー、1993年夏（ワタリウム美術館公式サイトより引用）</div>
+  </div>
+
+  <!-- 02 INSIGHT -->
+  <section class="section" aria-labelledby="lbl-insight">
+    <div class="section-id" id="lbl-insight">02 / Insight</div>
+    <div class="insight-stack">
+
+      <div class="insight-item">
+        <div class="insight-num">01</div>
+        <div class="insight-head">素材と光の関係を体で学ぶ</div>
+        <div class="insight-body">アルミニウム、鉄、プレキシグラス。ジャッドの強さは余白の大きさではなく、寸法の厳密さ・素材の反復・配置の必然性にある。光がどこに当たり、どう反射するかが作品の意味そのものになっている空間を、フォトグラファーとして体で経験できる。</div>
+        <span class="insight-tag">素材 / 光 / 撮影視点</span>
+      </div>
+
+      <div class="insight-item">
+        <div class="insight-num">02</div>
+        <div class="insight-head">「恒久展示」という思想の現場</div>
+        <div class="insight-body">一時的な展示ではなく「場所」を作ることがジャッドの信念だった。初期絵画から立体作品への変遷と、マーファで実践されたパーマネント・インスタレーションの思想が、ワタリウムの3フロアで一望できる。展示の「一時性」と「恒久性」の設計判断は、プロダクトやブランドの寿命設計と同じ構造を持っている。</div>
+        <span class="insight-tag">展示設計 / 寿命設計 / 空間体験</span>
+      </div>
+
+      <div class="insight-item">
+        <div class="insight-num">03</div>
+        <div class="insight-head">日本との48年の文脈</div>
+        <div class="insight-body">1978年、ギャルリー・ワタリが日本初招聘で「ジャッド展」を開催。その資料が本展でも展示される。ギャラリーとアーティストが48年かけて築いた関係が一つの展覧会に結実する過程は、長期的なコラボレーションのアーカイブとしても読める。</div>
+        <span class="insight-tag">アーカイブ / 関係構築 / 文脈</span>
+      </div>
+
+      <div class="insight-item">
+        <div class="insight-num">04</div>
+        <div class="insight-head">建築のモジュールを観察する</div>
+        <div class="insight-body">マリオ・ボッタ設計のワタリウム自体が彫刻的建築で、外壁の御影石ストライプはジャッドの反復構造と共鳴する。コンクリート・石・ガラスの素材選択とモジュールの繰り返しは、建築とプロダクト双方に通じるデザイン原則の実例として観察できる。</div>
+        <span class="insight-tag">建築 / モジュール / 素材選択</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 03 GALLERY -->
+  <section class="section" aria-labelledby="lbl-gallery">
+    <div class="section-id" id="lbl-gallery">03 / Gallery</div>
+    <div class="gallery-stack">
+
+      <figure class="gallery-figure hero-img">
+        <img src="images/og-image.jpg" alt="ワタリウム美術館 ジャッド｜マーファ展 展示全景">
+        <figcaption class="gallery-caption">JUDD | Marfa Exhibition at Watari-Um Museum of Contemporary Art, 2F</figcaption>
+      </figure>
+
+      <figure class="gallery-figure">
+        <img src="images/material.jpg" alt="Material — 亜鉛メッキ鉄スタックの影とスパングル" loading="lazy">
+        <figcaption class="gallery-caption">Untitled, 1967, Galvanized iron. Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</figcaption>
+      </figure>
+
+      <figure class="gallery-figure">
+        <img src="images/light.jpg" alt="Light — コンクリート梁のV字の光と影" loading="lazy">
+        <figcaption class="gallery-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</figcaption>
+      </figure>
+
+      <figure class="gallery-figure">
+        <img src="images/color.jpg" alt="Color — グレー×オレンジボックス正面" loading="lazy">
+        <figcaption class="gallery-caption">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass. Collection: Judd Foundation</figcaption>
+      </figure>
+
+      <figure class="gallery-figure">
+        <img src="images/space.jpg" alt="Space — 外螺旋階段とグリッドガラスのシルエット" loading="lazy">
+        <figcaption class="gallery-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</figcaption>
+      </figure>
+
+      <figure class="gallery-figure">
+        <img src="images/repetition.jpg" alt="Repetition — 黒アノダイズドアルミの壁付きスタック正面" loading="lazy">
+        <figcaption class="gallery-caption">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units). Collection: Shizuoka Prefectural Museum of Art</figcaption>
+      </figure>
+
+      <figure class="gallery-figure">
+        <img src="images/time.jpg" alt="Time — 赤×黄の壁付き作品を3Fから見下ろした構図" loading="lazy">
+        <figcaption class="gallery-caption">Untitled, 1989, Painted aluminum. Collection: Kirishima Open-Air Museum</figcaption>
+      </figure>
+
+    </div>
+  </section>
+
+  <!-- 04 ACTION -->
+  <section class="section" aria-labelledby="lbl-action">
+    <div class="section-id" id="lbl-action">04 / Action</div>
+
+    <div class="tabs" role="group" aria-label="表示モード">
+      <button class="tab" aria-pressed="true" onclick="switchTab('visit', this)">Visit Checklist</button>
+      <button class="tab" aria-pressed="false" onclick="switchTab('source', this)">Sources</button>
+    </div>
+
+    <div id="panel-visit" class="panel active">
+      <ul class="checklist">
+        <li><span class="cl-num">01</span><span>開館日・休館日を事前確認（月曜注意、祝日例外あり）</span><span class="cl-flag">Required</span></li>
+        <li><span class="cl-num">02</span><span>写真撮影の可否・条件を入場時にスタッフへ確認</span><span class="cl-flag">On-site</span></li>
+        <li><span class="cl-num">03</span><span>混雑回避のため平日午後を推奨</span><span class="cl-flag">Recommended</span></li>
+        <li><span class="cl-num">04</span><span>B1F カフェ「紅谷」で展示にちなんだ季節の和菓子を提供中</span><span class="cl-flag">Optional</span></li>
+        <li><span class="cl-num">05</span><span>1F ショップ「オン・サンデーズ」で関連書籍・カタログを確認</span><span class="cl-flag">Optional</span></li>
+      </ul>
+    </div>
+
+    <div id="panel-source" class="panel">
+      <ul class="checklist">
+        <li><span class="cl-num">01</span><span>ワタリウム美術館 公式サイト<br><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp/jp/exhibition/202602</a></span><span class="cl-flag">Primary</span></li>
+        <li><span class="cl-num">02</span><span>美術手帖 — 開幕レポート<br><a href="https://bijutsutecho.com/magazine/news/report/32123" target="_blank" rel="noopener">bijutsutecho.com</a></span><span class="cl-flag">Secondary</span></li>
+        <li><span class="cl-num">03</span><span>artscape — 展覧会情報<br><a href="https://artscape.jp/exhibitions/60756/" target="_blank" rel="noopener">artscape.jp</a></span><span class="cl-flag">Secondary</span></li>
+        <li><span class="cl-num">04</span><span>ART iT — おすすめ展覧会<br><a href="https://www.art-it.asia/top/admin_ed_pics/283433/" target="_blank" rel="noopener">art-it.asia</a></span><span class="cl-flag">Secondary</span></li>
+        <li><span class="cl-num">05</span><span>Tokyo Art Beat — 展覧会情報<br><a href="https://www.tokyoartbeat.com/events/-/Judd-Marfa/7879-E100/2026-02-15" target="_blank" rel="noopener">tokyoartbeat.com</a></span><span class="cl-flag">Secondary</span></li>
+      </ul>
+      <div class="note">最終確認日：2026.02.23 / 写真撮影の可否は未確認のため現地確認が必要</div>
+    </div>
+
+    <div class="tag-block">
+      <div class="tags">#ジャッドマーファ展 #ワタリウム美術館 #DonaldJudd #Minimalism #外苑前 #東京 #現代アート</div>
+      <button class="btn-copy" onclick="copyTags()">Copy Tags</button>
+    </div>
+
+    <div class="note">※ 訪問後、実際の体験を一文加えて仕上げることを前提とした草案</div>
+  </section>
+
+  <footer class="footer">
+    <span>B-Side — by Chisaki / 2026.02</span>
+    <span>watarium.co.jp/jp/exhibition/202602</span>
+  </footer>
+
+  <div class="note" style="margin-top:var(--s5); font-size:var(--t-xs); font-weight:300; line-height:1.8; color:#999;">
+    <strong style="font-weight:400;">Disclaimer</strong><br>
+    本ページは展覧会「ジャッド｜マーファ展」（ワタリウム美術館、2026年）の鑑賞ガイドとして作成した個人制作物です。展示情報は公式サイト（watarium.co.jp）、美術手帖、artscape等の公開情報に基づいています。Insightの記述には筆者の解釈が含まれます。引用文の出典はすべて明記しています。写真はすべて筆者撮影です（撮影許可の範囲内）。展示の正確な情報は公式サイトをご確認ください。
+  </div>
+
+</div>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.setAttribute('aria-pressed', 'true');
+  document.getElementById('panel-' + id).classList.add('active');
+}
+
+async function copyTags() {
+  const el = document.querySelector('.tags');
+  if (!el) return;
+  const text = el.innerText.trim();
+  try {
+    await navigator.clipboard.writeText(text);
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = 'Copied';
+    setTimeout(() => btn.textContent = 'Copy Tags', 2000);
+  } catch(e) {
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(r);
+  }
+}
+</script>
+</body>
+</html>

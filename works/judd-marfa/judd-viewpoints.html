@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Viewpoints — ジャッド｜マーファ展</title>
+<!-- v3 / 2026.02.26 — Questions → Viewpoints改名、ナビ追加 -->
+<style>
+:root {
+  --black: #000;
+  --white: #fff;
+  --font: 'Helvetica Neue', system-ui, sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  background: var(--white);
+  color: var(--black);
+  padding: 2rem 1.25rem 4rem;
+  max-width: 40rem;
+  margin: 0 auto;
+  -webkit-font-smoothing: antialiased;
+}
+h1 {
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--black);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.intro {
+  font-size: 13px;
+  font-weight: 300;
+  line-height: 1.8;
+  margin-bottom: 2.5rem;
+  color: #444;
+}
+.category {
+  margin-bottom: 2.5rem;
+}
+.cat-label {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.cat-title {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--black);
+}
+.q-list {
+  list-style: none;
+  counter-reset: q;
+}
+.q-list li {
+  counter-increment: q;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.25rem;
+}
+.q-list li::before {
+  content: counter(q, decimal-leading-zero);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: #999;
+  padding-top: 2px;
+}
+.q-list li:last-child { border-bottom: none; }
+.note {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--black);
+  font-size: 0.7rem;
+  font-weight: 300;
+  color: #999;
+  letter-spacing: 0.05em;
+  line-height: 1.8;
+}
+
+/* ── SITE NAV ── */
+.site-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 3rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.site-nav-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.site-nav-links a {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--black);
+  text-decoration: none;
+  border-bottom: 1px solid var(--black);
+}
+.site-nav-links a:hover { opacity: 0.5; }
+
+.site-nav-current {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  opacity: 0.3;
+}
+
+@media (max-width: 640px) {
+  .site-nav { flex-direction: column; gap: 0.25rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="site-nav">
+  <span>B-Side No.001</span>
+  <div class="site-nav-links">
+    <a href="index.html">Home</a>
+    <a href="judd-background.html">Background</a>
+    <span class="site-nav-current">Viewpoints</span>
+  </div>
+</nav>
+
+<h1>Viewpoints — ジャッド｜マーファ展</h1>
+
+<div class="intro">
+  背景：ジャッドはマーファに「動かさない・貸し出さない」恒久展示を作った人。今回ワタリウムに来ているのはマーファの作品そのものではなく、財団が管理する可搬作品・初期絵画・アーカイブ資料で「マーファという思想を語り直す」構成。この前提を持って見ると、展示の設計意図がより鮮明に見える。
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Insight 01</div>
+  <div class="cat-title">素材と光</div>
+  <ol class="q-list">
+    <li>アルミニウム・鉄・プレキシグラス——それぞれの表面で光の反射はどう違うか？</li>
+    <li>同じ素材の作品でも、展示室のどの位置に置かれているかで見え方は変わるか？</li>
+    <li>自然光と人工光で、作品の印象はどう変わるか？（時間帯で違いはあるか）</li>
+    <li>素材の「厚み」は見えるか？ 断面や接合部をどう処理しているか？</li>
+    <li>プレキシグラスの半透明な箱の中に何が見えるか？ 向こう側の壁？ 隣の作品？</li>
+    <li>色が使われている作品はあるか？ あるとしたら、なぜその色なのか？</li>
+    <li>素材の経年変化（酸化、傷、くすみ）は見えるか？ それは意図されたものか？</li>
+    <li>作品の「重さ」は見た目から感じ取れるか？ アルミと鉄で重量感の違いはあるか？</li>
+    <li>マーファの乾いた光と東京の湿った光——同じ素材でも見え方が変わるはず。その差を想像できるか？</li>
+    <li>ジャッドは素材を「表面仕上げ」しているか、「素材のまま」にしているか？ 作品によって違うか？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Insight 02</div>
+  <div class="cat-title">空間と配置の設計</div>
+  <ol class="q-list">
+    <li>作品と壁の距離はどのくらいか？ 作品同士の間隔は？</li>
+    <li>その間隔は均等か？ 不均等なら、なぜそう配置したのか？</li>
+    <li>壁掛けスタック作品の上端と下端は、人の身体のどの高さにあるか？</li>
+    <li>作品の「正面」はどこか？ 横から見ること、下から見ることは想定されているか？</li>
+    <li>1つの展示室に何点の作品があるか？ 「1点だけの部屋」はあるか？</li>
+    <li>作品を見る自分の動線は、展示側に設計されているか？ 自由か？</li>
+    <li>初期絵画と後期立体作品の展示方法に違いはあるか？（照明、壁の色、間隔）</li>
+    <li>「作品のない壁」はあるか？ その余白は意図的に見えるか？</li>
+    <li>床置きの作品と壁掛けの作品で、鑑賞者との距離感はどう違うか？</li>
+    <li>作品のスケール（大きさ）は人体との関係で設計されている印象を受けるか？</li>
+    <li>展示室の照明は均一か、スポットか？ 照明自体にデザインの意図を感じるか？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Insight 03</div>
+  <div class="cat-title">文脈とアーカイブ</div>
+  <ol class="q-list">
+    <li>各作品のキャプションに「所蔵元」は書いてあるか？（Judd Foundation? 美術館? 個人蔵?）</li>
+    <li>マーファの恒久展示について、映像や写真で説明されているか？ どんな映像か？</li>
+    <li>1978年のギャルリー・ワタリ展のドキュメントコーナーには何があるか？（写真? 手紙? 図面?）</li>
+    <li>和多利志津子はジャッドとどういう経緯で出会ったのか？ 記録はあるか？</li>
+    <li>ジャッドの言葉（テキスト）は展示されているか？ どんな内容か？</li>
+    <li>年表やタイムラインの展示はあるか？ あるなら、何年から何年をカバーしているか？</li>
+    <li>図録・カタログは販売されているか？ 内容はどの程度のボリュームか？</li>
+    <li>ジャッドのドローイングや図面は展示されているか？ 完成作品との対応関係は見えるか？</li>
+    <li>展示のキャプションや解説文は日本語のみか？ 英語もあるか？ 言語の選択に意図はあるか？</li>
+    <li>1978年と2026年の間——48年間に日本でジャッドの作品を見る機会はあったのか？ 展示内で言及はあるか？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Insight 04</div>
+  <div class="cat-title">建築とモジュール</div>
+  <ol class="q-list">
+    <li>ワタリウムの外壁（御影石のストライプ）のモジュール幅は？ ジャッド作品の反復間隔と共鳴するか？</li>
+    <li>展示室の天井高は？ 作品のスケール感にどう影響しているか？</li>
+    <li>建物の中で、コンクリート・石・ガラスがそれぞれどこに使われているか？</li>
+    <li>階段で上下階を移動するとき、作品の見え方は変わるか？（視線の高さの変化）</li>
+    <li>三角形の建物の平面形状は、展示にどう影響しているか？（角の処理、動線）</li>
+    <li>窓はあるか？ 外の景色と作品が同時に見える瞬間はあるか？</li>
+    <li>ボッタの建築の「重さ」（石、コンクリート）とジャッドの作品の「重さ」は調和しているか？ 競合しているか？</li>
+    <li>エレベーター・階段・通路の幅や素材に、建築としてのデザイン意図を感じるか？</li>
+    <li>建物の外観を見たとき、中にジャッドの作品があることを予感できるか？ 建築と展示の親和性はどの程度か？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Context</div>
+  <div class="cat-title">恒久と一時——マーファと東京</div>
+  <ol class="q-list">
+    <li>ジャッドは「展示は恒久的でなければならない」と主張した。この企画展は明らかに一時的。その矛盾をキュレーター側はどう扱っているか？</li>
+    <li>マーファの恒久展示は「建物ごと作品」。ここでは可搬作品だけ。その差から何が失われ、何が新たに見えるか？</li>
+    <li>マーファの映像や写真が展示されているなら、それを見て「ここではない場所」を想像させる演出になっているか？</li>
+    <li>マーファでは作品と空間が不可分。ワタリウムでは作品が「別の場所から運ばれてきたもの」。その「仮住まい感」は空間から感じ取れるか？</li>
+    <li>ジャッドがNYを離れた理由は、美術館やギャラリーの一時的な展示への不満だった。そのジャッドを「一時的な企画展」で見ることの意味は何か？</li>
+    <li>マーファの100個のコンクリートボックスや砲兵隊倉庫のアルミ作品は動かせない。では、今回来ている作品は「動かしてもいい」とジャッド自身が考えていたのか？</li>
+    <li>「恒久展示」の思想を知った上で見ると、この企画展の設計判断（作品の選定、配置、空間構成）にどんな意図が読み取れるか？</li>
+    <li>もしジャッドが生きていたら、この展示を許可しただろうか？ 展示を見て、その答えを想像できるか？</li>
+    <li>Chinati FoundationとJudd Foundationは別組織。今回の貸出元はどちらか？ キャプションで確認できるか？</li>
+    <li>マーファは人口1,700人の町。東京は1,400万人の都市。同じ作品でも、見る場所の文脈で意味が変わるか？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Cross-cutting</div>
+  <div class="cat-title">横断的な問い</div>
+  <ol class="q-list">
+    <li>「これはデザインか、アートか」と感じる瞬間はあるか？ その境界はどこにあるか？</li>
+    <li>ジャッドの作品を「プロダクト」として見たとき、何が見えるか？（寸法精度、仕上げ、量産性）</li>
+    <li>展示全体を通して「一番長く足が止まった作品」はどれか？ なぜ止まったか？</li>
+    <li>もしこの展示を自分がキュレーションし直すなら、何を変えるか？</li>
+    <li>この展示を見た後、自分の仕事（写真・空間・デザイン）に持ち帰れるものは何か？</li>
+    <li>ジャッドは画家から始まり、彫刻家を経て、建築・家具・空間設計に向かった。その変遷は展示の中で感じ取れるか？</li>
+    <li>ジャッドは「ミニマリズム」というラベルを嫌った。展示を見て、その理由を想像できるか？</li>
+    <li>ジャッドの作品は「見る」ものか、「体験する」ものか？ どちらの感覚が強かったか？</li>
+    <li>展示を見た他の来場者の行動を観察する。みんなどこで立ち止まり、何をスルーしているか？</li>
+    <li>一言で表すなら、この展示は何についての展示だったか？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Connections</div>
+  <div class="cat-title">同時代の作家・思想との比較</div>
+  <ol class="q-list">
+    <li>フレイヴィンの蛍光灯作品を知った上で見ると、ジャッドの「素材の選択」は何が違うか？ 既製品（蛍光灯）vs 工業的に製造された素材（アルミ・鉄）</li>
+    <li>ソル・ルウィットは「指示書があれば誰が作っても作品」と考えた。ジャッドの作品は「誰が作ったか」が重要か？ 工場に発注している以上、それは問題にならないか？</li>
+    <li>ステラの「見えるものが見えるものだ」とジャッドの「Specific Objects」は同じことを言っているか？ 違うとすれば何が違うか？</li>
+    <li>ブランクーシの彫刻は「形の本質」を追求した。ジャッドの箱は「形」を追求しているか？ それとも「形ではない何か」か？</li>
+    <li>ジャッドの空間設計にミースの建築の影響は見えるか？ 「Less is more」と「Specific Objects」の違いは何か？</li>
+    <li>ジャッドはアアルトの家具を自宅で使っていた。展示内にジャッドの家具デザインはあるか？ あるなら、アアルトとの共通点・相違点は？</li>
+    <li>ロスコの色面絵画は「崇高な経験」を目指した。ジャッドの作品は「体験」を目指しているか、それとも「事実の提示」か？</li>
+    <li>ジャッドは「ミニマリズム」というラベルを拒否した。展示を見て、フレイヴィンやアンドレと同じグループに入れられることへの彼の不満が理解できるか？</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">Record</div>
+  <div class="cat-title">記録すべき事実</div>
+  <ol class="q-list">
+    <li>写真撮影は可能だったか？ 条件は？（フラッシュ不可、SNS投稿可、等）</li>
+    <li>各作品のキャプション情報（タイトル / 年 / 素材 / サイズ / 所蔵元）</li>
+    <li>展示室の構成（何階に何があるか / フロアごとのテーマ）</li>
+    <li>作品の総点数。そのうち絵画は何点、立体は何点、資料は何点か</li>
+    <li>来場者の雰囲気（混み具合、客層、滞在時間の傾向）</li>
+    <li>ショップ「オン・サンデーズ」で関連書籍に何があったか</li>
+    <li>カフェ「紅谷」の展示関連メニューがあれば、内容と感想</li>
+    <li>入口から出口までの自分の滞在時間</li>
+    <li>会場内の温度・湿度・音の印象（静寂か、空調音があるか、外の音は聞こえるか）</li>
+  </ol>
+</div>
+
+<!-- ━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+<div class="category">
+  <div class="cat-label">AI Era</div>
+  <div class="cat-title">情報・AI時代とジャッドの姿勢</div>
+  <ol class="q-list">
+    <li>ジャッドは「自分の目で見たものだけを信じる」態度を貫いた。AIが画像を生成し、情報が氾濫する時代に、その態度はどう映るか？</li>
+    <li>ジャッドの作品は「実物の前に立たないと意味がない」ものの最たる例。画面上の画像で作品を「見た」と言えるか？ この展示でそれを確認できたか？</li>
+    <li>ジャッドがNYを離れた理由の一つは、一時的な展示システムへの批判だった。今、同じ問題意識を持つとすれば、どこに向かうか？ マーファに相当する「場所」は今の時代に存在するか？</li>
+    <li>ジャッドは工場に発注して作品を製造させた。AIに指示を出して画像やコードを生成させることと、構造的に何が同じで何が違うか？</li>
+    <li>「Specific Objects」（1965年）は、絵画でも彫刻でもない新しいカテゴリを提唱した。AIが生成するものは「アート」か「プロダクト」か「それ以外の何か」か？ ジャッドならどう定義するだろうか？</li>
+    <li>ジャッドは美術批評家でもあった。批評の質がAIで均質化される時代に、ジャッドのような「自分の目と言葉で書く」批評の価値はどう変わるか？</li>
+    <li>マーファは「情報から離れる場所」として機能した。デジタルデトックスやスクリーンタイムの議論と、ジャッドの選択は同じ問題を指しているか？</li>
+    <li>ジャッドの作品は寸法・素材・配置がすべて厳密に指定されている。この「仕様書としての完全性」は、プロンプトエンジニアリングと何が違うか？</li>
+    <li>この展示を見た後、自分がAIと協働する仕事の中で「ジャッド的な態度」を取るとしたら、それは具体的にどういう判断になるか？</li>
+  </ol>
+</div>
+
+<div class="note">
+  B-Side No. 001 — Viewpoints / Chisaki / 2026.02<br>
+  v2 — 2026.02.25 / AI時代カテゴリ追加<br>
+  全9カテゴリ / 87問<br>
+  ※ 全問に答える必要はない。引っかかった問いだけ、音声メモか紙で記録する。<br>
+  ※ 帰宅後、答えられた問いがそのままInsight・Gallery・Captionの素材になる。
+</div>
+
+</body>
+</html>
