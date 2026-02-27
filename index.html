@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v5.3 / 2026.02.27 — Setlist化: site-nav追加, Authorセクション追加, SNSリンクをAuthorに移動, フッターに©追加 -->
+<!-- v5.6 / 2026.02.27 — intro削除、header-subにLiner Notes for Exhibitions追加 -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -105,7 +105,7 @@ a:hover { opacity: 0.5; }
   letter-spacing: -0.01em;
 }
 
-.header-role {
+.header-sub {
   margin-top: var(--s1);
   font-size: var(--t-sm);
   font-weight: 300;
@@ -117,15 +117,6 @@ a:hover { opacity: 0.5; }
   font-size: var(--t-sm);
   font-weight: 300;
   line-height: 1.8;
-}
-
-/* ── INTRO ── */
-.intro {
-  padding: var(--s7) 0;
-  font-size: var(--t-md);
-  font-weight: 300;
-  line-height: 1.9;
-  max-width: 44rem;
 }
 
 /* ── SECTION ── */
@@ -234,8 +225,6 @@ a:hover { opacity: 0.5; }
 /* ── AUTHOR ── */
 .author {
   margin-top: var(--s8);
-  padding-top: var(--s4);
-  border-top: var(--rule) solid var(--black);
 }
 
 .author-id {
@@ -243,6 +232,8 @@ a:hover { opacity: 0.5; }
   font-weight: 400;
   letter-spacing: 0.25em;
   text-transform: uppercase;
+  padding-bottom: var(--s2);
+  border-bottom: var(--rule) solid var(--black);
   margin-bottom: var(--s4);
 }
 
@@ -323,7 +314,7 @@ a:hover { opacity: 0.5; }
 
   <!-- SITE NAV -->
   <nav class="site-nav">
-    <span>B-Side — Demo</span>
+    <span>Chisaki Hayakawa</span>
     <div class="site-nav-links">
       <span class="site-nav-current">Home</span>
       <a href="works/judd-marfa/">Liner Notes</a>
@@ -335,17 +326,13 @@ a:hover { opacity: 0.5; }
   <!-- HEADER -->
   <header class="header">
     <div>
-      <h1 class="header-name">Chisaki Hayakawa</h1>
-      <p class="header-role">Photographer / Designer / Engineer</p>
+      <h1 class="header-name">B-Side</h1>
+      <p class="header-sub">Liner Notes for Exhibitions</p>
     </div>
     <div class="header-meta">
-      Yokohama, Japan<br>
-      2026 — Demo
+      2026 — Demo Version
     </div>
   </header>
-
-  <!-- INTRO -->
-  <p class="intro">B-Side — 展示のライナーノーツ</p>
 
   <!-- B-SIDE NO.001 -->
   <section class="section">
