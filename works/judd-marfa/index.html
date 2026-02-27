@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v4.4 / 2026.02.27 — T01 CSS共通化: common.css導入、重複CSS削除 -->
+<!-- v4.5 / 2026.02.27 — T03 アクセシビリティ + T02 モバイルタップ + ナビ更新（Liner Notes/Backstage） -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -95,7 +95,7 @@
 }
 
 .vp-thumb::after {
-  content: 'Click to read';
+  content: 'Read';
   position: absolute;
   bottom: 0;
   left: 0;
@@ -110,7 +110,13 @@
   opacity: 0;
   transition: opacity 0.2s;
 }
-.vp-thumb:hover::after { opacity: 1; }
+.vp-thumb:hover::after,
+.vp-thumb:focus-visible::after { opacity: 1; }
+
+.vp-thumb:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 2px;
+}
 
 .vp-img {
   width: 100%;
@@ -119,7 +125,13 @@
   display: block;
   transition: opacity 0.2s;
 }
-.vp-thumb:hover .vp-img { opacity: 0.85; }
+.vp-thumb:hover .vp-img,
+.vp-thumb:focus-visible .vp-img { opacity: 0.85; }
+
+/* T02: タッチデバイスでは常時表示 */
+@media (hover: none) {
+  .vp-thumb::after { opacity: 1; }
+}
 
 .vp-caption {
   margin-top: var(--s2);
@@ -188,6 +200,10 @@
   justify-content: center;
 }
 .modal-close:hover { opacity: 0.4; }
+.modal-close:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 2px;
+}
 
 .modal-img {
   width: 100%;
@@ -315,9 +331,9 @@
   <nav class="site-nav">
     <span>B-Side No.001 — Demo</span>
     <div class="site-nav-links">
-      <span class="site-nav-current">Home</span>
-      <a href="judd-background.html">Background</a>
-      <a href="judd-viewpoints.html">Viewpoints</a>
+      <a href="../../">Home</a>
+      <span class="site-nav-current">Liner Notes</span>
+      <a href="judd-background.html">Backstage</a>
     </div>
   </nav>
 
@@ -340,7 +356,7 @@
   <!-- ── 01 MATERIAL ── -->
   <section class="vp">
     <div class="vp-label">01 / Material</div>
-    <div class="vp-thumb" onclick="openModal('material')">
+    <div class="vp-thumb" role="button" tabindex="0" aria-label="Material — 詳細を読む" data-modal="material">
       <img class="vp-img" src="images/material.jpg" alt="Material — 亜鉛メッキ鉄スタックの影とスパングル" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1967, Galvanized iron. Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</div>
@@ -348,13 +364,13 @@
     <div class="vp-short">1967年の亜鉛メッキ鉄スタック。表面に浮かぶスパングルと呼ばれる結晶模様は、雪の結晶や星のような幾何学模様で、純粋に綺麗だった。塗装でもテクスチャでもなく、亜鉛という素材が自ら生み出したもの。ジャッドはこの種の素材を「ありふれた商業用材料」と呼びながら、それ自体が色であり質感であることを見ていた。</div>
   </section>
 
-  <div class="modal-overlay" id="modal-material">
+  <div class="modal-overlay" id="modal-material" role="dialog" aria-modal="true" aria-labelledby="modal-title-material">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('material')">×</button>
+      <button class="modal-close" aria-label="閉じる" data-close="material">×</button>
       <img class="modal-img" src="images/material.jpg" alt="Material">
       <div class="modal-text">
         <div class="modal-axis">01 / Material</div>
-        <div class="modal-title">亜鉛メッキ鉄の表面に浮かぶ結晶模様——工業素材がそのまま視覚になる</div>
+        <div class="modal-title" id="modal-title-material">亜鉛メッキ鉄の表面に浮かぶ結晶模様——工業素材がそのまま視覚になる</div>
         <div class="modal-body">
           <p>1967年の亜鉛メッキ鉄スタック。表面に浮かぶスパングルと呼ばれる結晶模様は、雪の結晶や星のような幾何学模様で、純粋に綺麗だった。塗装でもテクスチャでもなく、亜鉛という素材が自ら生み出したもの。</p>
           <p>ジャッドはこの種の素材を「ありふれた商業用材料」と呼びながら、それ自体が色であり質感であることを見ていた。手仕事の痕跡はどこにもない。64年からジャッドは加工業者に製造を委ねている。</p>
@@ -368,7 +384,7 @@
   <!-- ── 02 LIGHT ── -->
   <section class="vp">
     <div class="vp-label">02 / Light</div>
-    <div class="vp-thumb" onclick="openModal('light')">
+    <div class="vp-thumb" role="button" tabindex="0" aria-label="Light — 詳細を読む" data-modal="light">
       <img class="vp-img" src="images/light.jpg" alt="Light — コンクリート梁のV字の光と影" loading="lazy">
     </div>
     <div class="vp-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
@@ -376,13 +392,13 @@
     <div class="vp-short">訪問日は雨だった。ボッタの建築が取り込むグレーがかった外光は、コンクリートの陰影と金属表面の反射を穏やかに統合していた。天井のダイヤ格子から落ちる光、縦長3連窓から入る光。晴れた日に来ていたら、同じ作品がまったく違って見えていたと思う。</div>
   </section>
 
-  <div class="modal-overlay" id="modal-light">
+  <div class="modal-overlay" id="modal-light" role="dialog" aria-modal="true" aria-labelledby="modal-title-light">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('light')">×</button>
+      <button class="modal-close" aria-label="閉じる" data-close="light">×</button>
       <img class="modal-img" src="images/light.jpg" alt="Light">
       <div class="modal-text">
         <div class="modal-axis">02 / Light</div>
-        <div class="modal-title">雨のグレーの光が、金属の表面を静かにしていた</div>
+        <div class="modal-title" id="modal-title-light">雨のグレーの光が、金属の表面を静かにしていた</div>
         <div class="modal-body">
           <p>訪問日は雨だった。ボッタの建築が取り込むグレーがかった外光は、コンクリートの陰影と金属表面の反射を穏やかに統合していた。天井のダイヤ格子から落ちる光、縦長3連窓から入る光。</p>
           <p>晴れた日に来ていたら、同じ作品がまったく違って見えていたと思う。マーファの乾いた砂漠の光の下では、なおさら。</p>
@@ -396,7 +412,7 @@
   <!-- ── 03 COLOR ── -->
   <section class="vp">
     <div class="vp-label">03 / Color</div>
-    <div class="vp-thumb" onclick="openModal('color')">
+    <div class="vp-thumb" role="button" tabindex="0" aria-label="Color — 詳細を読む" data-modal="color">
       <img class="vp-img" src="images/color.jpg" alt="Color — グレー×オレンジボックス正面" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass. Collection: Judd Foundation</div>
@@ -404,13 +420,13 @@
     <div class="vp-short">金属に塗料を重ねると素材の本質を偽る——そう考えたジャッドは、プレキシグラスという「それ自体が色を持つ素材」に至った。3階にはRALカラーチャートの実物が展示されていて、色の選択が抽象的な判断ではなく物質的な比較のプロセスだったことがわかる。アンバーのプレキシグラスの奥から、不思議なオレンジの光が底面に漏れていた。</div>
   </section>
 
-  <div class="modal-overlay" id="modal-color">
+  <div class="modal-overlay" id="modal-color" role="dialog" aria-modal="true" aria-labelledby="modal-title-color">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('color')">×</button>
+      <button class="modal-close" aria-label="閉じる" data-close="color">×</button>
       <img class="modal-img" src="images/color.jpg" alt="Color">
       <div class="modal-text">
         <div class="modal-axis">03 / Color</div>
-        <div class="modal-title">プレキシグラスの色は、素材に最初からある色だった</div>
+        <div class="modal-title" id="modal-title-color">プレキシグラスの色は、素材に最初からある色だった</div>
         <div class="modal-body">
           <p>金属に塗料を重ねると素材の本質を偽る——そう考えたジャッドは、プレキシグラスという「それ自体が色を持つ素材」に至った。3階にはRALカラーチャートの実物が展示されていて、色の選択が抽象的な判断ではなく物質的な比較のプロセスだったことがわかる。</p>
           <p>工業用の色見本帳がアート作品の思考プロセスとして額装されている。アンバーのプレキシグラスの奥から、不思議なオレンジの光が底面に漏れていた。</p>
@@ -424,7 +440,7 @@
   <!-- ── 04 SPACE ── -->
   <section class="vp">
     <div class="vp-label">04 / Space</div>
-    <div class="vp-thumb" onclick="openModal('space')">
+    <div class="vp-thumb" role="button" tabindex="0" aria-label="Space — 詳細を読む" data-modal="space">
       <img class="vp-img" src="images/space.jpg" alt="Space — 外螺旋階段とグリッドガラスのシルエット" loading="lazy">
     </div>
     <div class="vp-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
@@ -432,13 +448,13 @@
     <div class="vp-short">マリオ・ボッタ設計のワタリウムは初訪問だった。三角形の平面、吹き抜けと通常天井の使い分け、外階段の曲線とグリッドガラスの直線。「ニュートラルな空間など存在しない」と書いたジャッドの作品が、この建築の中で見えている。マーファからの仮住まいであっても、この空間は中性的な容器ではなかった。</div>
   </section>
 
-  <div class="modal-overlay" id="modal-space">
+  <div class="modal-overlay" id="modal-space" role="dialog" aria-modal="true" aria-labelledby="modal-title-space">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('space')">×</button>
+      <button class="modal-close" aria-label="閉じる" data-close="space">×</button>
       <img class="modal-img" src="images/space.jpg" alt="Space">
       <div class="modal-text">
         <div class="modal-axis">04 / Space</div>
-        <div class="modal-title">この建物は中性的な容器ではなく、ジャッドの作品を見る体験の一部だった</div>
+        <div class="modal-title" id="modal-title-space">この建物は中性的な容器ではなく、ジャッドの作品を見る体験の一部だった</div>
         <div class="modal-body">
           <p>マリオ・ボッタ設計のワタリウムは初訪問だった。三角形の平面、吹き抜けと通常天井の使い分け、外階段の曲線とグリッドガラスの直線。「ニュートラルな空間など存在しない」と書いたジャッドの作品が、この建築の中で見えている。</p>
           <p>マーファからの仮住まいであっても、この空間は中性的な容器ではなかった。建物自体がもうひとつの展示物だった。</p>
@@ -452,7 +468,7 @@
   <!-- ── 05 REPETITION ── -->
   <section class="vp">
     <div class="vp-label">05 / Repetition</div>
-    <div class="vp-thumb" onclick="openModal('repetition')">
+    <div class="vp-thumb" role="button" tabindex="0" aria-label="Repetition — 詳細を読む" data-modal="repetition">
       <img class="vp-img" src="images/repetition.jpg" alt="Repetition — 黒アノダイズドアルミの壁付きスタック正面" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units). Collection: Shizuoka Prefectural Museum of Art</div>
@@ -460,13 +476,13 @@
     <div class="vp-short">黒アノダイズドアルミとブロンズのプレキシグラス、10ユニット。2階の吹き抜けに3メートルを超えて積み重なるスタックは、この展示で一番足が止まった作品だった。不透明な金属と半透明な樹脂が等間隔で交替する。壁から突き出した金属の重さが体に伝わってくる。見上げているうちに、反復は数えるものではなく、体が受け取るものだとわかる。</div>
   </section>
 
-  <div class="modal-overlay" id="modal-repetition">
+  <div class="modal-overlay" id="modal-repetition" role="dialog" aria-modal="true" aria-labelledby="modal-title-repetition">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('repetition')">×</button>
+      <button class="modal-close" aria-label="閉じる" data-close="repetition">×</button>
       <img class="modal-img" src="images/repetition.jpg" alt="Repetition">
       <div class="modal-text">
         <div class="modal-axis">05 / Repetition</div>
-        <div class="modal-title">展示室で一番長くいた作品。3メートルの反復が体に入ってくる</div>
+        <div class="modal-title" id="modal-title-repetition">展示室で一番長くいた作品。3メートルの反復が体に入ってくる</div>
         <div class="modal-body">
           <p>黒アノダイズドアルミとブロンズのプレキシグラス、10ユニット。2階の吹き抜けに3メートルを超えて積み重なるスタックは、この展示で一番足が止まった作品だった。不透明な金属と半透明な樹脂が等間隔で交替する。</p>
           <p>壁から突き出した金属の重さが体に伝わってくる。見上げているうちに、反復は数えるものではなく、体が受け取るものだとわかる。</p>
@@ -480,7 +496,7 @@
   <!-- ── 06 TIME ── -->
   <section class="vp">
     <div class="vp-label">06 / Time</div>
-    <div class="vp-thumb" onclick="openModal('time')">
+    <div class="vp-thumb" role="button" tabindex="0" aria-label="Time — 詳細を読む" data-modal="time">
       <img class="vp-img" src="images/time.jpg" alt="Time — 赤×黄の壁付き作品を3Fから見下ろした構図" loading="lazy">
     </div>
     <div class="vp-caption">Untitled, 1989, Painted aluminum. Collection: Kirishima Open-Air Museum</div>
@@ -488,13 +504,13 @@
     <div class="vp-short">階を移動するたびに、さっき見た作品が別の角度から見えてくる。ボッタの吹き抜け構造がそれを可能にしている。同じ作品が、自分の体験の中の別の時点として存在する。グラフィックデザインやPCの中で仕事をしてきた自分にとって、3メートルの金属を見上げ、光の中で素材を見る体験は画面では得られないものだった。この展示は2026年6月に終わる。ジャッドが「その場限りのパフォーマンスにしてはならない」と書いた作品を、一時的な企画展で見ている。その矛盾がずっと残っている。</div>
   </section>
 
-  <div class="modal-overlay" id="modal-time">
+  <div class="modal-overlay" id="modal-time" role="dialog" aria-modal="true" aria-labelledby="modal-title-time">
     <div class="modal">
-      <button class="modal-close" onclick="closeModal('time')">×</button>
+      <button class="modal-close" aria-label="閉じる" data-close="time">×</button>
       <img class="modal-img" src="images/time.jpg" alt="Time">
       <div class="modal-text">
         <div class="modal-axis">06 / Time</div>
-        <div class="modal-title">2Fで正面から見た作品を、3Fから見下ろしている</div>
+        <div class="modal-title" id="modal-title-time">2Fで正面から見た作品を、3Fから見下ろしている</div>
         <div class="modal-body">
           <p>階を移動するたびに、さっき見た作品が別の角度から見えてくる。ボッタの吹き抜け構造がそれを可能にしている。同じ作品が、自分の体験の中の別の時点として存在する。</p>
           <p>グラフィックデザインやPCの中で仕事をしてきた自分にとって、3メートルの金属を見上げ、光の中で素材を見る体験は画面では得られないものだった。この展示は2026年6月に終わる。ジャッドが「その場限りのパフォーマンスにしてはならない」と書いた作品を、一時的な企画展で見ている。その矛盾がずっと残っている。</p>
@@ -546,11 +562,16 @@
 </div>
 
 <script>
+let lastFocusedElement = null;
+
 function openModal(id) {
   const el = document.getElementById('modal-' + id);
   if (!el) return;
+  lastFocusedElement = document.activeElement;
   el.classList.add('open');
   document.body.style.overflow = 'hidden';
+  const closeBtn = el.querySelector('.modal-close');
+  if (closeBtn) closeBtn.focus();
 }
 
 function closeAllModals() {
@@ -559,12 +580,20 @@ function closeAllModals() {
   });
   document.body.style.overflow = '';
   if (location.hash) history.replaceState(null, '', location.pathname);
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
 }
 
 function closeModal(id) {
   document.getElementById('modal-' + id).classList.remove('open');
   document.body.style.overflow = '';
   if (location.hash) history.replaceState(null, '', location.pathname);
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+    lastFocusedElement = null;
+  }
 }
 
 // Open modal from URL hash (#material, #light, etc.)
@@ -576,6 +605,23 @@ function openFromHash() {
 window.addEventListener('hashchange', openFromHash);
 window.addEventListener('DOMContentLoaded', openFromHash);
 
+// vp-thumb: click and keyboard (Enter/Space)
+document.querySelectorAll('.vp-thumb[data-modal]').forEach(thumb => {
+  const id = thumb.dataset.modal;
+  thumb.addEventListener('click', () => openModal(id));
+  thumb.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      openModal(id);
+    }
+  });
+});
+
+// modal-close: click
+document.querySelectorAll('.modal-close[data-close]').forEach(btn => {
+  btn.addEventListener('click', () => closeModal(btn.dataset.close));
+});
+
 // Close on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', (e) => {
@@ -583,9 +629,34 @@ document.querySelectorAll('.modal-overlay').forEach(overlay => {
   });
 });
 
-// Close on Escape
+// Close on Escape + focus trap (Tab cycling)
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeAllModals();
+  if (e.key === 'Escape') {
+    closeAllModals();
+    return;
+  }
+
+  if (e.key === 'Tab') {
+    const openOverlay = document.querySelector('.modal-overlay.open');
+    if (!openOverlay) return;
+    const focusable = openOverlay.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
 });
 </script>
 </body>
