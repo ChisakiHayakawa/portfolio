@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v4.1 / 2026.02.27 — v3構造統合: ヘッダー重複修正, 上部マージン調整, フッターにポートフォリオリンク+SNSアイコン追加, リンクホバー処理 -->
+<!-- v4.2 / 2026.02.28 — Demo表記追加, ハッシュモーダルJS追加 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -408,7 +408,7 @@ a:hover { opacity: 0.5; border-bottom-color: var(--black); }
 <div class="container">
 
   <nav class="site-nav">
-    <span>B-Side No.001</span>
+    <span>B-Side No.001 — Demo</span>
     <div class="site-nav-links">
       <span class="site-nav-current">Home</span>
       <a href="judd-background.html">Background</a>
@@ -423,7 +423,7 @@ a:hover { opacity: 0.5; border-bottom-color: var(--black); }
     </div>
     <div class="meta">
       <span class="meta-status">Now Open</span>
-      <div>2026.02.15 → 06.07</div>
+      <div>2026.02.15 → 06.07 — Demo</div>
     </div>
   </header>
 
@@ -642,33 +642,45 @@ a:hover { opacity: 0.5; border-bottom-color: var(--black); }
 
 <script>
 function openModal(id) {
-  document.getElementById('modal-' + id).classList.add('open');
+  const el = document.getElementById('modal-' + id);
+  if (!el) return;
+  el.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+function closeAllModals() {
+  document.querySelectorAll('.modal-overlay.open').forEach(m => {
+    m.classList.remove('open');
+  });
+  document.body.style.overflow = '';
+  if (location.hash) history.replaceState(null, '', location.pathname);
 }
 
 function closeModal(id) {
   document.getElementById('modal-' + id).classList.remove('open');
   document.body.style.overflow = '';
+  if (location.hash) history.replaceState(null, '', location.pathname);
 }
+
+// Open modal from URL hash (#material, #light, etc.)
+function openFromHash() {
+  const hash = location.hash.slice(1);
+  if (hash) openModal(hash);
+}
+
+window.addEventListener('hashchange', openFromHash);
+window.addEventListener('DOMContentLoaded', openFromHash);
 
 // Close on overlay click
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
   overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) {
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-    }
+    if (e.target === overlay) closeAllModals();
   });
 });
 
 // Close on Escape
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    document.querySelectorAll('.modal-overlay.open').forEach(m => {
-      m.classList.remove('open');
-      document.body.style.overflow = '';
-    });
-  }
+  if (e.key === 'Escape') closeAllModals();
 });
 </script>
 </body>

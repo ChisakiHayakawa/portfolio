@@ -4,13 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Designer / Photographer</title>
-<!-- v5 / 2026.02.27 — B-Sideハブとして再設計: Works/Gallery統合, イントロ追加, 各写真→セクション直リンク, Caption追加 -->
-<meta name="description" content="B-Side — 展示の裏側にある素材・文脈・受け取り方を、写真とテキストで記録する。">
+<!-- v5.2 / 2026.02.27 — イントロ確定「B-Side — 展示のライナーノーツ」, About削除, フッターにPhoto/Text/Code, Demo表記 -->
+<meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Chisaki Hayakawa — Designer / Photographer">
-<meta property="og:description" content="B-Side — 展示の裏側にある素材・文脈・受け取り方を、写真とテキストで記録する。">
+<meta property="og:description" content="B-Side — 展示のライナーノーツ">
 <meta property="og:url" content="https://chisakihayakawa.github.io/portfolio/">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:site_name" content="Chisaki Hayakawa">
@@ -117,7 +117,7 @@ a:hover { opacity: 0.5; }
 /* ── INTRO ── */
 .intro {
   padding: var(--s7) 0;
-  font-size: var(--t-lg);
+  font-size: var(--t-md);
   font-weight: 300;
   line-height: 1.9;
   max-width: 44rem;
@@ -212,18 +212,6 @@ a:hover { opacity: 0.5; }
   margin-top: 2px;
 }
 
-/* ── ABOUT ── */
-.about-text {
-  font-size: var(--t-md);
-  font-weight: 300;
-  line-height: var(--lh);
-  max-width: 44rem;
-}
-
-.about-text + .about-text {
-  margin-top: var(--s3);
-}
-
 /* ── FOOTER ── */
 .footer {
   margin-top: var(--s8);
@@ -275,12 +263,12 @@ a:hover { opacity: 0.5; }
     </div>
     <div class="header-meta">
       Yokohama, Japan<br>
-      2026
+      2026 — Demo
     </div>
   </header>
 
   <!-- INTRO -->
-  <p class="intro">B-Side — 展示の裏側にある素材・文脈・受け取り方を、写真とテキストで記録する。</p>
+  <p class="intro">B-Side — 展示のライナーノーツ</p>
 
   <!-- B-SIDE NO.001 -->
   <section class="section">
@@ -362,16 +350,9 @@ a:hover { opacity: 0.5; }
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section class="section">
-    <p class="section-id">About</p>
-    <p class="about-text">横浜在住のデザイナー・フォトグラファー。展示・空間・プロダクトの撮影を専門とし、写真を撮るだけでなく、作家の思想や展示の文脈を自分の言葉で書き、Webサイトとして設計・実装するところまでを一人で担う。</p>
-    <p class="about-text">このサイトを含め、すべて自分で設計・コーディングしている。</p>
-  </section>
-
   <!-- FOOTER -->
   <footer class="footer">
-    <span>Chisaki Hayakawa</span>
+    <span>Chisaki Hayakawa — Photo / Text / Code</span>
     <div class="footer-links">
       <a href="https://github.com/chisakihayakawa" target="_blank" rel="noopener" aria-label="GitHub" style="border-bottom:none;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
