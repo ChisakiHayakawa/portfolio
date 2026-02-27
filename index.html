@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Designer / Photographer</title>
-<!-- v3 / 2026.02.26 — Gallery 6枚3×2グリッド追加（写真プレースホルダー） -->
+<!-- v4 / 2026.02.27 — Gallery写真をB-Sideリンク化, AboutにB-Side説明+リンク追加 -->
 <meta name="description" content="Designer / Photographer. 横浜在住。展示・空間・プロダクトの撮影・言語化・Web実装。">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -218,7 +218,11 @@ a:hover { opacity: 0.5; }
 
 .gallery-item {
   display: block;
+  border-bottom: none;
 }
+
+.gallery-item:hover { opacity: 1; }
+.gallery-item:hover .gallery-thumb { opacity: 0.75; }
 
 .gallery-thumb {
   width: 100%;
@@ -228,6 +232,7 @@ a:hover { opacity: 0.5; }
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: opacity 0.2s;
 }
 
 .gallery-thumb img {
@@ -349,7 +354,7 @@ a:hover { opacity: 0.5; }
         <div class="work-meta">
           <span class="work-id">B-Side — No.001</span>
           <p class="work-title">Donald Judd | Marfa</p>
-          <p class="work-desc">ワタリウム美術館、2026年2月。素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。</p>
+          <p class="work-desc">ワタリウム美術館、2026年2月。展示を6つの視点で読み解く鑑賞アルバム。</p>
         </div>
       </a>
 
@@ -366,70 +371,70 @@ a:hover { opacity: 0.5; }
     <div class="gallery-grid">
 
       <!-- 1. Material -->
-      <div class="gallery-item">
+      <a class="gallery-item" href="works/judd-marfa/">
         <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/material.jpg" alt="Material — 亜鉛メッキ鉄スタックの影とスパングル" loading="lazy">
+          <img src="works/judd-marfa/images/material.jpg" alt="Untitled, 1967, Galvanized iron" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Material</span>
-          <span class="gallery-desc">Untitled, 1967, Galvanized iron. Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</span>
+          <span class="gallery-desc">Caption TBD</span>
         </div>
-      </div>
+      </a>
 
       <!-- 2. Light -->
-      <div class="gallery-item">
+      <a class="gallery-item" href="works/judd-marfa/">
         <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/light.jpg" alt="Light — コンクリート梁のV字の光と影" loading="lazy">
+          <img src="works/judd-marfa/images/light.jpg" alt="WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Light</span>
-          <span class="gallery-desc">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</span>
+          <span class="gallery-desc">Caption TBD</span>
         </div>
-      </div>
+      </a>
 
       <!-- 3. Color -->
-      <div class="gallery-item">
+      <a class="gallery-item" href="works/judd-marfa/">
         <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/color.jpg" alt="Color — グレー×オレンジボックス正面" loading="lazy">
+          <img src="works/judd-marfa/images/color.jpg" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Color</span>
-          <span class="gallery-desc">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass. Collection: Judd Foundation</span>
+          <span class="gallery-desc">Caption TBD</span>
         </div>
-      </div>
+      </a>
 
       <!-- 4. Space -->
-      <div class="gallery-item">
+      <a class="gallery-item" href="works/judd-marfa/">
         <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/space.jpg" alt="Space — 外螺旋階段とグリッドガラスのシルエット" loading="lazy">
+          <img src="works/judd-marfa/images/space.jpg" alt="WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Space</span>
-          <span class="gallery-desc">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</span>
+          <span class="gallery-desc">Caption TBD</span>
         </div>
-      </div>
+      </a>
 
       <!-- 5. Repetition -->
-      <div class="gallery-item">
+      <a class="gallery-item" href="works/judd-marfa/">
         <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/repetition.jpg" alt="Repetition — 黒アノダイズドアルミの壁付きスタック正面" loading="lazy">
+          <img src="works/judd-marfa/images/repetition.jpg" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units)" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Repetition</span>
-          <span class="gallery-desc">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units). Collection: Shizuoka Prefectural Museum of Art</span>
+          <span class="gallery-desc">Caption TBD</span>
         </div>
-      </div>
+      </a>
 
       <!-- 6. Time -->
-      <div class="gallery-item">
+      <a class="gallery-item" href="works/judd-marfa/">
         <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/time.jpg" alt="Time — 赤×黄の壁付き作品を3Fから見下ろした構図" loading="lazy">
+          <img src="works/judd-marfa/images/time.jpg" alt="Untitled, 1989, Painted aluminum" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Time</span>
-          <span class="gallery-desc">Untitled, 1989, Painted aluminum. Collection: Kirishima Open-Air Museum</span>
+          <span class="gallery-desc">Caption TBD</span>
         </div>
-      </div>
+      </a>
 
     </div>
   </section>
@@ -438,7 +443,7 @@ a:hover { opacity: 0.5; }
   <section class="section">
     <p class="section-id">About</p>
     <p class="about-text">横浜在住のデザイナー・フォトグラファー。展示・空間・プロダクトの撮影を専門とし、写真を撮るだけでなく、作家の思想や展示の文脈を自分の言葉で書き、Webサイトとして設計・実装するところまでを一人で担う。</p>
-    <p class="about-text" style="margin-top: var(--s3);">2025年10月よりB-Sideを開始。東京のギャラリー・美術館で見たものを、キュレーション視点のウェブドキュメントとして記録・公開している。このサイトを含め、すべて自分で設計・コーディングしている。</p>
+    <p class="about-text" style="margin-top: var(--s3);">2025年10月より<a href="works/judd-marfa/">B-Side</a>を開始。展示のA面だけでなく、素材・制作背景・自分自身の受け取り方といったB面を、キュレーション視点のウェブドキュメントとして記録・公開している。このサイトを含め、すべて自分で設計・コーディングしている。</p>
   </section>
 
   <!-- FOOTER -->
