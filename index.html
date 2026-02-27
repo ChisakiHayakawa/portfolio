@@ -4,13 +4,13 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Designer / Photographer</title>
-<!-- v4 / 2026.02.27 — Gallery写真をB-Sideリンク化, AboutにB-Side説明+リンク追加 -->
-<meta name="description" content="Designer / Photographer. 横浜在住。展示・空間・プロダクトの撮影・言語化・Web実装。">
+<!-- v5 / 2026.02.27 — B-Sideハブとして再設計: Works/Gallery統合, イントロ追加, 各写真→セクション直リンク, Caption追加 -->
+<meta name="description" content="B-Side — 展示の裏側にある素材・文脈・受け取り方を、写真とテキストで記録する。">
 <meta name="author" content="Chisaki Hayakawa">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Chisaki Hayakawa — Designer / Photographer">
-<meta property="og:description" content="Designer / Photographer. 展示・空間・プロダクトの記録と発信。">
+<meta property="og:description" content="B-Side — 展示の裏側にある素材・文脈・受け取り方を、写真とテキストで記録する。">
 <meta property="og:url" content="https://chisakihayakawa.github.io/portfolio/">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:site_name" content="Chisaki Hayakawa">
@@ -20,11 +20,8 @@
 
 <style>
 /* ═══════════════════════════════════════════════
-   CHISAKI HAYAKAWA — Portfolio Index
+   CHISAKI HAYAKAWA — B-Side Hub
    Designer / Photographer
-
-   Same design system as B-Side.
-   "One thing after another."
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -32,7 +29,6 @@
   --white: #fff;
   --font: 'Helvetica Neue', 'Libre Franklin', 'Noto Sans JP', sans-serif;
 
-  --unit:  8px;
   --s1:    8px;
   --s2:   16px;
   --s3:   24px;
@@ -118,6 +114,15 @@ a:hover { opacity: 0.5; }
   line-height: 1.8;
 }
 
+/* ── INTRO ── */
+.intro {
+  padding: var(--s7) 0;
+  font-size: var(--t-lg);
+  font-weight: 300;
+  line-height: 1.9;
+  max-width: 44rem;
+}
+
 /* ── SECTION ── */
 .section {
   margin-top: var(--s7);
@@ -133,80 +138,27 @@ a:hover { opacity: 0.5; }
   margin-bottom: var(--s5);
 }
 
-/* ── WORKS GRID ── */
-.works-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--s4);
-  max-width: 36rem;
-}
-
-/* 2件以上になったら有効化:
-.works-grid--multi {
-  grid-template-columns: repeat(2, 1fr);
-  max-width: none;
-} */
-
-.work-item {
+/* ── PROJECT LINK ── */
+.project-link {
   display: block;
   border-bottom: none;
-}
-
-.work-item:hover { opacity: 1; }
-.work-item:hover .work-thumb { opacity: 0.75; }
-
-.work-thumb {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  background: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  margin-bottom: var(--s5);
   transition: opacity 0.2s;
-  overflow: hidden;
 }
+.project-link:hover { opacity: 0.5; }
 
-.work-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.work-thumb-placeholder {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--black);
-  opacity: 0.3;
-}
-
-.work-meta {
-  margin-top: var(--s2);
-}
-
-.work-id {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  margin-bottom: var(--s1);
-  display: block;
-}
-
-.work-title {
-  font-size: var(--t-md);
+.project-title {
+  font-size: var(--t-xl);
   font-weight: 400;
   line-height: var(--lh-tight);
-  margin-bottom: var(--s1);
+  letter-spacing: -0.01em;
 }
 
-.work-desc {
+.project-meta {
+  margin-top: var(--s2);
   font-size: var(--t-sm);
   font-weight: 300;
   line-height: var(--lh);
-  color: var(--black);
 }
 
 /* ── GALLERY GRID ── */
@@ -228,9 +180,6 @@ a:hover { opacity: 0.5; }
   width: 100%;
   aspect-ratio: 4 / 3;
   background: var(--white);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
   transition: opacity 0.2s;
 }
@@ -240,15 +189,6 @@ a:hover { opacity: 0.5; }
   height: 100%;
   object-fit: cover;
   display: block;
-}
-
-.gallery-thumb-placeholder {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--black);
-  opacity: 0.3;
 }
 
 .gallery-caption {
@@ -314,7 +254,6 @@ a:hover { opacity: 0.5; }
   .container { padding: var(--s6) var(--s3); }
   .header { grid-template-columns: 1fr; gap: var(--s3); }
   .header-meta { text-align: left; }
-  .works-grid { grid-template-columns: 1fr; }
   .gallery-grid { grid-template-columns: 1fr; }
   .footer { flex-direction: column; gap: var(--s2); }
 }
@@ -340,99 +279,83 @@ a:hover { opacity: 0.5; }
     </div>
   </header>
 
-  <!-- WORKS -->
+  <!-- INTRO -->
+  <p class="intro">B-Side — 展示の裏側にある素材・文脈・受け取り方を、写真とテキストで記録する。</p>
+
+  <!-- B-SIDE NO.001 -->
   <section class="section">
-    <p class="section-id">Works</p>
+    <p class="section-id">B-Side No.001</p>
 
-    <div class="works-grid">
-
-      <!-- B-Side No.001 -->
-      <a class="work-item" href="works/judd-marfa/">
-        <div class="work-thumb">
-          <img src="works/judd-marfa/images/og-image.jpg" alt="B-Side No.001">
-        </div>
-        <div class="work-meta">
-          <span class="work-id">B-Side — No.001</span>
-          <p class="work-title">Donald Judd | Marfa</p>
-          <p class="work-desc">ワタリウム美術館、2026年2月。展示を6つの視点で読み解く鑑賞アルバム。</p>
-        </div>
-      </a>
-
-      <!-- 次の作品スロット（今後追加） -->
-      <!-- 今は非表示にしておく -->
-
-    </div>
-  </section>
-
-  <!-- GALLERY — B-Side No.001 / Donald Judd -->
-  <section class="section">
-    <p class="section-id">Gallery</p>
+    <a class="project-link" href="works/judd-marfa/">
+      <h2 class="project-title">Donald Judd | Marfa</h2>
+      <p class="project-meta">ワタリウム美術館、2026年2月–6月。素材・光・色・空間・反復・時間——6つの視点で展示のB面を記録。</p>
+    </a>
 
     <div class="gallery-grid">
 
       <!-- 1. Material -->
-      <a class="gallery-item" href="works/judd-marfa/">
+      <a class="gallery-item" href="works/judd-marfa/#material">
         <div class="gallery-thumb">
           <img src="works/judd-marfa/images/material.jpg" alt="Untitled, 1967, Galvanized iron" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Material</span>
-          <span class="gallery-desc">Caption TBD</span>
+          <span class="gallery-desc">スパングルの結晶模様が素材の来歴を残していた</span>
         </div>
       </a>
 
       <!-- 2. Light -->
-      <a class="gallery-item" href="works/judd-marfa/">
+      <a class="gallery-item" href="works/judd-marfa/#light">
         <div class="gallery-thumb">
           <img src="works/judd-marfa/images/light.jpg" alt="WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Light</span>
-          <span class="gallery-desc">Caption TBD</span>
+          <span class="gallery-desc">雨のグレーの光が金属の表面を静かにしていた</span>
         </div>
       </a>
 
       <!-- 3. Color -->
-      <a class="gallery-item" href="works/judd-marfa/">
+      <a class="gallery-item" href="works/judd-marfa/#color">
         <div class="gallery-thumb">
           <img src="works/judd-marfa/images/color.jpg" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Color</span>
-          <span class="gallery-desc">Caption TBD</span>
+          <span class="gallery-desc">プレキシグラスの色は素材に最初からある色だった</span>
         </div>
       </a>
 
       <!-- 4. Space -->
-      <a class="gallery-item" href="works/judd-marfa/">
+      <a class="gallery-item" href="works/judd-marfa/#space">
         <div class="gallery-thumb">
           <img src="works/judd-marfa/images/space.jpg" alt="WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Space</span>
-          <span class="gallery-desc">Caption TBD</span>
+          <span class="gallery-desc">建物自体が作品を見る体験の一部だった</span>
         </div>
       </a>
 
       <!-- 5. Repetition -->
-      <a class="gallery-item" href="works/judd-marfa/">
+      <a class="gallery-item" href="works/judd-marfa/#repetition">
         <div class="gallery-thumb">
           <img src="works/judd-marfa/images/repetition.jpg" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units)" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Repetition</span>
-          <span class="gallery-desc">Caption TBD</span>
+          <span class="gallery-desc">3メートルの反復が体に入ってくる</span>
         </div>
       </a>
 
       <!-- 6. Time -->
-      <a class="gallery-item" href="works/judd-marfa/">
+      <a class="gallery-item" href="works/judd-marfa/#time">
         <div class="gallery-thumb">
           <img src="works/judd-marfa/images/time.jpg" alt="Untitled, 1989, Painted aluminum" loading="lazy">
         </div>
         <div class="gallery-caption">
           <span class="gallery-axis">Time</span>
-          <span class="gallery-desc">Caption TBD</span>
+          <span class="gallery-desc">2Fで見た作品を3Fから見下ろしている</span>
         </div>
       </a>
 
@@ -443,7 +366,7 @@ a:hover { opacity: 0.5; }
   <section class="section">
     <p class="section-id">About</p>
     <p class="about-text">横浜在住のデザイナー・フォトグラファー。展示・空間・プロダクトの撮影を専門とし、写真を撮るだけでなく、作家の思想や展示の文脈を自分の言葉で書き、Webサイトとして設計・実装するところまでを一人で担う。</p>
-    <p class="about-text" style="margin-top: var(--s3);">2025年10月より<a href="works/judd-marfa/">B-Side</a>を開始。展示のA面だけでなく、素材・制作背景・自分自身の受け取り方といったB面を、キュレーション視点のウェブドキュメントとして記録・公開している。このサイトを含め、すべて自分で設計・コーディングしている。</p>
+    <p class="about-text">このサイトを含め、すべて自分で設計・コーディングしている。</p>
   </section>
 
   <!-- FOOTER -->
