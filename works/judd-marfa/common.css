@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════
    B-Side — Common Stylesheet
-   v1.1 / 2026.02.28 — T12: flex-wrap追加
+   v1.2 / 2026.02.28 — Remove footer border-top
    ══════════════════════════════════════════ */
 
 /* ── DESIGN TOKENS ── */
@@ -90,8 +90,6 @@ a:hover { opacity: 0.5; border-bottom-color: var(--black); }
 /* ── FOOTER ── */
 .footer {
   margin-top: var(--s8);
-  padding-top: var(--s3);
-  border-top: var(--rule) solid var(--black);
   display: flex;
   justify-content: space-between;
   align-items: center;
