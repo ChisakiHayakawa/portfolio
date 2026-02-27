@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Viewpoints — ジャッド｜マーファ展</title>
-<!-- v4.2 / 2026.02.28 — Demo表記追加 -->
+<!-- v4.4 / 2026.02.27 — T01 CSS共通化: common.css導入、.container追加、Google Fonts追加、重複CSS削除 -->
 <meta property="og:type" content="article">
 <meta property="og:title" content="Viewpoints — ジャッド｜マーファ展">
 <meta property="og:description" content="10カテゴリ・80の問い。B-Side No.001。">
@@ -14,59 +14,61 @@
 <meta name="twitter:title" content="Viewpoints — ジャッド｜マーファ展">
 <meta name="twitter:description" content="10カテゴリ・80の問い。B-Side No.001。">
 <meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/og-image.jpg">
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="common.css">
 <style>
-:root {
-  --black: #000;
-  --white: #fff;
-  --font: 'Helvetica Neue', system-ui, sans-serif;
+/* ── BASE OVERRIDES ── */
+body { font-size: 15px; }
+.footer { margin-top: var(--s5); padding-top: var(--s2); }
+.disclaimer { margin-top: 2.5rem; font-size: 0.7rem; }
+
+/* ── CONTAINER OVERRIDE ── */
+.container {
+  padding: var(--s4) 1.25rem var(--s6);
 }
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: var(--font);
-  font-size: 15px;
-  font-weight: 300;
-  line-height: 1.7;
-  background: var(--white);
-  color: var(--black);
-  padding: 2rem 1.25rem 4rem;
-  max-width: 56rem;
-  margin: 0 auto;
-  -webkit-font-smoothing: antialiased;
-}
+
+/* ── PAGE HEADING ── */
 h1 {
   font-size: 1.1rem;
   font-weight: 400;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--black);
+  border-bottom: var(--rule) solid var(--black);
   padding-bottom: 0.75rem;
   margin-bottom: 1.25rem;
 }
+
 .intro {
   font-size: 13px;
   font-weight: 300;
   line-height: 1.8;
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--s4);
   color: #444;
 }
+
+/* ── LAYERS ── */
 .layer-heading {
-  font-size: 0.75rem;
+  font-size: var(--t-xs);
   font-weight: 400;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  margin-top: 3rem;
+  margin-top: var(--s5);
   margin-bottom: 0.25rem;
   color: #999;
 }
 .layer-heading:first-of-type { margin-top: 0; }
+
 .layer-rule {
   border: none;
-  border-top: 1px solid var(--black);
-  margin-bottom: 2rem;
+  border-top: var(--rule) solid var(--black);
+  margin-bottom: var(--s4);
 }
+
+/* ── CATEGORIES ── */
 .category {
-  margin-bottom: 2.5rem;
+  margin-bottom: var(--s4);
 }
+
 .cat-label {
   font-size: 0.7rem;
   font-weight: 400;
@@ -74,26 +76,31 @@ h1 {
   text-transform: uppercase;
   margin-bottom: 0.5rem;
 }
+
 .cat-title {
-  font-size: 1rem;
+  font-size: var(--t-md);
   font-weight: 400;
-  margin-bottom: 1rem;
+  margin-bottom: var(--s2);
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--black);
+  border-bottom: var(--rule) solid var(--black);
 }
+
+/* ── QUESTION LIST ── */
 .q-list {
   list-style: none;
   counter-reset: q;
 }
+
 .q-list li {
   counter-increment: q;
   padding: 0.6rem 0;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: var(--rule) solid #e0e0e0;
   font-size: 14px;
   display: grid;
   grid-template-columns: 2rem 1fr;
   gap: 0.25rem;
 }
+
 .q-list li::before {
   content: counter(q, decimal-leading-zero);
   font-size: 0.7rem;
@@ -102,86 +109,22 @@ h1 {
   color: #999;
   padding-top: 2px;
 }
-.q-list li:last-child { border-bottom: none; }
-/* ── FOOTER ── */
-.footer {
-  margin-top: 3rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--black);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-.footer a {
-  color: var(--black);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease, opacity 0.2s ease;
-}
-.footer a:hover { opacity: 0.5; border-bottom-color: var(--black); }
-.disclaimer {
-  margin-top: 2.5rem;
-  font-size: 0.7rem;
-  font-weight: 300;
-  line-height: 1.8;
-  color: #999;
-}
-.disclaimer strong { font-weight: 400; }
-.footer-links { display: flex; align-items: center; gap: 1.5rem; }
 
+.q-list li:last-child { border-bottom: none; }
+
+/* ── NOTE ── */
 .note {
-  margin-top: 2.5rem;
+  margin-top: var(--s4);
   font-size: 0.7rem;
   font-weight: 300;
   color: #999;
   letter-spacing: 0.05em;
   line-height: 1.8;
 }
-
-/* ── SITE NAV ── */
-.site-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 3rem;
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.site-nav-links {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.site-nav-links a {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  color: var(--black);
-  text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s ease, opacity 0.2s ease;
-}
-.site-nav-links a:hover { opacity: 0.5; border-bottom-color: var(--black); }
-
-.site-nav-current {
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  opacity: 0.3;
-}
-
-@media (max-width: 640px) {
-  .site-nav { flex-direction: column; gap: 0.25rem; }
-  .footer { flex-direction: column; gap: 0.5rem; align-items: flex-start; }
-}
 </style>
 </head>
 <body>
+<div class="container">
 
 <nav class="site-nav">
   <span>B-Side No.001 — Demo</span>
@@ -415,5 +358,6 @@ h1 {
   ※ 答えた問いがそのまま Home の 6 Viewpoints テキストの素材になる。
 </div>
 
+</div><!-- /.container -->
 </body>
 </html>
