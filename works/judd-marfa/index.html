@@ -1,656 +1,753 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v5.2 / 2026.02.28 — Fix header grid, replace NOW OPEN with date only -->
+<!-- v6.0 / 2026.03.02 — booklet v2.0ベースでindex-judd置き換え。OGタグ・ナビ・フッター・Note・InfoCard統合 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
 <meta property="og:title" content="B-Side No.001 — ジャッド｜マーファ展">
 <meta property="og:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。ワタリウム美術館 2026.02–06。">
-<meta property="og:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/og-image.jpg">
+<meta property="og:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
 <meta property="og:url" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:site_name" content="B-Side by Chisaki">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="B-Side No.001 — ジャッド｜マーファ展">
 <meta name="twitter:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。">
-<meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/og-image.jpg">
+<meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
 <link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="common.css">
 <style>
-/* ── HEADER ── */
-.header {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--s5);
-  align-items: end;
-  padding-bottom: var(--s4);
-  border-bottom: var(--rule) solid var(--black);
-}
-
-.hero-title {
-  font-size: clamp(var(--t-xl), 4vw, var(--t-2xl));
-  font-weight: 400;
-  line-height: var(--lh-tight);
-  letter-spacing: -0.01em;
-}
-
-.hero-sub {
-  margin-top: var(--s1);
-  font-size: var(--t-sm);
-  font-weight: 300;
-}
-
-.meta {
-  text-align: right;
-  font-size: var(--t-sm);
-  font-weight: 300;
-  line-height: 1.8;
-}
-
-/* ── SUMMARY ── */
-.summary {
-  padding: var(--s7) 0;
-  font-size: var(--t-lg);
-  font-weight: 300;
-  line-height: 1.9;
-  text-align: center;
-  letter-spacing: 0.01em;
-}
-
-/* ── VIEWPOINT SECTION ── */
-.vp {
-  margin-bottom: var(--s7);
-}
-
-.vp-label {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  padding-bottom: var(--s2);
-  border-bottom: var(--rule) solid var(--black);
-  margin-bottom: var(--s3);
-}
-
-.vp-thumb {
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.vp-thumb::after {
-  content: 'Read';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: var(--s2) var(--s3);
-  background: linear-gradient(transparent, rgba(0,0,0,0.6));
-  color: var(--white);
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.vp-thumb:hover::after,
-.vp-thumb:focus-visible::after { opacity: 1; }
-
-.vp-thumb:focus-visible {
-  outline: 2px solid var(--black);
-  outline-offset: 2px;
-}
-
-.vp-img {
-  width: 100%;
-  max-height: 420px;
-  object-fit: cover;
-  display: block;
-  transition: opacity 0.2s;
-}
-.vp-thumb:hover .vp-img,
-.vp-thumb:focus-visible .vp-img { opacity: 0.85; }
-
-/* T02: タッチデバイスでは常時表示 */
-@media (hover: none) {
-  .vp-thumb::after { opacity: 1; }
-}
-
-.vp-caption {
-  margin-top: var(--s2);
-  font-size: var(--t-xs);
-  font-weight: 300;
-  letter-spacing: 0.05em;
-  line-height: var(--lh);
-}
-
-.vp-catch {
-  margin-top: var(--s3);
-  font-size: var(--t-md);
-  font-weight: 400;
-  line-height: 1.6;
-}
-
-.vp-short {
-  margin-top: var(--s1);
-  font-size: var(--t-sm);
-  font-weight: 300;
-  line-height: var(--lh);
-  max-width: 44rem;
-}
-
-/* ── MODAL ── */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.85);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  padding: var(--s5);
-}
-.modal-overlay.open { display: flex; }
-
-.modal {
-  background: var(--white);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  max-width: 960px;
-  max-height: 85vh;
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-}
-
-.modal-close {
-  position: absolute;
-  top: var(--s2);
-  right: var(--s3);
-  font-family: var(--font);
-  font-size: var(--t-xl);
-  font-weight: 300;
-  background: none;
-  border: none;
-  color: var(--black);
-  cursor: pointer;
-  z-index: 1001;
-  line-height: 1;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-close:hover { opacity: 0.4; }
-.modal-close:focus-visible {
-  outline: 2px solid var(--black);
-  outline-offset: 2px;
-}
-
-.modal-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.modal-text {
-  padding: var(--s5);
-  overflow-y: auto;
-}
-
-.modal-axis {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  margin-bottom: var(--s3);
-}
-
-.modal-title {
-  font-size: var(--t-lg);
-  font-weight: 400;
-  line-height: var(--lh-tight);
-  margin-bottom: var(--s3);
-}
-
-.modal-body {
-  font-size: var(--t-sm);
-  font-weight: 300;
-  line-height: 1.9;
-  margin-bottom: var(--s4);
-}
-
-.modal-body p + p { margin-top: 1em; }
-
-.modal-caption {
-  font-size: var(--t-xs);
-  font-weight: 300;
-  line-height: var(--lh);
-  padding-top: var(--s3);
-  border-top: var(--rule) solid var(--black);
-}
-
-/* ── INFO CARD ── */
-.info-card {
-  margin-top: var(--s5);
-  padding: var(--s5);
-  border: var(--rule) solid var(--black);
-}
-
-.info-card-title {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  margin-bottom: var(--s3);
-}
-
-.info-row {
-  display: grid;
-  grid-template-columns: 7rem 1fr;
-  gap: var(--s2);
-  padding: var(--s1) 0;
-  font-size: var(--t-sm);
-  font-weight: 300;
-}
-
-.info-label {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-/* ── QUOTE ── */
-.quote-block {
-  padding: var(--s6) 0;
-  text-align: center;
-}
-
-.quote-text {
-  font-size: var(--t-md);
-  font-weight: 300;
-  line-height: 1.8;
-  font-style: italic;
-}
-
-.quote-text::before { content: '\201C'; }
-.quote-text::after { content: '\201D'; }
-
-.quote-attr {
-  margin-top: var(--s2);
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.1em;
-}
-
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .modal {
-    grid-template-columns: 1fr;
-    max-height: 90vh;
+  :root {
+    --white: #f0f0f0;
+    --black: #1d1d1f;
+    --font: 'Libre Franklin', 'Helvetica Neue', sans-serif;
+    --font-jp: 'Noto Sans JP', sans-serif;
   }
-  .modal-img { max-height: 40vh; }
-}
 
-@media (max-width: 640px) {
-  .header { grid-template-columns: 1fr; gap: var(--s3); }
-  .meta { text-align: left; }
-  .summary { padding: var(--s6) 0; }
-  .info-row { grid-template-columns: 1fr; gap: 2px; }
-}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-@media print {
-  .modal-overlay { display: none !important; }
-  .vp-thumb::after { display: none; }
-}
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--white);
+    background: var(--black);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ════════════════════════════════════════
+     BOOKLET CONTAINER
+     ════════════════════════════════════════ */
+  .booklet {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .booklet::-webkit-scrollbar { display: none; }
+
+  .page {
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+  }
+  .page.page-endmatter {
+    overflow-y: auto;
+  }
+
+  .page img.bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ════════════════════════════════════════
+     COVER
+     ════════════════════════════════════════ */
+  .page-cover {
+    background: var(--black);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 48px 36px;
+  }
+  .page-cover .cover-no {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.4;
+    margin-bottom: 12px;
+  }
+  .page-cover .cover-title {
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 300;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+  }
+  .page-cover .cover-sub {
+    font-size: 13px;
+    font-weight: 300;
+    opacity: 0.5;
+    line-height: 1.8;
+  }
+  .page-cover .cover-hint {
+    position: absolute;
+    right: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    font-weight: 300;
+    opacity: 0.4;
+    letter-spacing: 0.1em;
+  }
+
+  /* ════════════════════════════════════════
+     PHOTO PAGE — LAYOUT D
+     ════════════════════════════════════════ */
+  .photo-d .title-area {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 36px;
+    max-width: 50%;
+    text-align: right;
+    z-index: 2;
+  }
+  .words-title {
+    font-family: var(--font-jp);
+    font-size: clamp(17px, 2.5vw, 24px);
+    font-weight: 400;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .words-title .sub {
+    display: block;
+    font-size: clamp(12px, 1.6vw, 15px);
+    font-weight: 300;
+    opacity: 1;
+    margin-top: 6px;
+    letter-spacing: 0.03em;
+  }
+  .words-title .lang-en {
+    font-family: var(--font);
+    font-size: clamp(19px, 2.8vw, 27px);
+    letter-spacing: 0.01em;
+  }
+  .words-title .lang-en .sub {
+    font-size: clamp(13px, 1.8vw, 16px);
+  }
+  .credit {
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    opacity: 0.7;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    margin-top: 12px;
+  }
+
+  /* ════════════════════════════════════════
+     TEXT PAGE
+     ════════════════════════════════════════ */
+  .page-text {
+    background: var(--black);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 48px 40px;
+    overflow-y: auto;
+  }
+  .page-text .text-inner {
+    margin: auto 0;
+    text-align: center;
+  }
+
+  .words-body {
+    font-family: var(--font-jp);
+    font-size: clamp(13px, 1.5vw, 15px);
+    font-weight: 300;
+    line-height: 2.2;
+    opacity: 0.85;
+  }
+  .words-body-en {
+    font-family: var(--font);
+    font-size: clamp(12px, 1.4vw, 14px);
+    font-weight: 300;
+    line-height: 2.0;
+    opacity: 0.85;
+    letter-spacing: 0.01em;
+  }
+  .stanza { margin-bottom: 1.6em; }
+  .stanza:last-child { margin-bottom: 0; }
+  .stanza-end { margin-top: 2em; }
+
+  /* ════════════════════════════════════════
+     CLOSING
+     ════════════════════════════════════════ */
+  .page-closing {
+    background: var(--black);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 36px;
+    text-align: center;
+  }
+  .page-closing .closing-title {
+    font-size: clamp(22px, 4vw, 32px);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+  .page-closing .closing-sub {
+    font-size: 11px;
+    font-weight: 300;
+    opacity: 0.4;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 48px;
+  }
+  .page-closing .closing-links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .page-closing .closing-links a {
+    color: var(--white);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 300;
+    opacity: 0.5;
+    letter-spacing: 0.08em;
+    transition: opacity 0.2s;
+  }
+  .page-closing .closing-links a:hover {
+    opacity: 0.8;
+  }
+
+  /* ════════════════════════════════════════
+     ENDMATTER（縦スクロールページ群）
+     ════════════════════════════════════════ */
+  .page-endmatter {
+    background: var(--black);
+    overflow-y: auto;
+    padding: 48px 40px 80px;
+  }
+  .endmatter-inner {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  /* ── SITE NAV ── */
+  .site-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(240,240,240,0.12);
+    margin-bottom: 48px;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+  }
+  .site-nav a {
+    color: var(--white);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .site-nav a:hover { opacity: 0.8; }
+  .site-nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  .site-nav-current {
+    opacity: 0.4;
+  }
+
+  /* ── QUOTE ── */
+  .quote-block {
+    padding: 48px 0;
+    text-align: center;
+  }
+  .quote-text {
+    font-size: clamp(14px, 1.6vw, 16px);
+    font-weight: 300;
+    line-height: 1.8;
+    font-style: italic;
+    opacity: 0.7;
+  }
+  .quote-text::before { content: '\201C'; }
+  .quote-text::after { content: '\201D'; }
+  .quote-attr {
+    margin-top: 12px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    opacity: 0.5;
+  }
+
+  /* ── INFO CARD ── */
+  .info-card {
+    padding: 32px;
+    border: 1px solid rgba(240,240,240,0.12);
+  }
+  .info-card-title {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    opacity: 0.5;
+  }
+  .info-row {
+    display: grid;
+    grid-template-columns: 6.5rem 1fr;
+    gap: 8px;
+    padding: 6px 0;
+    font-size: 13px;
+    font-weight: 300;
+  }
+  .info-label {
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+  .info-card a {
+    color: var(--white);
+    text-decoration: none;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .info-card a:hover { opacity: 1; }
+
+  /* ── FOOTER ── */
+  .endmatter-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(240,240,240,0.12);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 300;
+    opacity: 0.4;
+  }
+  .endmatter-footer a {
+    color: var(--white);
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .endmatter-footer a:hover { opacity: 0.8; }
+  .footer-icons {
+    display: flex;
+    gap: 12px;
+  }
+  .footer-icons svg { fill: var(--white); }
+
+  /* ── NOTE ── */
+  .note {
+    margin-top: 32px;
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 1.8;
+    opacity: 0.3;
+  }
+  .note strong {
+    font-weight: 400;
+  }
+
+  @media (max-width: 640px) {
+    .site-nav {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .info-row { grid-template-columns: 1fr; gap: 2px; }
+    .endmatter-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
+  }
+
+  /* ════════════════════════════════════════
+     日英切替（グローバル）
+     ════════════════════════════════════════ */
+  .lang-ja, .lang-en { transition: opacity 0.4s ease; }
+  .lang-en { display: none; }
+  body.show-en .lang-ja { display: none; }
+  body.show-en .lang-en { display: block; }
+  body.show-en span.lang-en { display: inline; }
+  span.lang-ja { display: inline; }
+
+  /* ════════════════════════════════════════
+     LANG BUTTON（全ページ共通）
+     ════════════════════════════════════════ */
+  .lang-btn {
+    position: absolute;
+    top: 28px;
+    right: 32px;
+    font-size: 11px;
+    font-weight: 300;
+    font-family: var(--font);
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    cursor: pointer;
+    background: none;
+    color: var(--white);
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .lang-btn:hover { opacity: 0.5; }
+  .lang-btn:active { opacity: 0.6; }
+
+  /* ════════════════════════════════════════
+     FADE-IN
+     ════════════════════════════════════════ */
+  .fade-target {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .fade-target.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .credit.fade-target.visible { opacity: 0.7; }
+  .words-body.fade-target.visible { opacity: 0.85; }
+  .words-body-en.fade-target.visible { opacity: 0.85; }
+
+  /* ════════════════════════════════════════
+     PAGE INDICATOR
+     ════════════════════════════════════════ */
+  .page-indicator {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 100;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--white);
+    opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+  .dot.active { opacity: 0.8; }
+
+  /* ════════════════════════════════════════
+     NAV ARROWS (PC only)
+     ════════════════════════════════════════ */
+  .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.2;
+    transition: opacity 0.2s;
+    z-index: 100;
+    padding: 16px;
+    font-family: var(--font);
+    font-weight: 300;
+  }
+  .nav-arrow:hover { opacity: 0.6; }
+  .nav-prev { left: 8px; }
+  .nav-next { right: 8px; }
+
+  @media (max-width: 640px) {
+    .photo-d .title-area {
+      max-width: 80%;
+      padding: 28px;
+    }
+    .words-title .lang-en {
+      font-size: 22px;
+    }
+    .words-title .lang-en .sub {
+      font-size: 14px;
+    }
+    .page-text { padding: 48px 32px; }
+    .nav-arrow { display: none; }
+    .lang-btn {
+      top: 24px;
+      right: 24px;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="container">
 
-  <nav class="site-nav">
-    <span>B-Side No.001 — Demo</span>
-    <div class="site-nav-links">
-      <a href="../../">Home</a>
-      <span class="site-nav-current">Liner Notes</span>
-      <a href="judd-backstage.html">Backstage</a>
-      <a href="../../#credits">Credits</a>
+<div class="booklet" id="booklet">
+
+  <!-- ══════════════════════════════════════════════
+       COVER
+       ══════════════════════════════════════════════ -->
+  <div class="page page-cover">
+    <div class="cover-no">B-Side No.001</div>
+    <div class="cover-title">JUDD | Marfa</div>
+    <div class="cover-sub">
+      <span class="lang-ja">ワタリウム美術館<br>2026.02.25 visited</span>
+      <span class="lang-en">WATARI-UM Museum<br>2026.02.25 visited</span>
     </div>
-  </nav>
-
-  <main>
-
-  <header class="header">
-    <div>
-      <h1 class="hero-title">ジャッド｜マーファ展</h1>
-      <div class="hero-sub">JUDD | Marfa — WATARI-UM, The Museum of Contemporary Art, Tokyo</div>
-    </div>
-    <div class="meta">
-      <div>2026.02.25</div>
-    </div>
-  </header>
-
-  <div class="summary">
-    素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。
+    <div class="cover-hint">Swipe to read →</div>
+    <button class="lang-btn">EN</button>
   </div>
 
-
-  <!-- ── 01 MATERIAL ── -->
-  <section class="vp">
-    <h2 class="vp-label">01 / Material</h2>
-    <div class="vp-thumb" role="button" tabindex="0" aria-label="Material — 詳細を読む" data-modal="material">
-      <img class="vp-img" src="images/material.jpg" alt="Material — 亜鉛メッキ鉄スタックの影とスパングル" loading="lazy">
+  <!-- ══════════════════════════════════════════════
+       2A: Material — 写真ページ
+       ══════════════════════════════════════════════ -->
+  <div class="page photo-d">
+    <img class="bg" src="images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
+    <div class="title-area">
+      <div class="words-title fade-target">
+        <span class="lang-ja">「見えないもの」を知覚する<span class="sub">グレーに浮かぶ、桜のピンク</span></span>
+        <span class="lang-en">Perceiving the invisible<span class="sub">Cherry blossom pink, floating in grey</span></span>
+      </div>
+      <div class="credit fade-target" style="transition-delay: 0.15s;">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</div>
     </div>
-    <div class="vp-caption">Untitled, 1967, Galvanized iron. Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</div>
-    <div class="vp-catch">亜鉛メッキ鉄の表面に浮かぶ結晶模様——工業素材がそのまま視覚になる</div>
-    <div class="vp-short">1967年の亜鉛メッキ鉄スタック。表面に浮かぶスパングルと呼ばれる結晶模様は、雪の結晶や星のような幾何学模様で、純粋に綺麗だった。塗装でもテクスチャでもなく、亜鉛という素材が自ら生み出したもの。ジャッドはこの種の素材を「ありふれた商業用材料」と呼びながら、それ自体が色であり質感であることを見ていた。</div>
-  </section>
+    <button class="lang-btn">EN</button>
+  </div>
 
-  <div class="modal-overlay" id="modal-material" role="dialog" aria-modal="true" aria-labelledby="modal-title-material">
-    <div class="modal">
-      <button class="modal-close" aria-label="閉じる" data-close="material">×</button>
-      <img class="modal-img" src="images/material.jpg" alt="Material">
-      <div class="modal-text">
-        <div class="modal-axis">01 / Material</div>
-        <div class="modal-title" id="modal-title-material">亜鉛メッキ鉄の表面に浮かぶ結晶模様——工業素材がそのまま視覚になる</div>
-        <div class="modal-body">
-          <p>1967年の亜鉛メッキ鉄スタック。表面に浮かぶスパングルと呼ばれる結晶模様は、雪の結晶や星のような幾何学模様で、純粋に綺麗だった。塗装でもテクスチャでもなく、亜鉛という素材が自ら生み出したもの。</p>
-          <p>ジャッドはこの種の素材を「ありふれた商業用材料」と呼びながら、それ自体が色であり質感であることを見ていた。手仕事の痕跡はどこにもない。64年からジャッドは加工業者に製造を委ねている。</p>
+  <!-- ══════════════════════════════════════════════
+       2A: Material — テキストページ
+       ══════════════════════════════════════════════ -->
+  <div class="page page-text">
+    <div class="text-inner">
+      <div class="lang-ja">
+        <div class="words-body fade-target">
+          <div class="stanza">雨の日の昼下がり<br>静かなワタリウム</div>
+          <div class="stanza">マーファは雨が降るのだろうか。</div>
+          <div class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</div>
+          <div class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</div>
+          <div class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</div>
+          <div class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</div>
+          <div class="stanza-end">春の気配がした</div>
         </div>
-        <div class="modal-caption">Untitled, 1967, Galvanized iron.<br>Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</div>
+      </div>
+      <div class="lang-en">
+        <div class="words-body-en fade-target">
+          <div class="stanza">A rainy afternoon<br>Quiet Watari-Um</div>
+          <div class="stanza">Does it rain in Marfa?</div>
+          <div class="stanza">Thinking about that<br>as I enter Judd's world</div>
+          <div class="stanza">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</div>
+          <div class="stanza">Yet its surface was soft and warm<br>draped in drifting light</div>
+          <div class="stanza">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</div>
+          <div class="stanza-end">A hint of spring</div>
+        </div>
       </div>
     </div>
+    <button class="lang-btn">EN</button>
   </div>
 
+  <!-- ══════════════════════════════════════════════
+       W1: Light — 写真ページ
+       ══════════════════════════════════════════════ -->
+  <div class="page photo-d">
+    <img class="bg" src="images/judd-w1.jpg" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
+    <button class="lang-btn">EN</button>
+  </div>
 
-  <!-- ── 02 LIGHT ── -->
-  <section class="vp">
-    <h2 class="vp-label">02 / Light</h2>
-    <div class="vp-thumb" role="button" tabindex="0" aria-label="Light — 詳細を読む" data-modal="light">
-      <img class="vp-img" src="images/light.jpg" alt="Light — コンクリート梁のV字の光と影" loading="lazy">
+  <!-- ══════════════════════════════════════════════
+       6D: Color — 写真ページ
+       ══════════════════════════════════════════════ -->
+  <div class="page photo-d">
+    <img class="bg" src="images/judd-6d.jpg" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
+    <button class="lang-btn">EN</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       W2: Space — 写真ページ
+       ══════════════════════════════════════════════ -->
+  <div class="page photo-d">
+    <img class="bg" src="images/judd-w2.jpg" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
+    <button class="lang-btn">EN</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       2B: Repetition — 写真ページ
+       ══════════════════════════════════════════════ -->
+  <div class="page photo-d">
+    <img class="bg" src="images/judd-2b.jpg" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass, 10 units">
+    <button class="lang-btn">EN</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       5B: Time — 写真ページ
+       ══════════════════════════════════════════════ -->
+  <div class="page photo-d">
+    <img class="bg" src="images/judd-5b.jpg" alt="Untitled, 1989, Painted aluminum">
+    <button class="lang-btn">EN</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════
+       CLOSING
+       ══════════════════════════════════════════════ -->
+  <div class="page page-closing">
+    <div class="closing-title">JUDD | Marfa</div>
+    <div class="closing-sub">B-Side No.001</div>
+    <div class="closing-links">
+      <a href="judd-backstage.html">Backstage →</a>
+      <a href="../../">Home →</a>
     </div>
-    <div class="vp-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
-    <div class="vp-catch">雨のグレーの光が、金属の表面を静かにしていた</div>
-    <div class="vp-short">訪問日は雨だった。ボッタの建築が取り込むグレーがかった外光は、コンクリートの陰影と金属表面の反射を穏やかに統合していた。天井のダイヤ格子から落ちる光、縦長3連窓から入る光。晴れた日に来ていたら、同じ作品がまったく違って見えていたと思う。</div>
-  </section>
+    <button class="lang-btn">EN</button>
+  </div>
 
-  <div class="modal-overlay" id="modal-light" role="dialog" aria-modal="true" aria-labelledby="modal-title-light">
-    <div class="modal">
-      <button class="modal-close" aria-label="閉じる" data-close="light">×</button>
-      <img class="modal-img" src="images/light.jpg" alt="Light">
-      <div class="modal-text">
-        <div class="modal-axis">02 / Light</div>
-        <div class="modal-title" id="modal-title-light">雨のグレーの光が、金属の表面を静かにしていた</div>
-        <div class="modal-body">
-          <p>訪問日は雨だった。ボッタの建築が取り込むグレーがかった外光は、コンクリートの陰影と金属表面の反射を穏やかに統合していた。天井のダイヤ格子から落ちる光、縦長3連窓から入る光。</p>
-          <p>晴れた日に来ていたら、同じ作品がまったく違って見えていたと思う。マーファの乾いた砂漠の光の下では、なおさら。</p>
+  <!-- ══════════════════════════════════════════════
+       ENDMATTER（Info / Quote / Footer / Note）
+       ══════════════════════════════════════════════ -->
+  <div class="page page-endmatter">
+    <div class="endmatter-inner">
+
+      <nav class="site-nav">
+        <span>B-Side No.001 — Demo</span>
+        <div class="site-nav-links">
+          <a href="../../">Home</a>
+          <span class="site-nav-current">Liner Notes</span>
+          <a href="judd-backstage.html">Backstage</a>
+          <a href="../../#credits">Credits</a>
         </div>
-        <div class="modal-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
+      </nav>
+
+      <div class="quote-block">
+        <div class="quote-text lang-ja">私にとって、ここは何もない田舎ではない。世界の中心なんだ。</div>
+        <div class="quote-text lang-en">To me, this isn't the middle of nowhere. It's the center of the world.</div>
+        <div class="quote-attr">Donald Judd, 1993</div>
       </div>
-    </div>
-  </div>
 
+      <div class="info-card">
+        <div class="info-card-title">Exhibition Info</div>
+        <div class="info-row"><span class="info-label">Exhibition</span><span><span class="lang-ja">ドナルド・ジャッド｜マーファ展</span><span class="lang-en">JUDD | Marfa</span></span></div>
+        <div class="info-row"><span class="info-label">Venue</span><span><span class="lang-ja">ワタリウム美術館 — 東京都渋谷区神宮前3-7-6</span><span class="lang-en">WATARI-UM, The Watari Museum of Contemporary Art — 3-7-6 Jingumae, Shibuya, Tokyo</span></span></div>
+        <div class="info-row"><span class="info-label">Dates</span><span>2026.02.15 – 06.07</span></div>
+        <div class="info-row"><span class="info-label">Hours</span><span><span class="lang-ja">11:00 – 19:00（月曜休館）</span><span class="lang-en">11:00 – 19:00 (Closed on Mondays)</span></span></div>
+        <div class="info-row"><span class="info-label">Admission</span><span><span class="lang-ja">一般 ¥1,500 / 学生 ¥1,300</span><span class="lang-en">Adults ¥1,500 / Students ¥1,300</span></span></div>
+        <div class="info-row"><span class="info-label">Photo</span><span><span class="lang-ja">撮影可（受付で確認済み）</span><span class="lang-en">Photography permitted (confirmed at reception)</span></span></div>
+        <div class="info-row"><span class="info-label">Website</span><span><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp</a></span></div>
+      </div>
 
-  <!-- ── 03 COLOR ── -->
-  <section class="vp">
-    <h2 class="vp-label">03 / Color</h2>
-    <div class="vp-thumb" role="button" tabindex="0" aria-label="Color — 詳細を読む" data-modal="color">
-      <img class="vp-img" src="images/color.jpg" alt="Color — グレー×オレンジボックス正面" loading="lazy">
-    </div>
-    <div class="vp-caption">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass. Collection: Judd Foundation</div>
-    <div class="vp-catch">プレキシグラスの色は、素材に最初からある色だった</div>
-    <div class="vp-short">金属に塗料を重ねると素材の本質を偽る——そう考えたジャッドは、プレキシグラスという「それ自体が色を持つ素材」に至った。3階にはRALカラーチャートの実物が展示されていて、色の選択が抽象的な判断ではなく物質的な比較のプロセスだったことがわかる。アンバーのプレキシグラスの奥から、不思議なオレンジの光が底面に漏れていた。</div>
-  </section>
-
-  <div class="modal-overlay" id="modal-color" role="dialog" aria-modal="true" aria-labelledby="modal-title-color">
-    <div class="modal">
-      <button class="modal-close" aria-label="閉じる" data-close="color">×</button>
-      <img class="modal-img" src="images/color.jpg" alt="Color">
-      <div class="modal-text">
-        <div class="modal-axis">03 / Color</div>
-        <div class="modal-title" id="modal-title-color">プレキシグラスの色は、素材に最初からある色だった</div>
-        <div class="modal-body">
-          <p>金属に塗料を重ねると素材の本質を偽る——そう考えたジャッドは、プレキシグラスという「それ自体が色を持つ素材」に至った。3階にはRALカラーチャートの実物が展示されていて、色の選択が抽象的な判断ではなく物質的な比較のプロセスだったことがわかる。</p>
-          <p>工業用の色見本帳がアート作品の思考プロセスとして額装されている。アンバーのプレキシグラスの奥から、不思議なオレンジの光が底面に漏れていた。</p>
+      <footer class="endmatter-footer">
+        <span>© 2026 <a href="../../">Chisaki Hayakawa</a></span>
+        <div class="footer-icons">
+          <a href="https://github.com/chisakihayakawa" target="_blank" rel="noopener" aria-label="GitHub">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          </a>
+          <a href="https://www.instagram.com/ch15aki/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+          </a>
         </div>
-        <div class="modal-caption">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass.<br>Collection: Judd Foundation</div>
+      </footer>
+
+      <div class="note">
+        <strong>Note</strong><br>
+        <span class="lang-ja">本ページは展覧会「ジャッド｜マーファ展」（ワタリウム美術館、2026年）の鑑賞記録として作成した個人制作物であり、美術館の公式コンテンツではありません。写真は美術館の許可のもと撮影しています。展示情報は公式サイト（watarium.co.jp）および公開情報に基づいていますが、正確な情報は公式サイトをご確認ください。</span>
+        <span class="lang-en">This page is a personal documentation of the exhibition "JUDD | Marfa" (WATARI-UM, 2026) and is not official museum content. Photos were taken with museum permission. Exhibition details are based on publicly available information; please refer to the official website (watarium.co.jp) for accurate information.</span>
       </div>
+
     </div>
-  </div>
-
-
-  <!-- ── 04 SPACE ── -->
-  <section class="vp">
-    <h2 class="vp-label">04 / Space</h2>
-    <div class="vp-thumb" role="button" tabindex="0" aria-label="Space — 詳細を読む" data-modal="space">
-      <img class="vp-img" src="images/space.jpg" alt="Space — 外螺旋階段とグリッドガラスのシルエット" loading="lazy">
-    </div>
-    <div class="vp-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
-    <div class="vp-catch">この建物は中性的な容器ではなく、ジャッドの作品を見る体験の一部だった</div>
-    <div class="vp-short">マリオ・ボッタ設計のワタリウムは初訪問だった。三角形の平面、吹き抜けと通常天井の使い分け、外階段の曲線とグリッドガラスの直線。「ニュートラルな空間など存在しない」と書いたジャッドの作品が、この建築の中で見えている。マーファからの仮住まいであっても、この空間は中性的な容器ではなかった。</div>
-  </section>
-
-  <div class="modal-overlay" id="modal-space" role="dialog" aria-modal="true" aria-labelledby="modal-title-space">
-    <div class="modal">
-      <button class="modal-close" aria-label="閉じる" data-close="space">×</button>
-      <img class="modal-img" src="images/space.jpg" alt="Space">
-      <div class="modal-text">
-        <div class="modal-axis">04 / Space</div>
-        <div class="modal-title" id="modal-title-space">この建物は中性的な容器ではなく、ジャッドの作品を見る体験の一部だった</div>
-        <div class="modal-body">
-          <p>マリオ・ボッタ設計のワタリウムは初訪問だった。三角形の平面、吹き抜けと通常天井の使い分け、外階段の曲線とグリッドガラスの直線。「ニュートラルな空間など存在しない」と書いたジャッドの作品が、この建築の中で見えている。</p>
-          <p>マーファからの仮住まいであっても、この空間は中性的な容器ではなかった。建物自体がもうひとつの展示物だった。</p>
-        </div>
-        <div class="modal-caption">WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)</div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ── 05 REPETITION ── -->
-  <section class="vp">
-    <h2 class="vp-label">05 / Repetition</h2>
-    <div class="vp-thumb" role="button" tabindex="0" aria-label="Repetition — 詳細を読む" data-modal="repetition">
-      <img class="vp-img" src="images/repetition.jpg" alt="Repetition — 黒アノダイズドアルミの壁付きスタック正面" loading="lazy">
-    </div>
-    <div class="vp-caption">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units). Collection: Shizuoka Prefectural Museum of Art</div>
-    <div class="vp-catch">展示室で一番長くいた作品。3メートルの反復が体に入ってくる</div>
-    <div class="vp-short">黒アノダイズドアルミとブロンズのプレキシグラス、10ユニット。2階の吹き抜けに3メートルを超えて積み重なるスタックは、この展示で一番足が止まった作品だった。不透明な金属と半透明な樹脂が等間隔で交替する。壁から突き出した金属の重さが体に伝わってくる。見上げているうちに、反復は数えるものではなく、体が受け取るものだとわかる。</div>
-  </section>
-
-  <div class="modal-overlay" id="modal-repetition" role="dialog" aria-modal="true" aria-labelledby="modal-title-repetition">
-    <div class="modal">
-      <button class="modal-close" aria-label="閉じる" data-close="repetition">×</button>
-      <img class="modal-img" src="images/repetition.jpg" alt="Repetition">
-      <div class="modal-text">
-        <div class="modal-axis">05 / Repetition</div>
-        <div class="modal-title" id="modal-title-repetition">展示室で一番長くいた作品。3メートルの反復が体に入ってくる</div>
-        <div class="modal-body">
-          <p>黒アノダイズドアルミとブロンズのプレキシグラス、10ユニット。2階の吹き抜けに3メートルを超えて積み重なるスタックは、この展示で一番足が止まった作品だった。不透明な金属と半透明な樹脂が等間隔で交替する。</p>
-          <p>壁から突き出した金属の重さが体に伝わってくる。見上げているうちに、反復は数えるものではなく、体が受け取るものだとわかる。</p>
-        </div>
-        <div class="modal-caption">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units).<br>Collection: Shizuoka Prefectural Museum of Art</div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ── 06 TIME ── -->
-  <section class="vp">
-    <h2 class="vp-label">06 / Time</h2>
-    <div class="vp-thumb" role="button" tabindex="0" aria-label="Time — 詳細を読む" data-modal="time">
-      <img class="vp-img" src="images/time.jpg" alt="Time — 赤×黄の壁付き作品を3Fから見下ろした構図" loading="lazy">
-    </div>
-    <div class="vp-caption">Untitled, 1989, Painted aluminum. Collection: Kirishima Open-Air Museum</div>
-    <div class="vp-catch">2Fで正面から見た作品を、3Fから見下ろしている</div>
-    <div class="vp-short">階を移動するたびに、さっき見た作品が別の角度から見えてくる。ボッタの吹き抜け構造がそれを可能にしている。同じ作品が、自分の体験の中の別の時点として存在する。グラフィックデザインやPCの中で仕事をしてきた自分にとって、3メートルの金属を見上げ、光の中で素材を見る体験は画面では得られないものだった。この展示は2026年6月に終わる。ジャッドが「その場限りのパフォーマンスにしてはならない」と書いた作品を、一時的な企画展で見ている。その矛盾がずっと残っている。</div>
-  </section>
-
-  <div class="modal-overlay" id="modal-time" role="dialog" aria-modal="true" aria-labelledby="modal-title-time">
-    <div class="modal">
-      <button class="modal-close" aria-label="閉じる" data-close="time">×</button>
-      <img class="modal-img" src="images/time.jpg" alt="Time">
-      <div class="modal-text">
-        <div class="modal-axis">06 / Time</div>
-        <div class="modal-title" id="modal-title-time">2Fで正面から見た作品を、3Fから見下ろしている</div>
-        <div class="modal-body">
-          <p>階を移動するたびに、さっき見た作品が別の角度から見えてくる。ボッタの吹き抜け構造がそれを可能にしている。同じ作品が、自分の体験の中の別の時点として存在する。</p>
-          <p>グラフィックデザインやPCの中で仕事をしてきた自分にとって、3メートルの金属を見上げ、光の中で素材を見る体験は画面では得られないものだった。この展示は2026年6月に終わる。ジャッドが「その場限りのパフォーマンスにしてはならない」と書いた作品を、一時的な企画展で見ている。その矛盾がずっと残っている。</p>
-        </div>
-        <div class="modal-caption">Untitled, 1989, Painted aluminum.<br>Collection: Kirishima Open-Air Museum</div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- ── QUOTE ── -->
-  <div class="quote-block">
-    <div class="quote-text">私にとって、ここは何もない田舎ではない。世界の中心なんだ。</div>
-    <div class="quote-attr">Donald Judd, 1993</div>
-  </div>
-
-
-  <!-- ── INFO CARD ── -->
-  <div class="info-card">
-    <div class="info-card-title">Exhibition Info</div>
-    <div class="info-row"><span class="info-label">Exhibition</span><span>ドナルド・ジャッド｜マーファ展</span></div>
-    <div class="info-row"><span class="info-label">Venue</span><span>ワタリウム美術館 — 東京都渋谷区神宮前3-7-6</span></div>
-    <div class="info-row"><span class="info-label">Dates</span><span>2026.02.15 – 06.07</span></div>
-    <div class="info-row"><span class="info-label">Hours</span><span>11:00 – 19:00（月曜休館）</span></div>
-    <div class="info-row"><span class="info-label">Admission</span><span>一般 ¥1,500 / 学生 ¥1,300</span></div>
-    <div class="info-row"><span class="info-label">Photo</span><span>撮影可（受付で確認済み）</span></div>
-    <div class="info-row"><span class="info-label">Website</span><span><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp</a></span></div>
-  </div>
-
-
-  </main>
-
-  <!-- ── FOOTER ── -->
-  <footer class="footer">
-    <span>© 2026 <a href="../../">Chisaki Hayakawa</a></span>
-    <div class="footer-links">
-      <a href="https://github.com/chisakihayakawa" target="_blank" rel="noopener" aria-label="GitHub">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      </a>
-      <a href="https://www.instagram.com/ch15aki/" target="_blank" rel="noopener" aria-label="Instagram">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-      </a>
-    </div>
-  </footer>
-
-  <div class="disclaimer">
-    <strong>Note</strong><br>
-    本ページは展覧会「ジャッド｜マーファ展」（ワタリウム美術館、2026年）の鑑賞記録として作成した個人制作物であり、美術館の公式コンテンツではありません。写真は美術館の許可のもと撮影しています。展示情報は公式サイト（watarium.co.jp）および公開情報に基づいていますが、正確な情報は公式サイトをご確認ください。
+    <button class="lang-btn">EN</button>
   </div>
 
 </div>
 
+<!-- Page indicator dots -->
+<div class="page-indicator" id="indicator"></div>
+
+<!-- Nav arrows (PC) -->
+<button class="nav-arrow nav-prev" id="prevBtn" aria-label="前のページ">‹</button>
+<button class="nav-arrow nav-next" id="nextBtn" aria-label="次のページ">›</button>
+
 <script>
-let lastFocusedElement = null;
+const booklet = document.getElementById('booklet');
+const pages = booklet.querySelectorAll('.page');
+const indicator = document.getElementById('indicator');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
 
-function openModal(id) {
-  const el = document.getElementById('modal-' + id);
-  if (!el) return;
-  lastFocusedElement = document.activeElement;
-  el.classList.add('open');
-  document.body.style.overflow = 'hidden';
-  const closeBtn = el.querySelector('.modal-close');
-  if (closeBtn) closeBtn.focus();
-}
-
-function closeAllModals() {
-  document.querySelectorAll('.modal-overlay.open').forEach(m => {
-    m.classList.remove('open');
-  });
-  document.body.style.overflow = '';
-  if (location.hash) history.replaceState(null, '', location.pathname);
-  if (lastFocusedElement) {
-    lastFocusedElement.focus();
-    lastFocusedElement = null;
-  }
-}
-
-function closeModal(id) {
-  document.getElementById('modal-' + id).classList.remove('open');
-  document.body.style.overflow = '';
-  if (location.hash) history.replaceState(null, '', location.pathname);
-  if (lastFocusedElement) {
-    lastFocusedElement.focus();
-    lastFocusedElement = null;
-  }
-}
-
-// Open modal from URL hash (#material, #light, etc.)
-function openFromHash() {
-  const hash = location.hash.slice(1);
-  if (hash) openModal(hash);
-}
-
-window.addEventListener('hashchange', openFromHash);
-window.addEventListener('DOMContentLoaded', openFromHash);
-
-// vp-thumb: click and keyboard (Enter/Space)
-document.querySelectorAll('.vp-thumb[data-modal]').forEach(thumb => {
-  const id = thumb.dataset.modal;
-  thumb.addEventListener('click', () => openModal(id));
-  thumb.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      openModal(id);
-    }
-  });
+// ── Dots ──
+pages.forEach((_, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  indicator.appendChild(dot);
 });
+const dots = indicator.querySelectorAll('.dot');
 
-// modal-close: click
-document.querySelectorAll('.modal-close[data-close]').forEach(btn => {
-  btn.addEventListener('click', () => closeModal(btn.dataset.close));
+function updateDots() {
+  const scrollLeft = booklet.scrollLeft;
+  const pageWidth = booklet.clientWidth;
+  const current = Math.round(scrollLeft / pageWidth);
+  dots.forEach((d, i) => d.classList.toggle('active', i === current));
+}
+booklet.addEventListener('scroll', updateDots);
+
+// ── Arrow nav ──
+prevBtn.addEventListener('click', () => {
+  booklet.scrollBy({ left: -booklet.clientWidth, behavior: 'smooth' });
 });
-
-// Close on overlay click
-document.querySelectorAll('.modal-overlay').forEach(overlay => {
-  overlay.addEventListener('click', (e) => {
-    if (e.target === overlay) closeAllModals();
-  });
+nextBtn.addEventListener('click', () => {
+  booklet.scrollBy({ left: booklet.clientWidth, behavior: 'smooth' });
 });
-
-// Close on Escape + focus trap (Tab cycling)
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeAllModals();
-    return;
-  }
+  if (e.key === 'ArrowLeft') booklet.scrollBy({ left: -booklet.clientWidth, behavior: 'smooth' });
+  if (e.key === 'ArrowRight') booklet.scrollBy({ left: booklet.clientWidth, behavior: 'smooth' });
+});
 
-  if (e.key === 'Tab') {
-    const openOverlay = document.querySelector('.modal-overlay.open');
-    if (!openOverlay) return;
-    const focusable = openOverlay.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
-    if (focusable.length === 0) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    if (e.shiftKey) {
-      if (document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      }
+// ── Fade-in ──
+const fadeObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const targets = entry.target.querySelectorAll('.fade-target');
+    if (entry.isIntersecting) {
+      targets.forEach(t => t.classList.add('visible'));
     } else {
-      if (document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
+      targets.forEach(t => t.classList.remove('visible'));
     }
-  }
+  });
+}, {
+  root: booklet,
+  threshold: 0.5
+});
+pages.forEach(page => fadeObserver.observe(page));
+
+// ── グローバル言語切替 ──
+const langBtns = document.querySelectorAll('.lang-btn');
+
+function toggleLang() {
+  const isEn = document.body.classList.toggle('show-en');
+  langBtns.forEach(btn => {
+    btn.textContent = isEn ? 'JP' : 'EN';
+  });
+}
+
+langBtns.forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleLang();
+  });
 });
 </script>
+
 </body>
 </html>
