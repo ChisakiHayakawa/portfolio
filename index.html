@@ -4,19 +4,19 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v5.9 / 2026.02.28 — C13: bio更新 + ヘッダーUI再構成 + セマンティック修正 + フッター簡略化 -->
+<!-- v6.0 / 2026.03.02 — ギャラリーグリッド→サムネイル1枚化、OG画像パス修正、不要CSS削除 -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="Chisaki Hayakawa — Photographer / Designer / Engineer">
 <meta property="og:description" content="B-Side — 展示のライナーノーツ">
-<meta property="og:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/og-image.jpg">
+<meta property="og:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
 <meta property="og:url" content="https://chisakihayakawa.github.io/portfolio/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Chisaki Hayakawa — Photographer / Designer / Engineer">
 <meta name="twitter:description" content="B-Side — 展示のライナーノーツ">
-<meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/og-image.jpg">
+<meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:site_name" content="Chisaki Hayakawa">
 
@@ -153,55 +153,17 @@ a:hover { opacity: 0.5; }
   line-height: var(--lh);
 }
 
-/* ── GALLERY GRID ── */
-.gallery-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--s3);
-}
-
-.gallery-item {
-  display: block;
-  border-bottom: none;
-}
-
-.gallery-item:hover { opacity: 1; }
-.gallery-item:hover .gallery-thumb { opacity: 0.75; }
-
-.gallery-thumb {
+/* ── PROJECT THUMBNAIL ── */
+.project-thumb {
   width: 100%;
-  aspect-ratio: 4 / 3;
-  background: var(--white);
   overflow: hidden;
   transition: opacity 0.2s;
 }
 
-.gallery-thumb img {
+.project-thumb img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
   display: block;
-}
-
-.gallery-caption {
-  margin-top: var(--s1);
-}
-
-.gallery-axis {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  display: block;
-}
-
-.gallery-desc {
-  font-size: var(--t-xs);
-  font-weight: 300;
-  line-height: var(--lh);
-  color: var(--black);
-  opacity: 0.5;
-  margin-top: 2px;
 }
 
 /* ── SITE NAV ── */
@@ -293,11 +255,6 @@ a:hover { opacity: 0.5; }
   .container { padding: var(--s6) var(--s3); }
   .header-meta-row { flex-direction: column; gap: var(--s1); }
   .site-nav { flex-direction: column; gap: var(--s1); }
-  .gallery-grid { grid-template-columns: 1fr; }
-}
-
-@media (min-width: 641px) and (max-width: 900px) {
-  .gallery-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
 </head>
@@ -334,77 +291,13 @@ a:hover { opacity: 0.5; }
       <h2 class="project-title">JUDD | Marfa</h2>
     </a>
 
-    <p class="project-meta">ワタリウム美術館、2026年2月–6月。素材・光・色・空間・反復・時間——6つの視点で展示のB面を記録。</p>
+    <p class="project-meta">ワタリウム美術館</p>
 
-    <div class="gallery-grid">
-
-      <!-- 1. Material -->
-      <a class="gallery-item" href="works/judd-marfa/#material">
-        <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/material.jpg" alt="Untitled, 1967, Galvanized iron" loading="lazy">
-        </div>
-        <div class="gallery-caption">
-          <span class="gallery-axis">Material</span>
-          <span class="gallery-desc">スパングルの結晶模様が素材の来歴を残していた</span>
-        </div>
-      </a>
-
-      <!-- 2. Light -->
-      <a class="gallery-item" href="works/judd-marfa/#light">
-        <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/light.jpg" alt="WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)" loading="lazy">
-        </div>
-        <div class="gallery-caption">
-          <span class="gallery-axis">Light</span>
-          <span class="gallery-desc">雨のグレーの光が金属の表面を静かにしていた</span>
-        </div>
-      </a>
-
-      <!-- 3. Color -->
-      <a class="gallery-item" href="works/judd-marfa/#color">
-        <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/color.jpg" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass" loading="lazy">
-        </div>
-        <div class="gallery-caption">
-          <span class="gallery-axis">Color</span>
-          <span class="gallery-desc">プレキシグラスの色は素材に最初からある色だった</span>
-        </div>
-      </a>
-
-      <!-- 4. Space -->
-      <a class="gallery-item" href="works/judd-marfa/#space">
-        <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/space.jpg" alt="WATARI-UM, The Museum of Contemporary Art (Mario Botta, 1990)" loading="lazy">
-        </div>
-        <div class="gallery-caption">
-          <span class="gallery-axis">Space</span>
-          <span class="gallery-desc">建物自体が作品を見る体験の一部だった</span>
-        </div>
-      </a>
-
-      <!-- 5. Repetition -->
-      <a class="gallery-item" href="works/judd-marfa/#repetition">
-        <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/repetition.jpg" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass (10 units)" loading="lazy">
-        </div>
-        <div class="gallery-caption">
-          <span class="gallery-axis">Repetition</span>
-          <span class="gallery-desc">3メートルの反復が体に入ってくる</span>
-        </div>
-      </a>
-
-      <!-- 6. Time -->
-      <a class="gallery-item" href="works/judd-marfa/#time">
-        <div class="gallery-thumb">
-          <img src="works/judd-marfa/images/time.jpg" alt="Untitled, 1989, Painted aluminum" loading="lazy">
-        </div>
-        <div class="gallery-caption">
-          <span class="gallery-axis">Time</span>
-          <span class="gallery-desc">2Fで見た作品を3Fから見下ろしている</span>
-        </div>
-      </a>
-
-    </div>
+    <a class="project-link" href="works/judd-marfa/">
+      <div class="project-thumb">
+        <img src="works/judd-marfa/images/judd-2a.jpg" alt="JUDD | Marfa — B-Side No.001" loading="lazy">
+      </div>
+    </a>
   </section>
 
   <!-- CREDITS -->
