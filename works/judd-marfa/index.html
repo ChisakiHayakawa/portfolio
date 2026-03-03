@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v8.0 / 2026.03.04 — カバーNo./Sub削除、Swipe to read W2リズム（14px/6s溶けフェード） -->
+<!-- v8.1 / 2026.03.04 — Swipe to readタイミングC（即ふわっ）、wheel横変換+ドラッグスクロール追加 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -56,6 +56,11 @@
     scrollbar-width: none;
   }
   .booklet::-webkit-scrollbar { display: none; }
+  .booklet.is-dragging {
+    scroll-snap-type: none;
+    cursor: grabbing;
+    user-select: none;
+  }
 
   .page {
     flex: 0 0 100%;
@@ -108,7 +113,7 @@
     letter-spacing: 0.12em;
     white-space: nowrap;
     opacity: 0;
-    animation: hint-fadein 1.2s ease-out 1.5s forwards, hint-breathe 6s ease-in-out 2.7s infinite;
+    animation: hint-fadein 1.0s ease-out 0s forwards, hint-breathe 6s ease-in-out 1.0s infinite;
   }
   @keyframes hint-fadein {
     from { opacity: 0; }
@@ -715,6 +720,65 @@ nextBtn.addEventListener('click', () => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') booklet.scrollBy({ left: -booklet.clientWidth, behavior: 'smooth' });
   if (e.key === 'ArrowRight') booklet.scrollBy({ left: booklet.clientWidth, behavior: 'smooth' });
+});
+
+// ── Wheel → horizontal scroll ──
+booklet.addEventListener('wheel', (e) => {
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+    e.preventDefault();
+    booklet.scrollBy({ left: e.deltaY, behavior: 'auto' });
+  }
+}, { passive: false });
+
+// ── Drag scroll ──
+let isDragging = false;
+let dragStartX = 0;
+let dragScrollStart = 0;
+let dragVelocity = 0;
+let dragLastX = 0;
+let dragLastTime = 0;
+
+booklet.addEventListener('mousedown', (e) => {
+  if (e.target.closest('button, a')) return;
+  isDragging = true;
+  dragStartX = e.pageX;
+  dragScrollStart = booklet.scrollLeft;
+  dragVelocity = 0;
+  dragLastX = e.pageX;
+  dragLastTime = Date.now();
+  booklet.classList.add('is-dragging');
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  const x = e.pageX;
+  booklet.scrollLeft = dragScrollStart + (dragStartX - x);
+  const now = Date.now();
+  const dt = now - dragLastTime;
+  if (dt > 0) {
+    dragVelocity = (dragLastX - x) / dt;
+  }
+  dragLastX = x;
+  dragLastTime = now;
+});
+
+document.addEventListener('mouseup', () => {
+  if (!isDragging) return;
+  isDragging = false;
+  const pageWidth = booklet.clientWidth;
+  const threshold = 0.3;
+  if (Math.abs(dragVelocity) > threshold) {
+    const direction = dragVelocity > 0 ? 1 : -1;
+    const currentPage = Math.round(booklet.scrollLeft / pageWidth);
+    const target = Math.max(0, Math.min(pages.length - 1, currentPage + direction));
+    booklet.classList.remove('is-dragging');
+    booklet.scrollTo({ left: target * pageWidth, behavior: 'smooth' });
+  } else {
+    booklet.classList.remove('is-dragging');
+    const currentPage = Math.round(booklet.scrollLeft / pageWidth);
+    booklet.scrollTo({ left: currentPage * pageWidth, behavior: 'smooth' });
+  }
 });
 
 // ── Fade-in ──
