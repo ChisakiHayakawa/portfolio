@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v7.0 / 2026.03.04 — カバー中央配置（タイトル50%固定、余白暫定値） -->
+<!-- v8.0 / 2026.03.04 — カバーNo./Sub削除、Swipe to read W2リズム（14px/6s溶けフェード） -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -86,17 +86,6 @@
     overflow: hidden;
     text-align: center;
   }
-  .page-cover .cover-no {
-    font-size: 11px;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    opacity: 0.4;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: calc(50% + var(--ts) + 30px);
-    white-space: nowrap;
-  }
   .page-cover .cover-title {
     font-family: var(--font-serif);
     font-size: var(--ts);
@@ -109,35 +98,28 @@
     transform: translateX(-50%);
     white-space: nowrap;
   }
-  .page-cover .cover-sub {
-    font-size: 15px;
-    font-weight: 300;
-    opacity: 0.5;
-    line-height: 1.8;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: calc(50% + 60px);
-    white-space: nowrap;
-  }
   .page-cover .cover-hint {
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: calc(50% + 160px);
-    font-size: 12px;
+    top: calc(50% + 80px);
+    font-size: 14px;
     font-weight: 300;
-    opacity: 0.3;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     white-space: nowrap;
+    opacity: 0;
+    animation: hint-fadein 1.2s ease-out 1.5s forwards, hint-breathe 6s ease-in-out 2.7s infinite;
   }
-  .cover-hint-arrow {
-    display: inline-block;
-    animation: nudge 2.4s ease-in-out infinite;
+  @keyframes hint-fadein {
+    from { opacity: 0; }
+    to   { opacity: 0.4; }
   }
-  @keyframes nudge {
-    0%, 100% { transform: translateX(0); opacity: 0.5; }
-    50% { transform: translateX(6px); opacity: 1; }
+  @keyframes hint-breathe {
+    0%   { opacity: 0.4; }
+    42%  { opacity: 0.4; }
+    67%  { opacity: 0; }
+    78%  { opacity: 0; }
+    100% { opacity: 0.4; }
   }
 
   /* ════════════════════════════════════════
@@ -532,13 +514,8 @@
        COVER
        ══════════════════════════════════════════════ -->
   <div class="page page-cover">
-    <div class="cover-no">B-Side No.001</div>
     <div class="cover-title">JUDD | Marfa</div>
-    <div class="cover-sub">
-      <span class="lang-ja">ワタリウム美術館<br>2026.02.25 visited</span>
-      <span class="lang-en">WATARI-UM Museum<br>2026.02.25 visited</span>
-    </div>
-    <div class="cover-hint">Swipe to read <span class="cover-hint-arrow">→</span></div>
+    <div class="cover-hint">Swipe to read →</div>
     <button class="lang-btn">EN</button>
   </div>
 
