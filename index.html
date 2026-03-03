@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v12.0 / 2026.03.03 — サムネイルフルスクリーン遷移 + ホバーラベル「Read Liner Notes」 -->
+<!-- v13.0 / 2026.03.03 — ホバー: G1リフト+エッジグロウ（ラベル廃止） -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -27,7 +27,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    B-SIDE — Setlist Index
-   v12.0 / フルスクリーン遷移 + ホバーラベル
+   v13.0 / G1リフト+エッジグロウ
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -164,35 +164,28 @@ a:hover { opacity: 0.5; }
   font-family: var(--font);
   position: relative;
   overflow: hidden;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(28, 27, 24, 0.15);
 }
 
-/* ── HOVER OVERLAY ── */
-.cover-thumb-inner::after {
-  content: 'Read Liner Notes';
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font);
-  font-size: 13px;
-  font-weight: 300;
-  letter-spacing: 0.15em;
-  color: #f0f0f0;
-  background: rgba(28, 27, 24, 0.45);
-  opacity: 0;
-  transition: opacity 0.35s ease;
-  pointer-events: none;
+/* ── HOVER: G1 リフト + エッジグロウ ── */
+.cover-thumb:hover .cover-thumb-inner {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow:
+    0 12px 40px rgba(28, 27, 24, 0.25),
+    0 4px 12px rgba(28, 27, 24, 0.1),
+    0 0 0 1px rgba(180, 175, 160, 0.25),
+    0 0 24px rgba(180, 175, 160, 0.08);
 }
-.cover-thumb:hover .cover-thumb-inner::after {
-  opacity: 1;
-}
-/* タッチデバイス: hover状態が残る問題を回避 */
+
+/* ── HOVER: タッチデバイスではリフト無効 ── */
 @media (hover: none) {
-  .cover-thumb-inner::after { display: none; }
+  .cover-thumb-inner {
+    transition: none;
+    box-shadow: none;
+  }
 }
-/* フルスクリーン展開中: オーバーレイ非表示 */
-.cover-thumb.opening .cover-thumb-inner::after { opacity: 0; }
 
 .cover-thumb-no {
   font-size: 10px;
@@ -344,7 +337,6 @@ const dest = thumb.getAttribute('href');
 
 thumb.addEventListener('click', (e) => {
   e.preventDefault();
-  thumb.classList.add("opening");
 
   const rect = thumb.getBoundingClientRect();
   const inner = thumb.querySelector('.cover-thumb-inner');
