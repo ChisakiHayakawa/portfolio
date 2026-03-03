@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v13.0 / 2026.03.03 — ホバー: G1リフト+エッジグロウ（ラベル廃止） -->
+<!-- v14.0 / 2026.03.04 — 遷移エンドポイントをjudd-index新カバーに合わせる -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -27,7 +27,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    B-SIDE — Setlist Index
-   v13.0 / G1リフト+エッジグロウ
+   v14.0 / 遷移エンドポイント更新
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -160,6 +160,8 @@ a:hover { opacity: 0.5; }
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   aspect-ratio: 16 / 9;
   font-family: var(--font);
   position: relative;
@@ -366,11 +368,11 @@ thumb.addEventListener('click', (e) => {
       inner.style.transition = `all ${dur} ${ease}`;
       inner.style.aspectRatio = 'auto';
       inner.style.height = '100%';
-      inner.style.padding = '48px 36px';
-      inner.style.justifyContent = 'flex-end';
+      inner.style.padding = '0';
+      inner.style.justifyContent = 'center';
 
       title.style.transition = `font-size ${dur} ${ease}`;
-      title.style.fontSize = 'clamp(28px, 5vw, 42px)';
+      title.style.fontSize = 'clamp(36px, 7vw, 60px)';
 
       // アニメーション完了後に遷移（widthの完了で判定）
       thumb.addEventListener('transitionend', (ev) => {
