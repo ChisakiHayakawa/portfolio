@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v8.2 / 2026.03.02 — bio重複削除、背景#f9f7f4、タイトル#141413、©/Note #9e9d94（ウォーム色体系） -->
+<!-- v11.0 / 2026.03.03 — ナビバー削除・余白3層構造・サブタイトルclamp・フッター540px統一 -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -21,18 +21,24 @@
 <meta property="og:site_name" content="Chisaki Hayakawa">
 
 <link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/">
-<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@300;400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.typekit.net/gvn8jks.css">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
 /* ═══════════════════════════════════════════════
-   CHISAKI HAYAKAWA — B-Side Setlist
-   Photographer / Designer / Engineer
+   B-SIDE — Setlist Index
+   v11.0 / ナビバー削除・余白3層・サブタイトルclamp・フッター540px
    ═══════════════════════════════════════════════ */
 
 :root {
-  --black: #000;
-  --white: #fff;
-  --font: 'Helvetica Neue', 'Libre Franklin', 'Noto Sans JP', sans-serif;
+  --font: "mr-eaves-xl-modern", "Noto Sans JP", sans-serif;
+  --font-serif: "mrs-eaves-roman-lining", serif;
+
+  --color-title: #1c1b18;
+  --color-credit: #6e6b63;
+  --color-note: #a3a099;
+  --color-rule: #d4d1c9;
+  --color-bg: #f9f7f4;
 
   --s1:    8px;
   --s2:   16px;
@@ -40,8 +46,6 @@
   --s4:   32px;
   --s5:   48px;
   --s6:   64px;
-  --s7:   96px;
-  --s8:  128px;
 
   --t-xs:   0.75rem;
   --t-sm:   0.875rem;
@@ -54,7 +58,6 @@
   --lh-tight: 1.2;
 
   --max: 56rem;
-  --rule: 1px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,68 +69,98 @@ body {
   font-size: var(--t-md);
   font-weight: 300;
   line-height: var(--lh);
-  background: #f9f7f4;
-  color: #1d1d1f;
+  background: var(--color-bg);
+  color: var(--color-title);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-::selection { background: #141413; color: #f9f7f4; }
+::selection { background: var(--color-title); color: var(--color-bg); }
 
 a {
-  color: #1d1d1f;
+  color: var(--color-title);
   text-decoration: none;
-  border-bottom: var(--rule) solid #1d1d1f;
+  border-bottom: 1px solid var(--color-title);
 }
 a:hover { opacity: 0.5; }
 
-/* ── CONTAINER ── */
+/* ── CONTAINER — フッターをビューポート下部に ── */
 .container {
   max-width: var(--max);
   margin: 0 auto;
-  padding: clamp(24px, 4vh, 64px) var(--s5);
-}
-
-/* ── HEADER ── */
-.header-row {
+  padding: var(--s5);
+  min-height: 100vh;
   display: flex;
-  align-items: baseline;
-  gap: var(--s3);
+  flex-direction: column;
+}
+.container > main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-.header-name {
-  font-size: clamp(var(--t-xl), 4vw, var(--t-2xl));
+/* ── HERO WRAPPER — コンテンツ領域 ── */
+.hero-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── HERO GRID — 1カラム縦積み ── */
+.hero-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* ── SITE IDENTITY — B-SIDE + サブタイトル ── */
+.site-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: var(--s6);
+}
+
+.site-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 400;
   line-height: var(--lh-tight);
-  letter-spacing: -0.01em;
-  color: #141413;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-title);
 }
 
-.header-sub {
-  font-size: var(--t-xs);
+.site-subtitle {
+  font-family: var(--font-serif);
+  font-size: clamp(0.75rem, 1.3vw, 0.95rem);
   font-weight: 400;
   letter-spacing: 0.15em;
-  color: #141413;
+  color: var(--color-title);
+  margin-top: var(--s1);
 }
 
 /* ── COVER THUMBNAIL ── */
 .cover-thumb {
   display: block;
   border-bottom: none;
-  margin-top: var(--s4);
   transition: opacity 0.2s;
 }
 .cover-thumb:hover { opacity: 0.85; }
 
 .cover-thumb-inner {
-  background: #1d1d1f;
+  background: var(--color-title);
   color: #f0f0f0;
-  padding: var(--s6) var(--s5);
+  padding: var(--s5) var(--s4);
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   aspect-ratio: 16 / 9;
-  font-family: 'Libre Franklin', 'Helvetica Neue', sans-serif;
+  font-family: var(--font);
 }
 
 .cover-thumb-no {
@@ -139,8 +172,9 @@ a:hover { opacity: 0.5; }
 }
 
 .cover-thumb-title {
+  font-family: var(--font-serif);
   font-size: clamp(22px, 3.5vw, 36px);
-  font-weight: 300;
+  font-weight: 400;
   line-height: 1.3;
   letter-spacing: -0.01em;
   margin-bottom: 12px;
@@ -153,78 +187,75 @@ a:hover { opacity: 0.5; }
   line-height: 1.8;
 }
 
-/* ── AUTHOR ── */
-.author {
-  margin-top: var(--s6);
+/* ── FOOTER BAR ── */
+.footer-bar {
+  margin-top: var(--s5);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--color-rule);
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.author-id {
-  font-size: var(--t-xs);
-  font-weight: 400;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  margin-bottom: var(--s2);
-}
-
-.author-name {
-  font-size: var(--t-lg);
-  font-weight: 400;
-  line-height: var(--lh-tight);
-}
-
-.author-role {
-  margin-top: var(--s2);
-  font-size: var(--t-sm);
-  font-weight: 300;
-  letter-spacing: 0.05em;
-}
-
-.author-location {
-  margin-top: var(--s1);
-  font-size: var(--t-sm);
-  font-weight: 300;
-  opacity: 0.5;
-}
-
-.author-bio {
-  margin-top: var(--s2);
-  font-size: var(--t-sm);
-  font-weight: 300;
-  line-height: 1.9;
-  max-width: 44rem;
-}
-
-.author-links {
-  margin-top: var(--s3);
+.footer-top {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--s3);
 }
-.author-links a { border-bottom: none; }
 
-/* ── NOTE ── */
-.author-copyright {
-  margin-top: var(--s5);
+.footer-copy {
   font-size: var(--t-xs);
   font-weight: 300;
   letter-spacing: 0.12em;
-  color: #9e9d94;
+  color: var(--color-credit);
 }
 
-.author-note {
-  margin-top: var(--s2);
+.footer-note {
   font-size: var(--t-xs);
   font-weight: 300;
   line-height: 1.8;
-  color: #9e9d94;
+  color: var(--color-note);
+  margin-top: var(--s4);
+}
+
+.footer-links {
+  display: flex;
+  gap: var(--s2);
+  flex-shrink: 0;
+}
+.footer-links a {
+  border-bottom: none;
+  color: var(--color-credit);
+}
+.footer-links a:hover { opacity: 0.5; }
+.footer-links svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  display: block;
 }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
-  .container { padding: clamp(24px, 4vh, 64px) var(--s3); }
-  .header-row { flex-direction: column; gap: var(--s1); }
+  .container {
+    padding: clamp(32px, 6vh, 80px) var(--s3) var(--s3);
+    min-height: auto;
+  }
+  .hero-wrapper {
+    align-items: flex-start;
+  }
+  .hero-grid {
+    max-width: none;
+  }
+  .site-identity {
+    margin-bottom: var(--s5);
+  }
   .cover-thumb-inner {
     aspect-ratio: 4 / 3;
-    padding: var(--s5) var(--s3);
+  }
+  .footer-bar {
+    margin-top: var(--s5);
   }
 }
 </style>
@@ -232,17 +263,19 @@ a:hover { opacity: 0.5; }
 
 <body>
 <div class="container">
+<main>
 
-  <main>
+  <!-- HERO -->
+  <div class="hero-wrapper">
+  <div class="hero-grid">
 
-  <!-- HEADER -->
-  <header class="header-row">
-    <h1 class="header-name">B-Side</h1>
-    <span class="header-sub">Liner Notes for Exhibitions</span>
-  </header>
+    <!-- SITE IDENTITY -->
+    <div class="site-identity">
+      <h1 class="site-title">B-Side</h1>
+      <p class="site-subtitle">Liner Notes for Exhibitions</p>
+    </div>
 
-  <!-- SETLIST -->
-  <section>
+    <!-- SETLIST -->
     <a class="cover-thumb" href="works/judd-marfa/">
       <div class="cover-thumb-inner">
         <div class="cover-thumb-no">B-Side No.001</div>
@@ -250,29 +283,27 @@ a:hover { opacity: 0.5; }
         <div class="cover-thumb-sub">ワタリウム美術館<br>2026.02.25 visited</div>
       </div>
     </a>
-  </section>
 
-  <!-- CREDITS -->
-  <section class="author" id="credits">
-    <h2 class="author-id">Credits</h2>
-    <p class="author-name">Chisaki Hayakawa</p>
-    <p class="author-role">Photographer / Designer / Engineer</p>
-    <p class="author-location">Yokohama, Japan</p>
-    <p class="author-bio">心のままに美術館やギャラリーを巡り、B-Sideにライナーノーツを綴る。</p>
-    <div class="author-links">
-      <a href="https://github.com/chisakihayakawa" target="_blank" rel="noopener" aria-label="GitHub">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      </a>
-      <a href="https://www.instagram.com/ch15aki/" target="_blank" rel="noopener" aria-label="Instagram">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
-      </a>
+  </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer-bar">
+    <div class="footer-top">
+      <p class="footer-copy">© 2026 — Concept & Created by Chisaki</p>
+      <div class="footer-links">
+        <a href="https://github.com/chisakihayakawa" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0 1 12 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/ch15aki/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+        </a>
+      </div>
     </div>
-    <p class="author-copyright">© 2026 — Concept & Created by Chisaki</p>
-    <p class="author-note">掲載写真は各美術館の許可のもと撮影しています。本サイトは個人制作物であり、掲載する展覧会の主催者・美術館とは関係ありません。</p>
-  </section>
+    <p class="footer-note">掲載写真は各美術館の許可のもと撮影しています。本サイトは個人制作物であり、掲載する展覧会の主催者・美術館とは関係ありません。</p>
+  </footer>
 
-  </main>
-
+</main>
 </div>
 </body>
 </html>
