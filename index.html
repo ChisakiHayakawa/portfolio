@@ -160,8 +160,6 @@ a:hover { opacity: 0.5; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-  text-align: center;
   aspect-ratio: 16 / 9;
   font-family: var(--font);
   position: relative;
@@ -353,6 +351,10 @@ thumb.addEventListener('click', (e) => {
   thumb.style.zIndex = '1000';
   thumb.style.margin = '0';
 
+  // hover reset
+  inner.style.transform = 'none';
+  inner.style.boxShadow = 'none';
+
   // 次フレームでフルスクリーンへアニメーション
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
@@ -370,6 +372,8 @@ thumb.addEventListener('click', (e) => {
       inner.style.height = '100%';
       inner.style.padding = '0';
       inner.style.justifyContent = 'center';
+      inner.style.alignItems = 'center';
+      inner.style.textAlign = 'center';
 
       title.style.transition = `font-size ${dur} ${ease}`;
       title.style.fontSize = 'clamp(36px, 7vw, 60px)';
