@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v14.0 / 2026.03.04 — 遷移エンドポイントをjudd-index新カバーに合わせる -->
+<!-- v15.0 / 2026.03.04 — サムネ中央寄せ修正 + 遷移時No./Subフェードアウト + Title位置をjudd-indexカバーに合わせる -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -160,6 +160,8 @@ a:hover { opacity: 0.5; }
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
+  text-align: center;
   aspect-ratio: 16 / 9;
   font-family: var(--font);
   position: relative;
@@ -341,6 +343,8 @@ thumb.addEventListener('click', (e) => {
   const rect = thumb.getBoundingClientRect();
   const inner = thumb.querySelector('.cover-thumb-inner');
   const title = thumb.querySelector('.cover-thumb-title');
+  const no = thumb.querySelector('.cover-thumb-no');
+  const sub = thumb.querySelector('.cover-thumb-sub');
 
   // 現在位置を固定
   thumb.style.position = 'fixed';
@@ -361,20 +365,34 @@ thumb.addEventListener('click', (e) => {
       const dur = '0.6s';
       const ease = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
+      // サムネイルをフルスクリーンに展開
       thumb.style.transition = `all ${dur} ${ease}`;
       thumb.style.top = '0';
       thumb.style.left = '0';
       thumb.style.width = '100vw';
       thumb.style.height = '100vh';
 
+      // インナーをフルスクリーンに
       inner.style.transition = `all ${dur} ${ease}`;
       inner.style.aspectRatio = 'auto';
       inner.style.height = '100%';
       inner.style.padding = '0';
-      inner.style.justifyContent = 'center';
-      inner.style.alignItems = 'center';
-      inner.style.textAlign = 'center';
 
+      // No. と Sub をフェードアウト
+      no.style.transition = `opacity 0.4s ${ease}`;
+      sub.style.transition = `opacity 0.4s ${ease}`;
+      no.style.opacity = '0';
+      sub.style.opacity = '0';
+
+      // タイトルを judd-index カバーと同じ配置に
+      // （bottom: 50% + line-height: 1 → ベースラインが画面50%に一致）
+      title.style.position = 'absolute';
+      title.style.left = '50%';
+      title.style.bottom = '50%';
+      title.style.transform = 'translateX(-50%)';
+      title.style.lineHeight = '1';
+      title.style.whiteSpace = 'nowrap';
+      title.style.margin = '0';
       title.style.transition = `font-size ${dur} ${ease}`;
       title.style.fontSize = 'clamp(36px, 7vw, 60px)';
 
