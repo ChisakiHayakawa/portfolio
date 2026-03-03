@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v15.0 / 2026.03.04 — サムネ中央寄せ修正 + 遷移時No./Subフェードアウト + Title位置をjudd-indexカバーに合わせる -->
+<!-- v16.0 / 2026.03.04 — 遷移時100vh→innerHeightでスマホ位置ずれ修正 + ブラウザバック状態リセット -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -333,6 +333,18 @@ a:hover { opacity: 0.5; }
 </div>
 
 <script>
+// ── ブラウザバック時の状態リセット ──
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    const t = document.getElementById('cover-thumb');
+    const inner = t.querySelector('.cover-thumb-inner');
+    const title = t.querySelector('.cover-thumb-title');
+    const no = t.querySelector('.cover-thumb-no');
+    const sub = t.querySelector('.cover-thumb-sub');
+    [t, inner, title, no, sub].forEach(el => el.removeAttribute('style'));
+  }
+});
+
 // ── フルスクリーン遷移 ──
 const thumb = document.getElementById('cover-thumb');
 const dest = thumb.getAttribute('href');
@@ -366,11 +378,13 @@ thumb.addEventListener('click', (e) => {
       const ease = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
       // サムネイルをフルスクリーンに展開
+      // 100vh はスマホでアドレスバー込みの高さになり judd-index の
+      // height:100% と不一致になるため、実際の表示領域サイズを使う
       thumb.style.transition = `all ${dur} ${ease}`;
       thumb.style.top = '0';
       thumb.style.left = '0';
-      thumb.style.width = '100vw';
-      thumb.style.height = '100vh';
+      thumb.style.width = window.innerWidth + 'px';
+      thumb.style.height = window.innerHeight + 'px';
 
       // インナーをフルスクリーンに
       inner.style.transition = `all ${dur} ${ease}`;
