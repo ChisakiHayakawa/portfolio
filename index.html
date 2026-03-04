@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v18.0 / 2026.03.04 — 順方向遷移改善（浮き溶けフェード+ゆったり展開） -->
+<!-- v19.0 / 2026.03.04 — 遷移テンポ全面改善（1.4sゆったり展開+scale収束+C案逆方向） -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -361,7 +361,7 @@ window.addEventListener('pageshow', (e) => {
 
   // 2. 即座にフルスクリーン状態にする（遷移なし）
   //    タイトルは absolute を使わず flex フローのまま。
-  //    No./Sub は opacity:0 + translateY(8px) で待機。
+  //    No./Sub は opacity:0 で待機（C案: translateYなし）。
   thumb.style.position = 'fixed';
   thumb.style.top = '0';
   thumb.style.left = '0';
@@ -379,10 +379,8 @@ window.addEventListener('pageshow', (e) => {
   inner.style.transition = 'none';
 
   no.style.opacity = '0';
-  no.style.transform = 'translateY(8px)';
   no.style.transition = 'none';
   sub.style.opacity = '0';
-  sub.style.transform = 'translateY(-8px)';
   sub.style.transition = 'none';
 
   title.style.fontSize = 'clamp(36px, 7vw, 60px)';
@@ -392,8 +390,8 @@ window.addEventListener('pageshow', (e) => {
   // 3. 次フレームでサムネイルサイズに縮小アニメーション
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const dur = '0.85s';
-      const ease = 'cubic-bezier(0.25, 0.1, 0.25, 1.0)';
+      const dur = '1.4s';
+      const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 
       thumb.style.transition = `all ${dur} ${ease}`;
       thumb.style.top = rect.top + 'px';
@@ -405,15 +403,13 @@ window.addEventListener('pageshow', (e) => {
       title.style.fontSize = '';
       title.style.lineHeight = '';
 
-      // 4. 縮小80%時点で No./Sub を「下からスッと上がる」フェードイン（オーバーラップ）
+      // 4. 縮小94%時点で No./Sub をフェードイン（B-Sideタイトルが見えるタイミングに合わせる）
       setTimeout(() => {
-        no.style.transition = `opacity 0.5s ${ease}, transform 0.5s ${ease}`;
-        sub.style.transition = `opacity 0.5s ${ease}, transform 0.5s ${ease}`;
+        no.style.transition = 'opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        sub.style.transition = 'opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1)';
         no.style.opacity = '';
-        no.style.transform = '';
         sub.style.opacity = '';
-        sub.style.transform = '';
-      }, 600);
+      }, 1316);
 
       // 5. 縮小完了 → スタイルクリア
       thumb.addEventListener('transitionend', function onShrink(ev) {
@@ -423,10 +419,10 @@ window.addEventListener('pageshow', (e) => {
         // すべてのインラインスタイルを一括クリア（flex フローなので位置ジャンプなし）
         [thumb, inner, title].forEach(el => el.removeAttribute('style'));
 
-        // No./Sub のフェードイン完了を待ってクリア（600ms + 500ms = 1100ms、余裕込み）
+        // No./Sub のフェードイン完了を待ってクリア（1316ms開始 + 500ms = 縮小後416ms）
         setTimeout(() => {
           [no, sub].forEach(el => el.removeAttribute('style'));
-        }, 300);
+        }, 500);
       });
     });
   });
@@ -461,8 +457,8 @@ thumb.addEventListener('click', (e) => {
   // 次フレームでフルスクリーンへアニメーション
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const dur = '0.85s';
-      const ease = 'cubic-bezier(0.25, 0.1, 0.25, 1.0)';
+      const dur = '1.4s';
+      const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
 
       // サムネイルをフルスクリーンに展開
       // 100vh はスマホでアドレスバー込みの高さになり judd-index の
@@ -479,13 +475,13 @@ thumb.addEventListener('click', (e) => {
       inner.style.height = '100%';
       inner.style.padding = '0';
 
-      // No. と Sub を中央に収束させてフェードアウト
-      no.style.transition = `opacity 0.35s ${ease}, transform 0.35s ${ease}`;
-      sub.style.transition = `opacity 0.35s ${ease}, transform 0.35s ${ease}`;
+      // No. と Sub をscale収束でフェードアウト
+      no.style.transition = `opacity 0.8s ${ease}, transform 0.8s ${ease}`;
+      sub.style.transition = `opacity 0.8s ${ease}, transform 0.8s ${ease}`;
       no.style.opacity = '0';
-      no.style.transform = 'translateY(12px)';
+      no.style.transform = 'scale(0.85) translateY(4px)';
       sub.style.opacity = '0';
-      sub.style.transform = 'translateY(-12px)';
+      sub.style.transform = 'scale(0.85) translateY(-4px)';
 
       // タイトルを judd-index カバーと同じ配置に
       // （bottom: 50% + line-height: 1 → ベースラインが画面50%に一致）
@@ -496,7 +492,7 @@ thumb.addEventListener('click', (e) => {
       title.style.lineHeight = '1';
       title.style.whiteSpace = 'nowrap';
       title.style.margin = '0';
-      title.style.transition = `font-size ${dur} ${ease}`;
+      title.style.transition = `font-size 1.4s cubic-bezier(0.22, 0.61, 0.36, 1)`;
       title.style.fontSize = 'clamp(36px, 7vw, 60px)';
 
       // アニメーション完了後に遷移（widthの完了で判定）
