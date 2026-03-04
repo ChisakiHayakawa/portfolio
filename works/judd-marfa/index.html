@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.5 / 2026.03.05 — update: delay 400→500ms, フェードイン 0.8→1s -->
+<!-- v9.7 / 2026.03.05 — fix: 到着チラ見え防止(head早期hide) + 二重rAF除去 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -21,6 +21,13 @@
 <link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
 <link rel="stylesheet" href="https://use.typekit.net/gvn8jks.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<script>
+// 順方向到着時、描画前にbodyを隠す（チラ見え防止）
+// body下部のスクリプトでオーバーレイ設置後に解除
+if (sessionStorage.getItem('bside-forward')) {
+  document.write('<style id="arrival-hide">body{visibility:hidden}</style>');
+}
+</script>
 <style>
   :root {
     --white: #f0f0f0;
@@ -659,6 +666,8 @@ window.addEventListener('pageshow', (e) => {
     // 到着オーバーレイが残っていたら除去
     const leftover = document.getElementById('bside-arrival-overlay');
     if (leftover) leftover.remove();
+    const hideStyle = document.getElementById('arrival-hide');
+    if (hideStyle) hideStyle.remove();
   }
 });
 
@@ -673,23 +682,23 @@ window.addEventListener('pageshow', (e) => {
     'position:fixed;inset:0;background:#1c1b18;z-index:9999;opacity:1;pointer-events:none;';
   document.body.appendChild(overlay);
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        overlay.style.transition = 'opacity 1s cubic-bezier(0.22, 0.61, 0.36, 1)';
-        overlay.style.opacity = '0';
+  // オーバーレイ設置完了 → bodyを表示（オーバーレイが覆っているのでチラ見えなし）
+  const hideStyle = document.getElementById('arrival-hide');
+  if (hideStyle) hideStyle.remove();
 
-        let done = false;
-        function complete() {
-          if (done) return;
-          done = true;
-          overlay.remove();
-        }
-        overlay.addEventListener('transitionend', complete);
-        setTimeout(complete, 1200);
-      }, 500);
-    });
-  });
+  setTimeout(() => {
+    overlay.style.transition = 'opacity 1.4s cubic-bezier(0.42, 0, 0.58, 1)';
+    overlay.style.opacity = '0';
+
+    let done = false;
+    function complete() {
+      if (done) return;
+      done = true;
+      overlay.remove();
+    }
+    overlay.addEventListener('transitionend', complete);
+    setTimeout(complete, 1600);
+  }, 700);
 })();
 
 const booklet = document.getElementById('booklet');

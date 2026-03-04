@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v23.5 / 2026.03.05 — update: 暗転duration 0.5s→0.4s, fallback 700→600ms -->
+<!-- v23.6 / 2026.03.05 — update: 待機350→650ms, 暗転0.4→0.35s -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -472,7 +472,7 @@ function doFlip() {
 
       // レイアウト強制 → トランジション開始
       overlay.offsetHeight;
-      overlay.style.transition = 'opacity 0.4s ease';
+      overlay.style.transition = 'opacity 0.35s ease';
       overlay.style.opacity = '1';
 
       let navigated = false;
@@ -483,8 +483,8 @@ function doFlip() {
         window.location.href = dest;
       }
       overlay.addEventListener('transitionend', navigate);
-      setTimeout(navigate, 600);
-    }, 350);
+      setTimeout(navigate, 550);
+    }, 650);
   }
 
   flipCard.addEventListener('transitionend', function onFlipEnd(ev) {
