@@ -382,7 +382,7 @@ window.addEventListener('pageshow', (e) => {
   no.style.transform = 'translateY(8px)';
   no.style.transition = 'none';
   sub.style.opacity = '0';
-  sub.style.transform = 'translateY(8px)';
+  sub.style.transform = 'translateY(-8px)';
   sub.style.transition = 'none';
 
   title.style.fontSize = 'clamp(36px, 7vw, 60px)';
@@ -479,11 +479,11 @@ thumb.addEventListener('click', (e) => {
       inner.style.height = '100%';
       inner.style.padding = '0';
 
-      // No. と Sub を「上に浮いて溶ける」フェードアウト
+      // No. と Sub を中央に収束させてフェードアウト
       no.style.transition = `opacity 0.35s ${ease}, transform 0.35s ${ease}`;
       sub.style.transition = `opacity 0.35s ${ease}, transform 0.35s ${ease}`;
       no.style.opacity = '0';
-      no.style.transform = 'translateY(-12px)';
+      no.style.transform = 'translateY(12px)';
       sub.style.opacity = '0';
       sub.style.transform = 'translateY(-12px)';
 

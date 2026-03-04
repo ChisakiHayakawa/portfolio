@@ -810,7 +810,7 @@ if (closingHome) {
     const sub = document.querySelector('.closing-sub');
     const home = closingHome;
 
-    // No.001 と Home → を「下に沈んで溶ける」フェードアウト
+    // No.001 と Home → を中央に収束させてフェードアウト
     const fadeEase = 'cubic-bezier(0.25, 0.1, 0.25, 1.0)';
     home.style.animation = 'none'; // breatheを停止（base opacity:0.5に戻る）
     home.offsetHeight; // リフロー強制: animation停止を確定させてからtransition開始
@@ -819,7 +819,7 @@ if (closingHome) {
     sub.style.opacity = '0';
     sub.style.transform = 'translateX(-50%) translateY(6px)';
     home.style.opacity = '0';
-    home.style.transform = 'translateX(-50%) translateY(6px)';
+    home.style.transform = 'translateX(-50%) translateY(-6px)';
 
     // フェード完了後にフラグセット → 遷移
     setTimeout(() => {
