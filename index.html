@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v23.6 / 2026.03.05 — update: 待機350→650ms, 暗転0.4→0.35s -->
+<!-- v23.7 / 2026.03.05 — update: 裏面文字mid-ts, 暗転0.35→0.5s -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -61,6 +61,7 @@
 
   --cover-ts: clamp(36px, 7vw, 60px);
   --thumb-ts: clamp(22px, 3.5vw, 36px);
+  --mid-ts:   clamp(28px, 5vw, 46px);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -220,7 +221,7 @@ a:hover { opacity: 0.5; }
 
 .flip-back-title {
   font-family: var(--font-serif);
-  font-size: var(--cover-ts);
+  font-size: var(--mid-ts);
   font-weight: 400;
   line-height: 1;
   letter-spacing: -0.01em;
@@ -472,7 +473,7 @@ function doFlip() {
 
       // レイアウト強制 → トランジション開始
       overlay.offsetHeight;
-      overlay.style.transition = 'opacity 0.35s ease';
+      overlay.style.transition = 'opacity 0.5s ease';
       overlay.style.opacity = '1';
 
       let navigated = false;
@@ -483,7 +484,7 @@ function doFlip() {
         window.location.href = dest;
       }
       overlay.addEventListener('transitionend', navigate);
-      setTimeout(navigate, 550);
+      setTimeout(navigate, 650);
     }, 650);
   }
 
