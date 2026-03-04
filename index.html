@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v23.1 / 2026.03.04 — fix: ブラウザバック時のanimatingフラグリセット漏れ修正 -->
+<!-- v23.2 / 2026.03.04 — fix: ブラウザバックanimatingリセット + 順方向遷移フラグ追加 -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -27,7 +27,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    B-SIDE — Setlist Index
-   v23.1 / ブラウザバック時animatingリセット修正
+   v23.2 / ブラウザバックリセット + 順方向フラグ
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -479,6 +479,7 @@ function doFlip() {
       function navigate() {
         if (navigated) return;
         navigated = true;
+        sessionStorage.setItem('bside-forward', '1');
         window.location.href = dest;
       }
       overlay.addEventListener('transitionend', navigate);

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.1 / 2026.03.04 — fix: safe area対応（viewport-fit=cover + env()） -->
+<!-- v9.2 / 2026.03.04 — feat: 順方向到着フェードイン + CLOSING逆遷移フェードアウト -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -651,9 +651,44 @@
 window.addEventListener('pageshow', (e) => {
   if (e.persisted) {
     const home = document.querySelector('.closing-home');
-    if (home) home.removeAttribute('style');
+    const title = document.querySelector('.closing-title');
+    const langBtn = document.querySelector('.page-closing .lang-btn');
+    if (home) { home.removeAttribute('style'); home.removeAttribute('data-animating'); }
+    if (title) title.removeAttribute('style');
+    if (langBtn) langBtn.removeAttribute('style');
+    // 到着オーバーレイが残っていたら除去
+    const leftover = document.getElementById('bside-arrival-overlay');
+    if (leftover) leftover.remove();
   }
 });
+
+// ── index.htmlからの順方向到着（暗転→フェードイン） ──
+(function() {
+  if (!sessionStorage.getItem('bside-forward')) return;
+  sessionStorage.removeItem('bside-forward');
+
+  const overlay = document.createElement('div');
+  overlay.id = 'bside-arrival-overlay';
+  overlay.style.cssText =
+    'position:fixed;inset:0;background:#1c1b18;z-index:9999;opacity:1;pointer-events:none;';
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      overlay.style.transition = 'opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1)';
+      overlay.style.opacity = '0';
+
+      let done = false;
+      function complete() {
+        if (done) return;
+        done = true;
+        overlay.remove();
+      }
+      overlay.addEventListener('transitionend', complete);
+      setTimeout(complete, 1000);
+    });
+  });
+})();
 
 const booklet = document.getElementById('booklet');
 const pages = booklet.querySelectorAll('.page');
@@ -786,14 +821,36 @@ langBtns.forEach(btn => {
   });
 });
 
-// ── CLOSING → Home 逆遷移 ──
+// ── CLOSING → Home 逆遷移（フェードアウト→暗転→遷移） ──
 const closingHome = document.querySelector('.closing-home');
 if (closingHome) {
   const closingDest = closingHome.getAttribute('href');
+  const closingTitle = document.querySelector('.closing-title');
+  const closingLangBtn = document.querySelector('.page-closing .lang-btn');
+
   closingHome.addEventListener('click', (e) => {
     e.preventDefault();
-    sessionStorage.setItem('bside-reverse', '1');
-    window.location.href = closingDest;
+    if (closingHome.dataset.animating) return;
+    closingHome.dataset.animating = '1';
+
+    // 1. タイトル・ボタンのフェードアウト
+    closingHome.style.animation = 'none';
+    closingHome.style.transition = 'opacity 0.4s ease';
+    closingHome.style.opacity = '0';
+    if (closingTitle) {
+      closingTitle.style.transition = 'opacity 0.4s ease';
+      closingTitle.style.opacity = '0';
+    }
+    if (closingLangBtn) {
+      closingLangBtn.style.transition = 'opacity 0.4s ease';
+      closingLangBtn.style.opacity = '0';
+    }
+
+    // 2. フェード完了後、一瞬の暗闇 → 遷移
+    setTimeout(() => {
+      sessionStorage.setItem('bside-reverse', '1');
+      window.location.href = closingDest;
+    }, 700);
   });
 }
 </script>
