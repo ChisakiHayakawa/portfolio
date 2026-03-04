@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v23.0 / 2026.03.04 — feat: 遷移をリフト＆フリップ方式に置換（順方向+逆方向） -->
+<!-- v23.1 / 2026.03.04 — fix: ブラウザバック時のanimatingフラグリセット漏れ修正 -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -27,7 +27,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    B-SIDE — Setlist Index
-   v23.0 / リフト＆フリップ遷移
+   v23.1 / ブラウザバック時animatingリセット修正
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -407,6 +407,7 @@ window.addEventListener('pageshow', (e) => {
     // フェードオーバーレイが残っていたら除去
     const leftover = document.getElementById('bside-fade-overlay');
     if (leftover) leftover.remove();
+    animating = false;
   }
 });
 
