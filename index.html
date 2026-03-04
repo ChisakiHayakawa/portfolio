@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v22.1 / 2026.03.04 — fix: 遷移フォールバック追加（順方向+逆方向のsetTimeout安全ネット） -->
+<!-- v23.0 / 2026.03.04 — feat: 遷移をリフト＆フリップ方式に置換（順方向+逆方向） -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -27,7 +27,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    B-SIDE — Setlist Index
-   v14.0 / 遷移エンドポイント更新
+   v23.0 / リフト＆フリップ遷移
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -59,6 +59,7 @@
 
   --max: 56rem;
 
+  --cover-ts: clamp(36px, 7vw, 60px);
   --thumb-ts: clamp(22px, 3.5vw, 36px);
 }
 
@@ -152,38 +153,82 @@ a:hover { opacity: 0.5; }
   border-bottom: none;
   position: relative;
   cursor: pointer;
+  perspective: 1200px;
 }
 .cover-thumb:hover { opacity: 1; }
 
-.cover-thumb-inner {
-  background: var(--color-title);
-  color: #f0f0f0;
-  display: block;
+/* ── FLIP SHELL — ホバー担当（transform-origin: center bottom） ── */
+.flip-shell {
+  width: 100%;
   aspect-ratio: 16 / 9;
-  font-family: var(--font);
   position: relative;
-  overflow: hidden;
+  transform-origin: center bottom;
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
               box-shadow 0.45s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(28, 27, 24, 0.15);
 }
 
-/* ── HOVER: G1 リフト + エッジグロウ ── */
-.cover-thumb:hover .cover-thumb-inner {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow:
-    0 12px 40px rgba(28, 27, 24, 0.25),
-    0 4px 12px rgba(28, 27, 24, 0.1),
-    0 0 0 1px rgba(180, 175, 160, 0.25),
-    0 0 24px rgba(180, 175, 160, 0.08);
+/* ── HOVER: リフト＋傾き（PCのみ） ── */
+@media (hover: hover) {
+  .cover-thumb:hover .flip-shell {
+    transform: translateY(-7px) rotateX(-4deg);
+    box-shadow:
+      0 18px 56px rgba(28, 27, 24, 0.22),
+      0 4px 12px rgba(28, 27, 24, 0.1),
+      0 0 0 1px rgba(180, 175, 160, 0.25),
+      0 0 24px rgba(180, 175, 160, 0.08);
+  }
 }
 
-/* ── HOVER: タッチデバイスではリフト無効 ── */
+/* ── タッチデバイスではホバー効果なし ── */
 @media (hover: none) {
-  .cover-thumb-inner {
+  .flip-shell {
     transition: none;
     box-shadow: none;
   }
+}
+
+/* ── FLIP CARD — フリップ担当（transform-origin: center center） ── */
+.flip-card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transform-origin: center center;
+}
+
+.flip-front,
+.flip-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  overflow: hidden;
+}
+
+.flip-front {
+  background: var(--color-title);
+  color: #f0f0f0;
+  font-family: var(--font);
+}
+
+.flip-back {
+  background: var(--color-title);
+  color: #f0f0f0;
+  transform: rotateX(180deg);
+}
+
+.flip-back-title {
+  font-family: var(--font-serif);
+  font-size: var(--cover-ts);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  transform: translateX(-50%);
 }
 
 .cover-thumb-no {
@@ -289,7 +334,7 @@ a:hover { opacity: 0.5; }
   .site-identity {
     margin-bottom: var(--s5);
   }
-  .cover-thumb-inner {
+  .flip-shell {
     aspect-ratio: 4 / 3;
   }
   .footer-bar {
@@ -315,10 +360,17 @@ a:hover { opacity: 0.5; }
 
     <!-- SETLIST -->
     <a class="cover-thumb" id="cover-thumb" href="works/judd-marfa/">
-      <div class="cover-thumb-inner">
-        <div class="cover-thumb-no">B-Side No.001</div>
-        <div class="cover-thumb-title">JUDD | Marfa</div>
-        <div class="cover-thumb-sub">ワタリウム美術館<br>2026.02.25 visited</div>
+      <div class="flip-shell">
+        <div class="flip-card">
+          <div class="flip-front">
+            <div class="cover-thumb-no">B-Side No.001</div>
+            <div class="cover-thumb-title">JUDD | Marfa</div>
+            <div class="cover-thumb-sub">ワタリウム美術館<br>2026.02.25 visited</div>
+          </div>
+          <div class="flip-back">
+            <div class="flip-back-title">JUDD | Marfa</div>
+          </div>
+        </div>
       </div>
     </a>
 
@@ -348,188 +400,115 @@ a:hover { opacity: 0.5; }
 // ── ブラウザバック時の状態リセット ──
 window.addEventListener('pageshow', (e) => {
   if (e.persisted) {
-    const t = document.getElementById('cover-thumb');
-    const inner = t.querySelector('.cover-thumb-inner');
-    const title = t.querySelector('.cover-thumb-title');
-    const no = t.querySelector('.cover-thumb-no');
-    const sub = t.querySelector('.cover-thumb-sub');
-    [t, inner, title, no, sub].forEach(el => el.removeAttribute('style'));
+    const shell = document.querySelector('.flip-shell');
+    const card = document.querySelector('.flip-card');
+    if (shell) shell.removeAttribute('style');
+    if (card) card.removeAttribute('style');
+    // フェードオーバーレイが残っていたら除去
+    const leftover = document.getElementById('bside-fade-overlay');
+    if (leftover) leftover.remove();
   }
 });
 
-// ── CLOSINGからの逆遷移 ──
+// ── CLOSINGからの逆遷移（暗転→フェードイン） ──
 (function() {
   if (!sessionStorage.getItem('bside-reverse')) return;
   sessionStorage.removeItem('bside-reverse');
 
-  const thumb = document.getElementById('cover-thumb');
-  const thumbTitle = thumb.querySelector('.cover-thumb-title');
-  const no = thumb.querySelector('.cover-thumb-no');
-  const sub = thumb.querySelector('.cover-thumb-sub');
-
-  // 1. サムネイルの自然な位置を取得（ページレイアウトはそのまま）
-  const rect = thumb.getBoundingClientRect();
-  const vw = window.innerWidth;
-  const vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
-  const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
-  const dur = '1.4s';
-
-  // アニメーション中はthumb内のタイトル・No./Subを非表示（オーバーレイが代役）
-  thumbTitle.style.opacity = '0';
-  thumbTitle.style.transition = 'none';
-  no.style.opacity = '0';
-  no.style.transition = 'none';
-  sub.style.opacity = '0';
-  sub.style.transition = 'none';
-
-  // 2. JUDD | Marfaタイトル付きのダーク全画面オーバーレイを生成
-  //    → ページ全体（B-Side/フッター/クリーム背景）は最初から表示されたまま
   const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position: fixed; top: 0; left: 0;
-    width: ${vw}px; height: ${vh}px;
-    background: #1c1b18;
-    z-index: 1000;
-    overflow: hidden;
-    pointer-events: none;
-  `;
-
-  // judd-indexカバーと同じ大きいフォントサイズ → thumbタイトルサイズへ縮小
-  const largePx = Math.min(60, Math.max(36, vw * 0.07));
-  const smallPx = Math.min(36, Math.max(22, vw * 0.035));
-  const overlayTitle = document.createElement('div');
-  overlayTitle.textContent = 'JUDD | Marfa';
-  overlayTitle.style.cssText = `
-    font-family: "mrs-eaves-roman-lining", serif;
-    font-size: ${largePx}px;
-    font-weight: 400;
-    line-height: 1;
-    letter-spacing: -0.01em;
-    color: #f0f0f0;
-    white-space: nowrap;
-    position: absolute;
-    left: 50%; bottom: 50%;
-    transform: translateX(-50%);
-  `;
-  overlay.appendChild(overlayTitle);
+  overlay.id = 'bside-fade-overlay';
+  overlay.style.cssText =
+    'position:fixed;inset:0;background:#1c1b18;z-index:9999;opacity:1;pointer-events:none;';
   document.body.appendChild(overlay);
 
-  // 3. 次フレームでオーバーレイをサムネイル位置・サイズに縮小、タイトルも縮小
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      overlay.style.transition = `all ${dur} ${ease}`;
-      overlay.style.top = rect.top + 'px';
-      overlay.style.left = rect.left + 'px';
-      overlay.style.width = rect.width + 'px';
-      overlay.style.height = rect.height + 'px';
+      overlay.style.transition = 'opacity 0.8s cubic-bezier(0.22, 0.61, 0.36, 1)';
+      overlay.style.opacity = '0';
 
-      overlayTitle.style.transition = `font-size ${dur} ${ease}`;
-      overlayTitle.style.fontSize = smallPx + 'px';
-
-      // 4. 縮小95%時点で No./Sub をフェードイン
-      setTimeout(() => {
-        no.style.transition = 'opacity 0.5s ' + ease;
-        sub.style.transition = 'opacity 0.5s ' + ease;
-        no.style.opacity = '';
-        sub.style.opacity = '';
-      }, 1330);
-
-      // 5. 縮小完了 → オーバーレイ削除・thumbタイトル復元
-      //    bottom:50%がCSS側でも設定済み → 位置一致でカクツキなし
-      let reverseCompleted = false;
-      function completeReverse() {
-        if (reverseCompleted) return;
-        reverseCompleted = true;
+      let done = false;
+      function complete() {
+        if (done) return;
+        done = true;
         overlay.remove();
-        thumbTitle.removeAttribute('style');
-        setTimeout(() => {
-          [no, sub].forEach(el => el.removeAttribute('style'));
-        }, 500);
       }
-      overlay.addEventListener('transitionend', function onShrink(ev) {
-        if (ev.propertyName !== 'width') return;
-        overlay.removeEventListener('transitionend', onShrink);
-        completeReverse();
-      });
-      // フォールバック: transitionend未発火時の安全ネット
-      setTimeout(completeReverse, 1900);
+      overlay.addEventListener('transitionend', complete);
+      setTimeout(complete, 1000);
     });
   });
 })();
 
-// ── フルスクリーン遷移 ──
+// ── 順方向遷移（リフト＆フリップ） ──
 const thumb = document.getElementById('cover-thumb');
 const dest = thumb.getAttribute('href');
+const flipShell = thumb.querySelector('.flip-shell');
+const flipCard = thumb.querySelector('.flip-card');
+const isTouch = window.matchMedia('(hover: none)').matches;
+let animating = false;
 
-thumb.addEventListener('click', (e) => {
-  e.preventDefault();
+function doFlip() {
+  // ホバーのtransformをクリアしてからフリップ開始（干渉防止）
+  flipShell.style.transition = 'none';
+  flipShell.style.transform = 'none';
+  flipShell.style.boxShadow = 'none';
 
-  const rect = thumb.getBoundingClientRect();
-  const inner = thumb.querySelector('.cover-thumb-inner');
-  const title = thumb.querySelector('.cover-thumb-title');
-  const no = thumb.querySelector('.cover-thumb-no');
-  const sub = thumb.querySelector('.cover-thumb-sub');
+  const flipEase = 'cubic-bezier(0.4, 0, 0.15, 1)';
+  flipCard.style.transition = 'transform 0.75s ' + flipEase;
+  flipCard.style.transform = 'rotateX(-180deg)';
 
-  // 現在位置を固定
-  thumb.style.position = 'fixed';
-  thumb.style.top = rect.top + 'px';
-  thumb.style.left = rect.left + 'px';
-  thumb.style.width = rect.width + 'px';
-  thumb.style.height = rect.height + 'px';
-  thumb.style.zIndex = '1000';
-  thumb.style.margin = '0';
+  let flipDone = false;
+  function afterFlip() {
+    if (flipDone) return;
+    flipDone = true;
 
-  // hover reset
-  inner.style.transform = 'none';
-  inner.style.boxShadow = 'none';
+    // 800ms待ち → ダークフェード → ページ遷移
+    setTimeout(() => {
+      const overlay = document.createElement('div');
+      overlay.id = 'bside-fade-overlay';
+      overlay.style.cssText =
+        'position:fixed;inset:0;background:#1c1b18;z-index:9999;opacity:0;pointer-events:none;';
+      document.body.appendChild(overlay);
 
-  // 次フレームでフルスクリーンへアニメーション
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const dur = '2.3s';
-      const ease = 'cubic-bezier(0.5, 0, 0.5, 1)';
+      // レイアウト強制 → トランジション開始
+      overlay.offsetHeight;
+      overlay.style.transition = 'opacity 0.3s ease';
+      overlay.style.opacity = '1';
 
-      // サムネイルをフルスクリーンに展開
-      // iPadではツールバーの影響でwindow.innerHeightが画面より短くなる場合がある
-      // 少しオーバーサイズにして隙間を防ぐ（overflow:hiddenでクリップされる）
-      const vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
-      thumb.style.transition = `all ${dur} ${ease}`;
-      thumb.style.top = '0';
-      thumb.style.left = '0';
-      thumb.style.width = window.innerWidth + 'px';
-      thumb.style.height = vh + 'px';
-
-      // インナーをフルスクリーンに
-      inner.style.transition = `all ${dur} ${ease}`;
-      inner.style.aspectRatio = 'auto';
-      inner.style.height = '100%';
-
-      // No. と Sub をscale収束でフェードアウト
-      no.style.transition = `opacity 0.8s ${ease}, transform 0.8s ${ease}`;
-      sub.style.transition = `opacity 0.8s ${ease}, transform 0.8s ${ease}`;
-      no.style.opacity = '0';
-      no.style.transform = 'translateX(-50%) scale(0.85) translateY(4px)';
-      sub.style.opacity = '0';
-      sub.style.transform = 'translateX(-50%) scale(0.85) translateY(-4px)';
-
-      // タイトルをjudd-indexカバーの大サイズに拡大（bottom:50%/position:absoluteはCSS側で設定済み）
-      title.style.transition = `font-size 2.3s cubic-bezier(0.5, 0, 0.5, 1)`;
-      title.style.fontSize = 'clamp(36px, 7vw, 60px)';
-
-      // アニメーション完了後に遷移（widthの完了で判定）
       let navigated = false;
       function navigate() {
         if (navigated) return;
         navigated = true;
         window.location.href = dest;
       }
-      thumb.addEventListener('transitionend', (ev) => {
-        if (ev.propertyName === 'width') navigate();
-      });
-      // フォールバック: transitionend未発火時の安全ネット
-      setTimeout(navigate, 2800);
-    });
+      overlay.addEventListener('transitionend', navigate);
+      setTimeout(navigate, 500);
+    }, 800);
+  }
+
+  flipCard.addEventListener('transitionend', function onFlipEnd(ev) {
+    if (ev.propertyName === 'transform') {
+      flipCard.removeEventListener('transitionend', onFlipEnd);
+      afterFlip();
+    }
   });
+  setTimeout(afterFlip, 1000);
+}
+
+thumb.addEventListener('click', (e) => {
+  e.preventDefault();
+  if (animating) return;
+  animating = true;
+
+  if (isTouch) {
+    // モバイル: ため（350ms）→ フリップ
+    flipShell.style.transition = 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1)';
+    flipShell.style.transform = 'translateY(-7px) rotateX(-4deg)';
+    flipShell.style.boxShadow = '0 18px 56px rgba(28,27,24,0.22), 0 4px 12px rgba(28,27,24,0.1)';
+    setTimeout(doFlip, 350);
+  } else {
+    // PC: ホバーで既にリフト済み → 即フリップ
+    doFlip();
+  }
 });
 </script>
 
