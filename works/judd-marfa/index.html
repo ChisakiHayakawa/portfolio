@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v8.5 / 2026.03.04 — CLOSING absolute化 + Swipe/Home位置統一 -->
+<!-- v8.6 / 2026.03.04 — CLOSING逆遷移フェード改善 + Home breatheアニメーション -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -246,17 +246,25 @@
     text-decoration: none;
     font-size: 14px;
     font-weight: 300;
-    opacity: 0.5;
     letter-spacing: 0.08em;
-    transition: opacity 0.2s;
     position: absolute;
     left: 50%;
     top: calc(50% + 50px);
     transform: translateX(-50%);
     white-space: nowrap;
+    opacity: 0.5;
+    animation: home-breathe 6s ease-in-out 1.0s infinite;
   }
   .page-closing .closing-home:hover {
+    animation: none;
     opacity: 0.8;
+  }
+  @keyframes home-breathe {
+    0%   { opacity: 0.5; }
+    42%  { opacity: 0.5; }
+    67%  { opacity: 0.15; }
+    78%  { opacity: 0.15; }
+    100% { opacity: 0.5; }
   }
 
   /* ════════════════════════════════════════
@@ -801,19 +809,23 @@ if (closingHome) {
 
     const sub = document.querySelector('.closing-sub');
     const home = closingHome;
-    const ease = 'cubic-bezier(0.4, 0, 0.2, 1)';
 
-    // No.001 と Home → をフェードアウト（順方向と対称）
-    sub.style.transition = `opacity 0.4s ${ease}`;
-    home.style.transition = `opacity 0.4s ${ease}`;
+    // No.001 と Home → を「下に沈んで溶ける」フェードアウト
+    const fadeEase = 'cubic-bezier(0.25, 0.1, 0.25, 1.0)';
+    home.style.animation = 'none'; // breatheを停止（base opacity:0.5に戻る）
+    home.offsetHeight; // リフロー強制: animation停止を確定させてからtransition開始
+    sub.style.transition = `opacity 0.35s ${fadeEase}, transform 0.35s ${fadeEase}`;
+    home.style.transition = `opacity 0.35s ${fadeEase}, transform 0.35s ${fadeEase}`;
     sub.style.opacity = '0';
+    sub.style.transform = 'translateX(-50%) translateY(6px)';
     home.style.opacity = '0';
+    home.style.transform = 'translateX(-50%) translateY(6px)';
 
     // フェード完了後にフラグセット → 遷移
     setTimeout(() => {
       sessionStorage.setItem('bside-reverse', '1');
       window.location.href = closingDest;
-    }, 420);
+    }, 380);
   });
 }
 </script>
