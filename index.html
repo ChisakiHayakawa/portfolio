@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v22.0 / 2026.03.04 — 順方向イージングをeaseInOutSine 2.3sに変更（本を開く感） -->
+<!-- v22.1 / 2026.03.04 — fix: 遷移フォールバック追加（順方向+逆方向のsetTimeout安全ネット） -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -436,16 +436,23 @@ window.addEventListener('pageshow', (e) => {
 
       // 5. 縮小完了 → オーバーレイ削除・thumbタイトル復元
       //    bottom:50%がCSS側でも設定済み → 位置一致でカクツキなし
-      overlay.addEventListener('transitionend', function onShrink(ev) {
-        if (ev.propertyName !== 'width') return;
-        overlay.removeEventListener('transitionend', onShrink);
+      let reverseCompleted = false;
+      function completeReverse() {
+        if (reverseCompleted) return;
+        reverseCompleted = true;
         overlay.remove();
         thumbTitle.removeAttribute('style');
-
         setTimeout(() => {
           [no, sub].forEach(el => el.removeAttribute('style'));
         }, 500);
+      }
+      overlay.addEventListener('transitionend', function onShrink(ev) {
+        if (ev.propertyName !== 'width') return;
+        overlay.removeEventListener('transitionend', onShrink);
+        completeReverse();
       });
+      // フォールバック: transitionend未発火時の安全ネット
+      setTimeout(completeReverse, 1900);
     });
   });
 })();
@@ -510,11 +517,17 @@ thumb.addEventListener('click', (e) => {
       title.style.fontSize = 'clamp(36px, 7vw, 60px)';
 
       // アニメーション完了後に遷移（widthの完了で判定）
+      let navigated = false;
+      function navigate() {
+        if (navigated) return;
+        navigated = true;
+        window.location.href = dest;
+      }
       thumb.addEventListener('transitionend', (ev) => {
-        if (ev.propertyName === 'width') {
-          window.location.href = dest;
-        }
+        if (ev.propertyName === 'width') navigate();
       });
+      // フォールバック: transitionend未発火時の安全ネット
+      setTimeout(navigate, 2800);
     });
   });
 });
