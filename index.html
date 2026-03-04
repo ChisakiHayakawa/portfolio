@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v23.2 / 2026.03.04 — fix: ブラウザバックanimatingリセット + 順方向遷移フラグ追加 -->
+<!-- v23.3 / 2026.03.04 — fix: flip-back-title中央寄せ + フリップ後待機短縮(800→350ms) -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -27,7 +27,7 @@
 <style>
 /* ═══════════════════════════════════════════════
    B-SIDE — Setlist Index
-   v23.2 / ブラウザバックリセット + 順方向フラグ
+   v23.3 / flip-back-title中央寄せ + 待機短縮
    ═══════════════════════════════════════════════ */
 
 :root {
@@ -227,8 +227,8 @@ a:hover { opacity: 0.5; }
   white-space: nowrap;
   position: absolute;
   left: 50%;
-  bottom: 50%;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .cover-thumb-no {
@@ -484,7 +484,7 @@ function doFlip() {
       }
       overlay.addEventListener('transitionend', navigate);
       setTimeout(navigate, 500);
-    }, 800);
+    }, 350);
   }
 
   flipCard.addEventListener('transitionend', function onFlipEnd(ev) {
