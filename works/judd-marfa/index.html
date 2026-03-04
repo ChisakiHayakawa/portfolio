@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v8.3 / 2026.03.04 — CLOSING→Home逆遷移トリガー追加 -->
+<!-- v8.4 / 2026.03.04 — ブラウザ進む時のCLOSING状態リセット追加 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -644,6 +644,16 @@
 <button class="nav-arrow nav-next" id="nextBtn" aria-label="次のページ">›</button>
 
 <script>
+// ── ブラウザバック/進む時の状態リセット ──
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    const sub = document.querySelector('.closing-sub');
+    const home = document.querySelector('.closing-home');
+    if (sub) sub.removeAttribute('style');
+    if (home) home.removeAttribute('style');
+  }
+});
+
 const booklet = document.getElementById('booklet');
 const pages = booklet.querySelectorAll('.page');
 const indicator = document.getElementById('indicator');
