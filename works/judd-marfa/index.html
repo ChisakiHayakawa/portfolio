@@ -808,24 +808,27 @@ if (closingHome) {
     e.preventDefault();
 
     const sub = document.querySelector('.closing-sub');
+    const closingTitle = document.querySelector('.closing-title');
     const home = closingHome;
 
-    // No.001 と Home → をscale収束でフェードアウト
+    // CLOSING全体（title + No.001 + Home →）をフェードアウト → 暗転後に遷移
     const fadeEase = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
     home.style.animation = 'none'; // breatheを停止（base opacity:0.5に戻る）
     home.offsetHeight; // リフロー強制: animation停止を確定させてからtransition開始
-    sub.style.transition = `opacity 0.6s ${fadeEase}, transform 0.6s ${fadeEase}`;
-    home.style.transition = `opacity 0.6s ${fadeEase}, transform 0.6s ${fadeEase}`;
+    closingTitle.style.transition = `opacity 0.5s ${fadeEase}`;
+    sub.style.transition = `opacity 0.5s ${fadeEase}, transform 0.5s ${fadeEase}`;
+    home.style.transition = `opacity 0.5s ${fadeEase}, transform 0.5s ${fadeEase}`;
+    closingTitle.style.opacity = '0';
     sub.style.opacity = '0';
     sub.style.transform = 'translateX(-50%) scale(0.8) translateY(16px)';
     home.style.opacity = '0';
     home.style.transform = 'translateX(-50%) scale(0.8) translateY(-16px)';
 
-    // フェード完了後にフラグセット → 遷移
+    // フェード完了後にフラグセット → 遷移（暗転状態でページ移動）
     setTimeout(() => {
       sessionStorage.setItem('bside-reverse', '1');
       window.location.href = closingDest;
-    }, 650);
+    }, 500);
   });
 }
 </script>

@@ -351,76 +351,91 @@ window.addEventListener('pageshow', (e) => {
   sessionStorage.removeItem('bside-reverse');
 
   const thumb = document.getElementById('cover-thumb');
-  const inner = thumb.querySelector('.cover-thumb-inner');
-  const title = thumb.querySelector('.cover-thumb-title');
+  const thumbTitle = thumb.querySelector('.cover-thumb-title');
   const no = thumb.querySelector('.cover-thumb-no');
   const sub = thumb.querySelector('.cover-thumb-sub');
 
-  // 1. サムネイルの自然な位置を取得
+  // 1. サムネイルの自然な位置を取得（ページレイアウトはそのまま）
   const rect = thumb.getBoundingClientRect();
-
-  // 2. 即座にフルスクリーン状態にする（遷移なし）
-  //    タイトルは absolute を使わず flex フローのまま。
-  //    No./Sub は opacity:0 で待機（C案: translateYなし）。
+  const vw = window.innerWidth;
   const vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
-  thumb.style.position = 'fixed';
-  thumb.style.top = '0';
-  thumb.style.left = '0';
-  thumb.style.width = window.innerWidth + 'px';
-  thumb.style.height = vh + 'px';
-  thumb.style.zIndex = '1000';
-  thumb.style.margin = '0';
-  thumb.style.transition = 'none';
+  const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+  const dur = '1.4s';
 
-  inner.style.aspectRatio = 'auto';
-  inner.style.height = '100%';
-  inner.style.padding = '0';
-  inner.style.transform = 'none';
-  inner.style.boxShadow = 'none';
-  inner.style.transition = 'none';
-
+  // アニメーション中はthumb内のタイトル・No./Subを非表示（オーバーレイが代役）
+  thumbTitle.style.opacity = '0';
+  thumbTitle.style.transition = 'none';
   no.style.opacity = '0';
   no.style.transition = 'none';
   sub.style.opacity = '0';
   sub.style.transition = 'none';
 
-  title.style.fontSize = 'clamp(36px, 7vw, 60px)';
-  title.style.lineHeight = '1';
-  title.style.transition = 'none';
+  // 2. JUDD | Marfaタイトル付きのダーク全画面オーバーレイを生成
+  //    → ページ全体（B-Side/フッター/クリーム背景）は最初から表示されたまま
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    position: fixed; top: 0; left: 0;
+    width: ${vw}px; height: ${vh}px;
+    background: #1c1b18;
+    z-index: 1000;
+    overflow: hidden;
+    pointer-events: none;
+  `;
 
-  // 3. 次フレームでサムネイルサイズに縮小アニメーション
+  // judd-indexカバーと同じ大きいフォントサイズ → thumbタイトルサイズへ縮小
+  const largePx = Math.min(60, Math.max(36, vw * 0.07));
+  const smallPx = Math.min(36, Math.max(22, vw * 0.035));
+  const overlayTitle = document.createElement('div');
+  overlayTitle.textContent = 'JUDD | Marfa';
+  overlayTitle.style.cssText = `
+    font-family: "mrs-eaves-roman-lining", serif;
+    font-size: ${largePx}px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: #f0f0f0;
+    white-space: nowrap;
+    position: absolute;
+    left: 50%; bottom: 50%;
+    transform: translateX(-50%);
+  `;
+  overlay.appendChild(overlayTitle);
+  document.body.appendChild(overlay);
+
+  // 3. 次フレームでオーバーレイをサムネイル位置・サイズに縮小、タイトルも縮小
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const dur = '1.4s';
-      const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+      overlay.style.transition = `all ${dur} ${ease}`;
+      overlay.style.top = rect.top + 'px';
+      overlay.style.left = rect.left + 'px';
+      overlay.style.width = rect.width + 'px';
+      overlay.style.height = rect.height + 'px';
 
-      thumb.style.transition = `all ${dur} ${ease}`;
-      thumb.style.top = rect.top + 'px';
-      thumb.style.left = rect.left + 'px';
-      thumb.style.width = rect.width + 'px';
-      thumb.style.height = rect.height + 'px';
+      overlayTitle.style.transition = `font-size ${dur} ${ease}`;
+      overlayTitle.style.fontSize = smallPx + 'px';
 
-      title.style.transition = `font-size ${dur} ${ease}, line-height ${dur} ${ease}`;
-      title.style.fontSize = '';
-      title.style.lineHeight = '';
-
-      // 4. 縮小94%時点で No./Sub をフェードイン（B-Sideタイトルが見えるタイミングに合わせる）
+      // 4. 縮小95%時点で No./Sub をフェードイン
       setTimeout(() => {
-        no.style.transition = 'opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1)';
-        sub.style.transition = 'opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1)';
+        no.style.transition = 'opacity 0.5s ' + ease;
+        sub.style.transition = 'opacity 0.5s ' + ease;
         no.style.opacity = '';
         sub.style.opacity = '';
-      }, 1316);
+      }, 1330);
 
-      // 5. 縮小完了 → スタイルクリア
-      thumb.addEventListener('transitionend', function onShrink(ev) {
+      // 5. 縮小完了 → オーバーレイ削除・thumbタイトル復元
+      overlay.addEventListener('transitionend', function onShrink(ev) {
         if (ev.propertyName !== 'width') return;
-        thumb.removeEventListener('transitionend', onShrink);
+        overlay.removeEventListener('transitionend', onShrink);
+        overlay.remove();
+        // opacity:0のまま表示してからフェードイン（位置ズレのカクツキを隠す）
+        thumbTitle.style.opacity = '0';
+        thumbTitle.style.transition = 'none';
+        requestAnimationFrame(() => {
+          thumbTitle.style.transition = 'opacity 0.15s ease';
+          thumbTitle.style.opacity = '1';
+          thumbTitle.addEventListener('transitionend', () => thumbTitle.removeAttribute('style'), { once: true });
+        });
 
-        // すべてのインラインスタイルを一括クリア（flex フローなので位置ジャンプなし）
-        [thumb, inner, title].forEach(el => el.removeAttribute('style'));
-
-        // No./Sub のフェードイン完了を待ってクリア（1316ms開始 + 500ms = 縮小後416ms）
         setTimeout(() => {
           [no, sub].forEach(el => el.removeAttribute('style'));
         }, 500);
