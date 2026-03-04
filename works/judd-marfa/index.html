@@ -2,9 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v8.7 / 2026.03.04 — 遷移テンポ全面改善（1.4sゆったり+scale収束+C案逆方向） -->
+<!-- v9.0 / 2026.03.04 — fix: closing-home CSS修復+viewport zoom許可+lazy loading追加 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -235,7 +235,10 @@
     letter-spacing: 0.08em;
     position: absolute;
     left: 50%;
-    top: calc(50% + var(--ts) * 0.83); 6s ease-in-out 1.0s infinite;
+    top: calc(50% + var(--ts) * 0.83);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    animation: home-breathe 6s ease-in-out 1.0s infinite;
   }
   .page-closing .closing-home:hover {
     animation: none;
@@ -540,7 +543,7 @@
        W1: Light — 写真ページ
        ══════════════════════════════════════════════ -->
   <div class="page photo-d">
-    <img class="bg" src="images/judd-w1.jpg" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
+    <img class="bg" src="images/judd-w1.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
     <button class="lang-btn">EN</button>
   </div>
 
@@ -548,7 +551,7 @@
        6D: Color — 写真ページ
        ══════════════════════════════════════════════ -->
   <div class="page photo-d">
-    <img class="bg" src="images/judd-6d.jpg" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
+    <img class="bg" src="images/judd-6d.jpg" loading="lazy" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
     <button class="lang-btn">EN</button>
   </div>
 
@@ -556,7 +559,7 @@
        W2: Space — 写真ページ
        ══════════════════════════════════════════════ -->
   <div class="page photo-d">
-    <img class="bg" src="images/judd-w2.jpg" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
+    <img class="bg" src="images/judd-w2.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
     <button class="lang-btn">EN</button>
   </div>
 
@@ -564,7 +567,7 @@
        2B: Repetition — 写真ページ
        ══════════════════════════════════════════════ -->
   <div class="page photo-d">
-    <img class="bg" src="images/judd-2b.jpg" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass, 10 units">
+    <img class="bg" src="images/judd-2b.jpg" loading="lazy" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass, 10 units">
     <button class="lang-btn">EN</button>
   </div>
 
@@ -572,7 +575,7 @@
        5B: Time — 写真ページ
        ══════════════════════════════════════════════ -->
   <div class="page photo-d">
-    <img class="bg" src="images/judd-5b.jpg" alt="Untitled, 1989, Painted aluminum">
+    <img class="bg" src="images/judd-5b.jpg" loading="lazy" alt="Untitled, 1989, Painted aluminum">
     <button class="lang-btn">EN</button>
   </div>
 

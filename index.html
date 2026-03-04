@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v22.0 / 2026.03.04 — 逆遷移イージングをA-B中間値に調整 -->
+<!-- v22.0 / 2026.03.04 — 順方向イージングをeaseInOutSine 2.3sに変更（本を開く感） -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -371,7 +371,7 @@ window.addEventListener('pageshow', (e) => {
   const rect = thumb.getBoundingClientRect();
   const vw = window.innerWidth;
   const vh = Math.max(window.innerHeight, document.documentElement.clientHeight);
-  const ease = 'cubic-bezier(0.49, 0.31, 0.30, 1)';
+  const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
   const dur = '1.4s';
 
   // アニメーション中はthumb内のタイトル・No./Subを非表示（オーバーレイが代役）
@@ -479,8 +479,8 @@ thumb.addEventListener('click', (e) => {
   // 次フレームでフルスクリーンへアニメーション
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const dur = '1.4s';
-      const ease = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
+      const dur = '2.3s';
+      const ease = 'cubic-bezier(0.5, 0, 0.5, 1)';
 
       // サムネイルをフルスクリーンに展開
       // iPadではツールバーの影響でwindow.innerHeightが画面より短くなる場合がある
@@ -506,7 +506,7 @@ thumb.addEventListener('click', (e) => {
       sub.style.transform = 'translateX(-50%) scale(0.85) translateY(-4px)';
 
       // タイトルをjudd-indexカバーの大サイズに拡大（bottom:50%/position:absoluteはCSS側で設定済み）
-      title.style.transition = `font-size 1.4s cubic-bezier(0.22, 0.61, 0.36, 1)`;
+      title.style.transition = `font-size 2.3s cubic-bezier(0.5, 0, 0.5, 1)`;
       title.style.fontSize = 'clamp(36px, 7vw, 60px)';
 
       // アニメーション完了後に遷移（widthの完了で判定）
