@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v8.4 / 2026.03.04 — ブラウザ進む時のCLOSING状態リセット追加 -->
+<!-- v8.5 / 2026.03.04 — CLOSING absolute化 + Swipe/Home位置統一 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -109,7 +109,7 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: calc(50% + 80px);
+    top: calc(50% + 50px);
     font-size: 14px;
     font-weight: 300;
     letter-spacing: 0.12em;
@@ -214,11 +214,6 @@
      ════════════════════════════════════════ */
   .page-closing {
     background: var(--black);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 48px 36px;
     text-align: center;
   }
   .page-closing .closing-title {
@@ -227,7 +222,11 @@
     font-weight: 400;
     line-height: 1;
     letter-spacing: -0.01em;
-    margin-bottom: 0;
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
   }
   .page-closing .closing-sub {
     font-family: var(--font-serif);
@@ -236,17 +235,25 @@
     opacity: 0.4;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 30px;
+    position: absolute;
+    left: 50%;
+    bottom: calc(50% + var(--ts) + 30px);
+    transform: translateX(-50%);
+    white-space: nowrap;
   }
   .page-closing .closing-home {
     color: var(--white);
     text-decoration: none;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 300;
     opacity: 0.5;
     letter-spacing: 0.08em;
     transition: opacity 0.2s;
-    margin-top: 60px;
+    position: absolute;
+    left: 50%;
+    top: calc(50% + 50px);
+    transform: translateX(-50%);
+    white-space: nowrap;
   }
   .page-closing .closing-home:hover {
     opacity: 0.8;
