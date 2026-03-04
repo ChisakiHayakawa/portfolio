@@ -109,9 +109,8 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    top: calc(50% + 50px);
+    top: calc(50% + var(--ts) * 0.83);
     font-size: 14px;
-    font-weight: 300;
     letter-spacing: 0.12em;
     white-space: nowrap;
     opacity: 0;
@@ -228,19 +227,6 @@
     transform: translateX(-50%);
     white-space: nowrap;
   }
-  .page-closing .closing-sub {
-    font-family: var(--font-serif);
-    font-size: 11px;
-    font-weight: 300;
-    opacity: 0.4;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    position: absolute;
-    left: 50%;
-    bottom: calc(50% + var(--ts) + 30px);
-    transform: translateX(-50%);
-    white-space: nowrap;
-  }
   .page-closing .closing-home {
     color: var(--white);
     text-decoration: none;
@@ -249,11 +235,7 @@
     letter-spacing: 0.08em;
     position: absolute;
     left: 50%;
-    top: calc(50% + 50px);
-    transform: translateX(-50%);
-    white-space: nowrap;
-    opacity: 0.5;
-    animation: home-breathe 6s ease-in-out 1.0s infinite;
+    top: calc(50% + var(--ts) * 0.83); 6s ease-in-out 1.0s infinite;
   }
   .page-closing .closing-home:hover {
     animation: none;
@@ -643,7 +625,6 @@
        CLOSING（最終ページ — 裏表紙）
        ══════════════════════════════════════════════ -->
   <div class="page page-closing">
-    <div class="closing-sub">B-Side No.001</div>
     <div class="closing-title">JUDD | Marfa</div>
     <a class="closing-home" href="../../">Home →</a>
     <button class="lang-btn">EN</button>
@@ -662,9 +643,7 @@
 // ── ブラウザバック/進む時の状態リセット ──
 window.addEventListener('pageshow', (e) => {
   if (e.persisted) {
-    const sub = document.querySelector('.closing-sub');
     const home = document.querySelector('.closing-home');
-    if (sub) sub.removeAttribute('style');
     if (home) home.removeAttribute('style');
   }
 });
@@ -806,29 +785,8 @@ if (closingHome) {
   const closingDest = closingHome.getAttribute('href');
   closingHome.addEventListener('click', (e) => {
     e.preventDefault();
-
-    const sub = document.querySelector('.closing-sub');
-    const closingTitle = document.querySelector('.closing-title');
-    const home = closingHome;
-
-    // CLOSING全体（title + No.001 + Home →）をフェードアウト → 暗転後に遷移
-    const fadeEase = 'cubic-bezier(0.22, 0.61, 0.36, 1)';
-    home.style.animation = 'none'; // breatheを停止（base opacity:0.5に戻る）
-    home.offsetHeight; // リフロー強制: animation停止を確定させてからtransition開始
-    closingTitle.style.transition = `opacity 0.5s ${fadeEase}`;
-    sub.style.transition = `opacity 0.5s ${fadeEase}, transform 0.5s ${fadeEase}`;
-    home.style.transition = `opacity 0.5s ${fadeEase}, transform 0.5s ${fadeEase}`;
-    closingTitle.style.opacity = '0';
-    sub.style.opacity = '0';
-    sub.style.transform = 'translateX(-50%) scale(0.8) translateY(16px)';
-    home.style.opacity = '0';
-    home.style.transform = 'translateX(-50%) scale(0.8) translateY(-16px)';
-
-    // フェード完了後にフラグセット → 遷移（暗転状態でページ移動）
-    setTimeout(() => {
-      sessionStorage.setItem('bside-reverse', '1');
-      window.location.href = closingDest;
-    }, 500);
+    sessionStorage.setItem('bside-reverse', '1');
+    window.location.href = closingDest;
   });
 }
 </script>

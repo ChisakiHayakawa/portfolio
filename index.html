@@ -58,6 +58,8 @@
   --lh-tight: 1.2;
 
   --max: 56rem;
+
+  --thumb-ts: clamp(22px, 3.5vw, 36px);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -156,12 +158,7 @@ a:hover { opacity: 0.5; }
 .cover-thumb-inner {
   background: var(--color-title);
   color: #f0f0f0;
-  padding: var(--s5) var(--s4);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  display: block;
   aspect-ratio: 16 / 9;
   font-family: var(--font);
   position: relative;
@@ -194,16 +191,25 @@ a:hover { opacity: 0.5; }
   letter-spacing: 0.3em;
   text-transform: uppercase;
   opacity: 0.4;
-  margin-bottom: 12px;
+  position: absolute;
+  left: 50%;
+  bottom: calc(50% + var(--thumb-ts) * 1.5);
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 .cover-thumb-title {
   font-family: var(--font-serif);
-  font-size: clamp(22px, 3.5vw, 36px);
+  font-size: var(--thumb-ts);
   font-weight: 400;
-  line-height: 1.3;
+  line-height: 1;
   letter-spacing: -0.01em;
-  margin-bottom: 12px;
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  margin: 0;
 }
 
 .cover-thumb-sub {
@@ -211,6 +217,12 @@ a:hover { opacity: 0.5; }
   font-weight: 300;
   opacity: 0.5;
   line-height: 1.8;
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--thumb-ts) * 0.83);
+  transform: translateX(-50%);
+  text-align: center;
+  margin: 0;
 }
 
 /* ── FOOTER BAR ── */
@@ -423,18 +435,12 @@ window.addEventListener('pageshow', (e) => {
       }, 1330);
 
       // 5. 縮小完了 → オーバーレイ削除・thumbタイトル復元
+      //    bottom:50%がCSS側でも設定済み → 位置一致でカクツキなし
       overlay.addEventListener('transitionend', function onShrink(ev) {
         if (ev.propertyName !== 'width') return;
         overlay.removeEventListener('transitionend', onShrink);
         overlay.remove();
-        // opacity:0のまま表示してからフェードイン（位置ズレのカクツキを隠す）
-        thumbTitle.style.opacity = '0';
-        thumbTitle.style.transition = 'none';
-        requestAnimationFrame(() => {
-          thumbTitle.style.transition = 'opacity 0.15s ease';
-          thumbTitle.style.opacity = '1';
-          thumbTitle.addEventListener('transitionend', () => thumbTitle.removeAttribute('style'), { once: true });
-        });
+        thumbTitle.removeAttribute('style');
 
         setTimeout(() => {
           [no, sub].forEach(el => el.removeAttribute('style'));
@@ -490,25 +496,16 @@ thumb.addEventListener('click', (e) => {
       inner.style.transition = `all ${dur} ${ease}`;
       inner.style.aspectRatio = 'auto';
       inner.style.height = '100%';
-      inner.style.padding = '0';
 
       // No. と Sub をscale収束でフェードアウト
       no.style.transition = `opacity 0.8s ${ease}, transform 0.8s ${ease}`;
       sub.style.transition = `opacity 0.8s ${ease}, transform 0.8s ${ease}`;
       no.style.opacity = '0';
-      no.style.transform = 'scale(0.85) translateY(4px)';
+      no.style.transform = 'translateX(-50%) scale(0.85) translateY(4px)';
       sub.style.opacity = '0';
-      sub.style.transform = 'scale(0.85) translateY(-4px)';
+      sub.style.transform = 'translateX(-50%) scale(0.85) translateY(-4px)';
 
-      // タイトルを judd-index カバーと同じ配置に
-      // （bottom: 50% + line-height: 1 → ベースラインが画面50%に一致）
-      title.style.position = 'absolute';
-      title.style.left = '50%';
-      title.style.bottom = '50%';
-      title.style.transform = 'translateX(-50%)';
-      title.style.lineHeight = '1';
-      title.style.whiteSpace = 'nowrap';
-      title.style.margin = '0';
+      // タイトルをjudd-indexカバーの大サイズに拡大（bottom:50%/position:absoluteはCSS側で設定済み）
       title.style.transition = `font-size 1.4s cubic-bezier(0.22, 0.61, 0.36, 1)`;
       title.style.fontSize = 'clamp(36px, 7vw, 60px)';
 
