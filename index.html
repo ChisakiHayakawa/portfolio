@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v16.0 / 2026.03.04 — 遷移時100vh→innerHeightでスマホ位置ずれ修正 + ブラウザバック状態リセット -->
+<!-- v17.0 / 2026.03.04 — CLOSINGからの逆遷移（サムネイル縮小アニメーション） -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -344,6 +344,89 @@ window.addEventListener('pageshow', (e) => {
     [t, inner, title, no, sub].forEach(el => el.removeAttribute('style'));
   }
 });
+
+// ── CLOSINGからの逆遷移 ──
+(function() {
+  if (!sessionStorage.getItem('bside-reverse')) return;
+  sessionStorage.removeItem('bside-reverse');
+
+  const thumb = document.getElementById('cover-thumb');
+  const inner = thumb.querySelector('.cover-thumb-inner');
+  const title = thumb.querySelector('.cover-thumb-title');
+  const no = thumb.querySelector('.cover-thumb-no');
+  const sub = thumb.querySelector('.cover-thumb-sub');
+
+  // 1. サムネイルの自然な位置を取得
+  const rect = thumb.getBoundingClientRect();
+
+  // 2. 即座にフルスクリーン状態にする（遷移なし）
+  //    タイトルは absolute を使わず flex フローのまま。
+  //    No./Sub は opacity:0 だが flex スペースは占める。
+  thumb.style.position = 'fixed';
+  thumb.style.top = '0';
+  thumb.style.left = '0';
+  thumb.style.width = window.innerWidth + 'px';
+  thumb.style.height = window.innerHeight + 'px';
+  thumb.style.zIndex = '1000';
+  thumb.style.margin = '0';
+  thumb.style.transition = 'none';
+
+  inner.style.aspectRatio = 'auto';
+  inner.style.height = '100%';
+  inner.style.padding = '0';
+  inner.style.transform = 'none';
+  inner.style.boxShadow = 'none';
+  inner.style.transition = 'none';
+
+  no.style.opacity = '0';
+  no.style.transition = 'none';
+  sub.style.opacity = '0';
+  sub.style.transition = 'none';
+
+  title.style.fontSize = 'clamp(36px, 7vw, 60px)';
+  title.style.lineHeight = '1';
+  title.style.transition = 'none';
+
+  // 3. 次フレームでサムネイルサイズに縮小アニメーション
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const dur = '0.6s';
+      const ease = 'cubic-bezier(0.4, 0, 0.2, 1)';
+
+      thumb.style.transition = `all ${dur} ${ease}`;
+      thumb.style.top = rect.top + 'px';
+      thumb.style.left = rect.left + 'px';
+      thumb.style.width = rect.width + 'px';
+      thumb.style.height = rect.height + 'px';
+
+      title.style.transition = `font-size ${dur} ${ease}, line-height ${dur} ${ease}`;
+      title.style.fontSize = '';
+      title.style.lineHeight = '';
+
+      // 4. 縮小完了 → スタイルクリア → No./Sub フェードイン
+      thumb.addEventListener('transitionend', function onShrink(ev) {
+        if (ev.propertyName !== 'width') return;
+        thumb.removeEventListener('transitionend', onShrink);
+
+        // すべてのインラインスタイルを一括クリア（flex フローなので位置ジャンプなし）
+        [thumb, inner, title].forEach(el => el.removeAttribute('style'));
+
+        // 次フレームで No./Sub フェードイン
+        requestAnimationFrame(() => {
+          no.style.transition = `opacity 0.4s ${ease}`;
+          sub.style.transition = `opacity 0.4s ${ease}`;
+          no.style.opacity = '';
+          sub.style.opacity = '';
+
+          // フェードイン完了後に全インラインスタイルをクリア
+          setTimeout(() => {
+            [no, sub].forEach(el => el.removeAttribute('style'));
+          }, 420);
+        });
+      });
+    });
+  });
+})();
 
 // ── フルスクリーン遷移 ──
 const thumb = document.getElementById('cover-thumb');
