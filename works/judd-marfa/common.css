@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════════
    B-Side — Common Stylesheet
-   v1.2 / 2026.02.28 — Remove footer border-top
+   v1.3 / 2026.03.05 — feat: 筑紫A丸ゴシックをfont-stackに追加
    ══════════════════════════════════════════ */
 
 /* ── DESIGN TOKENS ── */
@@ -9,7 +9,7 @@
   --white: #fff;
   --grey: #666;
   --light: #e8e8e8;
-  --font: 'Helvetica Neue', 'Libre Franklin', 'Noto Sans JP', sans-serif;
+  --font: 'Helvetica Neue', 'Libre Franklin', 'fot-tsukuardgothic-std', 'Noto Sans JP', sans-serif;
 
   /* Spacing (8px grid) */
   --s1:    8px;

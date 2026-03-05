@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.9 / 2026.03.05 — fix: Adobe Fonts webプロジェクトID変更(gvn8jks→pxi5mdv) -->
+<!-- v9.10 / 2026.03.05 — feat: Adobe Fonts CSS→JS埋め込み切替 + 筑紫A丸ゴシック追加 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -19,7 +19,16 @@
 <meta name="twitter:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。">
 <meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
 <link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
-<link rel="stylesheet" href="https://use.typekit.net/pxi5mdv.css">
+<script>
+(function(d) {
+  var config = {
+    kitId: 'pxi5mdv',
+    scriptTimeout: 3000,
+    async: true
+  },
+  h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+})(document);
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <script>
 // 順方向到着時、描画前にbodyを隠す（チラ見え防止）
@@ -32,9 +41,9 @@ if (sessionStorage.getItem('bside-forward')) {
   :root {
     --white: #f0f0f0;
     --black: #1c1b18;
-    --font: "mr-eaves-xl-modern", "Noto Sans JP", sans-serif;
+    --font: "mr-eaves-xl-modern", "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
     --font-serif: "mrs-eaves-roman-lining", serif;
-    --font-jp: "Noto Sans JP", sans-serif;
+    --font-jp: "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
     --ts: clamp(36px, 7vw, 60px);
   }
 

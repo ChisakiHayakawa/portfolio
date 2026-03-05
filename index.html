@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chisaki Hayakawa — Photographer / Designer / Engineer</title>
-<!-- v23.8 / 2026.03.05 — fix: Adobe Fonts webプロジェクトID変更(gvn8jks→pxi5mdv) -->
+<!-- v23.9 / 2026.03.05 — feat: Adobe Fonts CSS→JS埋め込み切替 + 筑紫A丸ゴシック追加 -->
 <meta name="description" content="B-Side — 展示のライナーノーツ">
 <meta name="author" content="Chisaki Hayakawa">
 
@@ -21,7 +21,16 @@
 <meta property="og:site_name" content="Chisaki Hayakawa">
 
 <link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/">
-<link rel="stylesheet" href="https://use.typekit.net/pxi5mdv.css">
+<script>
+(function(d) {
+  var config = {
+    kitId: 'pxi5mdv',
+    scriptTimeout: 3000,
+    async: true
+  },
+  h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+})(document);
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 
 <style>
@@ -31,7 +40,7 @@
    ═══════════════════════════════════════════════ */
 
 :root {
-  --font: "mr-eaves-xl-modern", "Noto Sans JP", sans-serif;
+  --font: "mr-eaves-xl-modern", "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
   --font-serif: "mrs-eaves-roman-lining", serif;
 
   --color-title: #1c1b18;
