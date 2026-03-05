@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.14 / 2026.03.05 — fix: endmatterスクロールバー非表示、quote削除、Photo行削除 -->
+<!-- v9.15 / 2026.03.05 — fix: カバータイトルFOUT防止、写真チカチカ修正(contain:paint + lazy→eager) -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -90,6 +90,7 @@ if (sessionStorage.getItem('bside-forward')) {
     scroll-snap-align: start;
     position: relative;
     overflow: hidden;
+    contain: paint;
   }
   .page.page-endmatter {
     overflow-y: auto;
@@ -417,6 +418,25 @@ if (sessionStorage.getItem('bside-forward')) {
   /* ════════════════════════════════════════
      FADE-IN
      ════════════════════════════════════════ */
+  /* ── FOUT防止: フォントロード完了まで両方停止、ロード後に同時フェードイン ── */
+  /* 直接アクセス時: タイトルとヒントが一緒にふわっと出る（順方向遷移時はオーバーレイの下で完了） */
+  .cover-title {
+    opacity: 0;
+    animation: title-fadein 1.0s ease-out forwards;
+  }
+  .wf-loading .cover-title,
+  .wf-loading .cover-hint {
+    animation: none;
+    opacity: 0;
+  }
+  .wf-loading .closing-title {
+    visibility: hidden;
+  }
+  @keyframes title-fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
   .fade-target {
     opacity: 0;
     transform: translateY(14px);
@@ -827,6 +847,16 @@ const fadeObserver = new IntersectionObserver((entries) => {
   threshold: 0.5
 });
 pages.forEach(page => fadeObserver.observe(page));
+
+// ── lazy画像のアンロード防止 ──
+// 読み込み完了後にeagerに切り替え、Chromeがスクロール中にアンロードするのを防ぐ
+document.querySelectorAll('.page img.bg[loading="lazy"]').forEach(img => {
+  if (img.complete) {
+    img.loading = 'eager';
+  } else {
+    img.addEventListener('load', () => { img.loading = 'eager'; }, { once: true });
+  }
+});
 
 // ── グローバル言語切替 ──
 const langBtns = document.querySelectorAll('.lang-btn');
