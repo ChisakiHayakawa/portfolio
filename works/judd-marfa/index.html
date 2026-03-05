@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.7 / 2026.03.05 — fix: 到着チラ見え防止(head早期hide) + 二重rAF除去 -->
+<!-- v9.8 / 2026.03.05 — update: セマンティクスHTML化(div→section/main/h1/blockquote等) -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -292,6 +292,7 @@ if (sessionStorage.getItem('bside-forward')) {
     margin-top: 12px;
     font-size: 11px;
     font-weight: 400;
+    font-style: normal;
     letter-spacing: 0.1em;
     opacity: 0.5;
   }
@@ -493,21 +494,21 @@ if (sessionStorage.getItem('bside-forward')) {
 </head>
 <body style="background:#1c1b18">
 
-<div class="booklet" id="booklet">
+<main class="booklet" id="booklet">
 
   <!-- ══════════════════════════════════════════════
        COVER
        ══════════════════════════════════════════════ -->
-  <div class="page page-cover">
-    <div class="cover-title">JUDD | Marfa</div>
-    <div class="cover-hint">Swipe to read →</div>
+  <section class="page page-cover">
+    <h1 class="cover-title">JUDD | Marfa</h1>
+    <p class="cover-hint">Swipe to read →</p>
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        2A: Material — 写真ページ
        ══════════════════════════════════════════════ -->
-  <div class="page photo-d">
+  <section class="page photo-d">
     <img class="bg" src="images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
     <div class="title-area">
       <div class="words-title fade-target">
@@ -517,12 +518,12 @@ if (sessionStorage.getItem('bside-forward')) {
       <div class="credit fade-target" style="transition-delay: 0.15s;">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</div>
     </div>
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        2A: Material — テキストページ
        ══════════════════════════════════════════════ -->
-  <div class="page page-text">
+  <section class="page page-text">
     <div class="text-inner">
       <div class="lang-ja">
         <div class="words-body fade-target">
@@ -548,62 +549,62 @@ if (sessionStorage.getItem('bside-forward')) {
       </div>
     </div>
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        W1: Light — 写真ページ
        ══════════════════════════════════════════════ -->
-  <div class="page photo-d">
+  <section class="page photo-d">
     <img class="bg" src="images/judd-w1.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        6D: Color — 写真ページ
        ══════════════════════════════════════════════ -->
-  <div class="page photo-d">
+  <section class="page photo-d">
     <img class="bg" src="images/judd-6d.jpg" loading="lazy" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        W2: Space — 写真ページ
        ══════════════════════════════════════════════ -->
-  <div class="page photo-d">
+  <section class="page photo-d">
     <img class="bg" src="images/judd-w2.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        2B: Repetition — 写真ページ
        ══════════════════════════════════════════════ -->
-  <div class="page photo-d">
+  <section class="page photo-d">
     <img class="bg" src="images/judd-2b.jpg" loading="lazy" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass, 10 units">
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        5B: Time — 写真ページ
        ══════════════════════════════════════════════ -->
-  <div class="page photo-d">
+  <section class="page photo-d">
     <img class="bg" src="images/judd-5b.jpg" loading="lazy" alt="Untitled, 1989, Painted aluminum">
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        ENDMATTER（Info / Quote / Footer / Note）
        ══════════════════════════════════════════════ -->
-  <div class="page page-endmatter">
+  <section class="page page-endmatter">
     <div class="endmatter-inner">
 
-      <div class="quote-block">
-        <div class="quote-text lang-ja">私にとって、ここは何もない田舎ではない。世界の中心なんだ。</div>
-        <div class="quote-text lang-en">To me, this isn't the middle of nowhere. It's the center of the world.</div>
-        <div class="quote-attr">Donald Judd, 1993</div>
-      </div>
+      <blockquote class="quote-block">
+        <p class="quote-text lang-ja">私にとって、ここは何もない田舎ではない。世界の中心なんだ。</p>
+        <p class="quote-text lang-en">To me, this isn't the middle of nowhere. It's the center of the world.</p>
+        <cite class="quote-attr">Donald Judd, 1993</cite>
+      </blockquote>
 
       <div class="info-card">
-        <div class="info-card-title">Exhibition Info</div>
+        <h2 class="info-card-title">Exhibition Info</h2>
         <div class="info-row"><span class="info-label">Exhibition</span><span><span class="lang-ja">ドナルド・ジャッド｜マーファ展</span><span class="lang-en">JUDD | Marfa</span></span></div>
         <div class="info-row"><span class="info-label">Venue</span><span><span class="lang-ja">ワタリウム美術館 — 東京都渋谷区神宮前3-7-6</span><span class="lang-en">WATARI-UM, The Watari Museum of Contemporary Art — 3-7-6 Jingumae, Shibuya, Tokyo</span></span></div>
         <div class="info-row"><span class="info-label">Dates</span><span>2026.02.15 – 06.07</span></div>
@@ -625,29 +626,29 @@ if (sessionStorage.getItem('bside-forward')) {
         </div>
       </footer>
 
-      <div class="note">
+      <aside class="note">
         <strong>Note</strong><br>
         <span class="lang-ja">本ページは展覧会「ジャッド｜マーファ展」（ワタリウム美術館、2026年）の鑑賞記録として作成した個人制作物であり、美術館の公式コンテンツではありません。写真は美術館の許可のもと撮影しています。展示情報は公式サイト（watarium.co.jp）および公開情報に基づいていますが、正確な情報は公式サイトをご確認ください。</span>
         <span class="lang-en">This page is a personal documentation of the exhibition "JUDD | Marfa" (WATARI-UM, 2026) and is not official museum content. Photos were taken with museum permission. Exhibition details are based on publicly available information; please refer to the official website (watarium.co.jp) for accurate information.</span>
-      </div>
+      </aside>
 
     </div>
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
   <!-- ══════════════════════════════════════════════
        CLOSING（最終ページ — 裏表紙）
        ══════════════════════════════════════════════ -->
-  <div class="page page-closing">
-    <div class="closing-title">JUDD | Marfa</div>
+  <section class="page page-closing">
+    <h1 class="closing-title">JUDD | Marfa</h1>
     <a class="closing-home" href="../../">Home →</a>
     <button class="lang-btn">EN</button>
-  </div>
+  </section>
 
-</div>
+</main>
 
 <!-- Page indicator dots -->
-<div class="page-indicator" id="indicator"></div>
+<nav class="page-indicator" id="indicator" aria-label="ページ"></nav>
 
 <!-- Nav arrows (PC) -->
 <button class="nav-arrow nav-prev" id="prevBtn" aria-label="前のページ">‹</button>
