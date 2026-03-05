@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.12 / 2026.03.05 — feat: 全6枚に所蔵元クレジット追加（パネル準拠・日英切替対応） -->
+<!-- v9.14 / 2026.03.05 — fix: endmatterスクロールバー非表示、quote削除、Photo行削除 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -278,34 +278,13 @@ if (sessionStorage.getItem('bside-forward')) {
   .page-endmatter {
     background: var(--color-bg);
     overflow-y: auto;
+    scrollbar-width: none;
     padding: 48px 40px calc(80px + env(safe-area-inset-bottom, 0px));
   }
+  .page-endmatter::-webkit-scrollbar { display: none; }
   .endmatter-inner {
     max-width: 640px;
     margin: 0 auto;
-  }
-
-  /* ── QUOTE ── */
-  .quote-block {
-    padding: 48px 0;
-    text-align: center;
-  }
-  .quote-text {
-    font-size: clamp(14px, 1.6vw, 16px);
-    font-weight: 300;
-    line-height: 1.8;
-    font-style: italic;
-    color: var(--color-credit);
-  }
-  .quote-text::before { content: '\201C'; }
-  .quote-text::after { content: '\201D'; }
-  .quote-attr {
-    margin-top: 12px;
-    font-size: 11px;
-    font-weight: 400;
-    font-style: normal;
-    letter-spacing: 0.1em;
-    color: var(--color-note);
   }
 
   /* ── INFO CARD ── */
@@ -635,12 +614,6 @@ if (sessionStorage.getItem('bside-forward')) {
   <section class="page page-endmatter">
     <div class="endmatter-inner">
 
-      <blockquote class="quote-block">
-        <p class="quote-text lang-ja">私にとって、ここは何もない田舎ではない。世界の中心なんだ。</p>
-        <p class="quote-text lang-en">To me, this isn't the middle of nowhere. It's the center of the world.</p>
-        <cite class="quote-attr">Donald Judd, 1993</cite>
-      </blockquote>
-
       <div class="info-card">
         <h2 class="info-card-title">Exhibition Info</h2>
         <div class="info-rows">
@@ -649,7 +622,6 @@ if (sessionStorage.getItem('bside-forward')) {
           <div class="info-row"><span class="info-label">Dates</span><span class="info-value">2026.02.15 – 06.07</span></div>
           <div class="info-row"><span class="info-label">Hours</span><span class="info-value"><span class="lang-ja">11:00 – 19:00（月曜休館）</span><span class="lang-en">11:00 – 19:00 (Closed on Mondays)</span></span></div>
           <div class="info-row"><span class="info-label">Admission</span><span class="info-value"><span class="lang-ja">一般 ¥1,500 / 学生 ¥1,300</span><span class="lang-en">Adults ¥1,500 / Students ¥1,300</span></span></div>
-          <div class="info-row"><span class="info-label">Photo</span><span class="info-value"><span class="lang-ja">撮影可（受付で確認済み）</span><span class="lang-en">Photography permitted (confirmed at reception)</span></span></div>
           <div class="info-row"><span class="info-label">Website</span><span class="info-value"><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp</a></span></div>
         </div>
       </div>
