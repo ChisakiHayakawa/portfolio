@@ -189,7 +189,8 @@ if (sessionStorage.getItem('bside-forward')) {
     font-size: 10px;
     font-weight: 300;
     letter-spacing: 0.02em;
-    color: var(--color-credit);
+    color: var(--color-title);
+    opacity: 0.7; /* 仮値 — テキスト配置確定後に調整 */
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
     margin-top: 12px;
   }
@@ -319,15 +320,17 @@ if (sessionStorage.getItem('bside-forward')) {
     text-transform: uppercase;
     margin-bottom: 20px;
     color: var(--color-note);
+    text-align: center;
+  }
+  .info-rows {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 8px 16px;
+    width: fit-content;
+    margin: 0 auto;
   }
   .info-row {
-    display: grid;
-    grid-template-columns: 6.5rem 1fr;
-    gap: 8px;
-    padding: 6px 0;
-    font-size: 13px;
-    font-weight: 300;
-    color: var(--color-credit);
+    display: contents;
   }
   .info-label {
     font-size: 11px;
@@ -335,9 +338,20 @@ if (sessionStorage.getItem('bside-forward')) {
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--color-note);
+    text-align: right;
+    align-self: baseline;
+    padding: 6px 0;
+  }
+  .info-value {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--color-note);
+    text-align: left;
+    align-self: baseline;
+    padding: 6px 0;
   }
   .info-card a {
-    color: var(--color-credit);
+    color: var(--color-note);
     text-decoration: none;
     transition: color 0.2s;
   }
@@ -380,7 +394,9 @@ if (sessionStorage.getItem('bside-forward')) {
   }
 
   @media (max-width: 640px) {
-    .info-row { grid-template-columns: 1fr; gap: 2px; }
+    .info-rows { grid-template-columns: 1fr; width: 100%; text-align: center; }
+    .info-label { text-align: center; padding-bottom: 0; }
+    .info-value { text-align: center; padding-top: 0; margin-bottom: 8px; }
     .endmatter-footer { flex-direction: column; align-items: flex-start; gap: 12px; }
   }
 
@@ -627,13 +643,15 @@ if (sessionStorage.getItem('bside-forward')) {
 
       <div class="info-card">
         <h2 class="info-card-title">Exhibition Info</h2>
-        <div class="info-row"><span class="info-label">Exhibition</span><span><span class="lang-ja">ドナルド・ジャッド｜マーファ展</span><span class="lang-en">JUDD | Marfa</span></span></div>
-        <div class="info-row"><span class="info-label">Venue</span><span><span class="lang-ja">ワタリウム美術館 — 東京都渋谷区神宮前3-7-6</span><span class="lang-en">WATARI-UM, The Watari Museum of Contemporary Art — 3-7-6 Jingumae, Shibuya, Tokyo</span></span></div>
-        <div class="info-row"><span class="info-label">Dates</span><span>2026.02.15 – 06.07</span></div>
-        <div class="info-row"><span class="info-label">Hours</span><span><span class="lang-ja">11:00 – 19:00（月曜休館）</span><span class="lang-en">11:00 – 19:00 (Closed on Mondays)</span></span></div>
-        <div class="info-row"><span class="info-label">Admission</span><span><span class="lang-ja">一般 ¥1,500 / 学生 ¥1,300</span><span class="lang-en">Adults ¥1,500 / Students ¥1,300</span></span></div>
-        <div class="info-row"><span class="info-label">Photo</span><span><span class="lang-ja">撮影可（受付で確認済み）</span><span class="lang-en">Photography permitted (confirmed at reception)</span></span></div>
-        <div class="info-row"><span class="info-label">Website</span><span><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp</a></span></div>
+        <div class="info-rows">
+          <div class="info-row"><span class="info-label">Exhibition</span><span class="info-value"><span class="lang-ja">ドナルド・ジャッド｜マーファ展</span><span class="lang-en">JUDD | Marfa</span></span></div>
+          <div class="info-row"><span class="info-label">Venue</span><span class="info-value"><span class="lang-ja">ワタリウム美術館<br>東京都渋谷区神宮前3-7-6</span><span class="lang-en">WATARI-UM, The Watari Museum of Contemporary Art<br>3-7-6 Jingumae, Shibuya, Tokyo</span></span></div>
+          <div class="info-row"><span class="info-label">Dates</span><span class="info-value">2026.02.15 – 06.07</span></div>
+          <div class="info-row"><span class="info-label">Hours</span><span class="info-value"><span class="lang-ja">11:00 – 19:00（月曜休館）</span><span class="lang-en">11:00 – 19:00 (Closed on Mondays)</span></span></div>
+          <div class="info-row"><span class="info-label">Admission</span><span class="info-value"><span class="lang-ja">一般 ¥1,500 / 学生 ¥1,300</span><span class="lang-en">Adults ¥1,500 / Students ¥1,300</span></span></div>
+          <div class="info-row"><span class="info-label">Photo</span><span class="info-value"><span class="lang-ja">撮影可（受付で確認済み）</span><span class="lang-en">Photography permitted (confirmed at reception)</span></span></div>
+          <div class="info-row"><span class="info-label">Website</span><span class="info-value"><a href="http://www.watarium.co.jp/jp/exhibition/202602/" target="_blank" rel="noopener">watarium.co.jp</a></span></div>
+        </div>
       </div>
 
       <footer class="endmatter-footer">
