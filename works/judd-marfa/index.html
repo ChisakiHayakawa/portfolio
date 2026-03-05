@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v9.10 / 2026.03.05 — feat: Adobe Fonts CSS→JS埋め込み切替 + 筑紫A丸ゴシック追加 -->
+<!-- v9.11 / 2026.03.05 — feat: ダークUI 5段階カラーシステム実装（opacity方式→明示的5色） -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -39,8 +39,11 @@ if (sessionStorage.getItem('bside-forward')) {
 </script>
 <style>
   :root {
-    --white: #f0f0f0;
-    --black: #1c1b18;
+    --color-title: #f0ede8;
+    --color-credit: #b5b2ab;
+    --color-note: #7d7a73;
+    --color-rule: #35332e;
+    --color-bg: #1c1b18;
     --font: "mr-eaves-xl-modern", "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
     --font-serif: "mrs-eaves-roman-lining", serif;
     --font-jp: "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
@@ -55,8 +58,8 @@ if (sessionStorage.getItem('bside-forward')) {
     height: 100%;
     overflow: hidden;
     font-family: var(--font);
-    color: var(--white);
-    background: var(--black);
+    color: var(--color-title);
+    background: var(--color-bg);
     -webkit-font-smoothing: antialiased;
   }
 
@@ -104,7 +107,7 @@ if (sessionStorage.getItem('bside-forward')) {
      COVER
      ════════════════════════════════════════ */
   .page-cover {
-    background: var(--black);
+    background: var(--color-bg);
     position: relative;
     overflow: hidden;
     text-align: center;
@@ -186,7 +189,7 @@ if (sessionStorage.getItem('bside-forward')) {
     font-size: 10px;
     font-weight: 300;
     letter-spacing: 0.02em;
-    opacity: 0.7;
+    color: var(--color-credit);
     text-shadow: 0 1px 4px rgba(0,0,0,0.3);
     margin-top: 12px;
   }
@@ -195,7 +198,7 @@ if (sessionStorage.getItem('bside-forward')) {
      TEXT PAGE
      ════════════════════════════════════════ */
   .page-text {
-    background: var(--black);
+    background: var(--color-bg);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -212,14 +215,12 @@ if (sessionStorage.getItem('bside-forward')) {
     font-size: clamp(13px, 1.5vw, 15px);
     font-weight: 300;
     line-height: 2.2;
-    opacity: 0.85;
   }
   .words-body-en {
     font-family: var(--font);
     font-size: clamp(12px, 1.4vw, 14px);
     font-weight: 300;
     line-height: 2.0;
-    opacity: 0.85;
     letter-spacing: 0.01em;
   }
   .stanza { margin-bottom: 1.6em; }
@@ -230,7 +231,7 @@ if (sessionStorage.getItem('bside-forward')) {
      CLOSING
      ════════════════════════════════════════ */
   .page-closing {
-    background: var(--black);
+    background: var(--color-bg);
     text-align: center;
   }
   .page-closing .closing-title {
@@ -246,7 +247,7 @@ if (sessionStorage.getItem('bside-forward')) {
     white-space: nowrap;
   }
   .page-closing .closing-home {
-    color: var(--white);
+    color: var(--color-note);
     text-decoration: none;
     font-size: 14px;
     font-weight: 300;
@@ -274,7 +275,7 @@ if (sessionStorage.getItem('bside-forward')) {
      ENDMATTER（縦スクロールページ群）
      ════════════════════════════════════════ */
   .page-endmatter {
-    background: var(--black);
+    background: var(--color-bg);
     overflow-y: auto;
     padding: 48px 40px calc(80px + env(safe-area-inset-bottom, 0px));
   }
@@ -293,7 +294,7 @@ if (sessionStorage.getItem('bside-forward')) {
     font-weight: 300;
     line-height: 1.8;
     font-style: italic;
-    opacity: 0.7;
+    color: var(--color-credit);
   }
   .quote-text::before { content: '\201C'; }
   .quote-text::after { content: '\201D'; }
@@ -303,13 +304,13 @@ if (sessionStorage.getItem('bside-forward')) {
     font-weight: 400;
     font-style: normal;
     letter-spacing: 0.1em;
-    opacity: 0.5;
+    color: var(--color-note);
   }
 
   /* ── INFO CARD ── */
   .info-card {
     padding: 32px;
-    border: 1px solid rgba(240,240,240,0.12);
+    border: 1px solid var(--color-rule);
   }
   .info-card-title {
     font-size: 11px;
@@ -317,7 +318,7 @@ if (sessionStorage.getItem('bside-forward')) {
     letter-spacing: 0.25em;
     text-transform: uppercase;
     margin-bottom: 20px;
-    opacity: 0.5;
+    color: var(--color-note);
   }
   .info-row {
     display: grid;
@@ -326,45 +327,45 @@ if (sessionStorage.getItem('bside-forward')) {
     padding: 6px 0;
     font-size: 13px;
     font-weight: 300;
+    color: var(--color-credit);
   }
   .info-label {
     font-size: 11px;
     font-weight: 400;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    opacity: 0.5;
+    color: var(--color-note);
   }
   .info-card a {
-    color: var(--white);
+    color: var(--color-credit);
     text-decoration: none;
-    opacity: 0.7;
-    transition: opacity 0.2s;
+    transition: color 0.2s;
   }
-  .info-card a:hover { opacity: 1; }
+  .info-card a:hover { color: var(--color-title); }
 
   /* ── FOOTER ── */
   .endmatter-footer {
     margin-top: 48px;
     padding-top: 24px;
-    border-top: 1px solid rgba(240,240,240,0.12);
+    border-top: 1px solid var(--color-rule);
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 11px;
     font-weight: 300;
-    opacity: 0.4;
+    color: var(--color-note);
   }
   .endmatter-footer a {
-    color: var(--white);
+    color: var(--color-note);
     text-decoration: none;
-    transition: opacity 0.2s;
+    transition: color 0.2s;
   }
-  .endmatter-footer a:hover { opacity: 0.8; }
+  .endmatter-footer a:hover { color: var(--color-credit); }
   .footer-icons {
     display: flex;
     gap: 12px;
   }
-  .footer-icons svg { fill: var(--white); }
+  .footer-icons svg { fill: var(--color-note); }
 
   /* ── NOTE ── */
   .note {
@@ -372,7 +373,7 @@ if (sessionStorage.getItem('bside-forward')) {
     font-size: 11px;
     font-weight: 300;
     line-height: 1.8;
-    opacity: 0.3;
+    color: var(--color-note);
   }
   .note strong {
     font-weight: 400;
@@ -411,7 +412,7 @@ if (sessionStorage.getItem('bside-forward')) {
     border-radius: 0;
     cursor: pointer;
     background: none;
-    color: var(--white);
+    color: var(--color-note);
     z-index: 10;
     -webkit-tap-highlight-color: transparent;
   }
@@ -430,9 +431,6 @@ if (sessionStorage.getItem('bside-forward')) {
     opacity: 1;
     transform: translateY(0);
   }
-  .credit.fade-target.visible { opacity: 0.7; }
-  .words-body.fade-target.visible { opacity: 0.85; }
-  .words-body-en.fade-target.visible { opacity: 0.85; }
 
   /* ════════════════════════════════════════
      PAGE INDICATOR
@@ -450,7 +448,7 @@ if (sessionStorage.getItem('bside-forward')) {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--white);
+    background: var(--color-title);
     opacity: 0.2;
     transition: opacity 0.3s;
   }
@@ -465,7 +463,7 @@ if (sessionStorage.getItem('bside-forward')) {
     transform: translateY(-50%);
     background: none;
     border: none;
-    color: var(--white);
+    color: var(--color-title);
     font-size: 24px;
     cursor: pointer;
     opacity: 0.2;
