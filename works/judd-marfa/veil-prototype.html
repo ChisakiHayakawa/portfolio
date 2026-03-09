@@ -126,11 +126,9 @@
   }
 
   .veil-content {
-    min-height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 60px 40px 100px;
+    display: flex;
+    justify-content: center;
   }
 
   .veil-text {
@@ -448,6 +446,7 @@ function isVeilOpen(pageIndex) {
 function openVeil(pageIndex) {
   const v = veils.get(pageIndex);
   if (!v || v.veil.classList.contains('open')) return;
+  v.veil.scrollTop = 0;  // テキスト先頭から表示
   v.veil.classList.add('open');
   pages[pageIndex].classList.add('veil-active');
   log(`VEIL OPEN page=${pageIndex}`);
@@ -482,8 +481,8 @@ veils.forEach(function(v, i) {
 
 // ── Page navigation ──
 const TRANSITION_DURATION = 420;
-const SWIPE_THRESHOLD = 50;
-const VELOCITY_THRESHOLD = 0.3;
+const SWIPE_THRESHOLD = 80;
+const VELOCITY_THRESHOLD = 0.45;
 
 // Rubber-band
 const RB = { rubberC: 0.38, kick: 5, stiffness: 40, damping: 13 };
@@ -776,7 +775,7 @@ document.addEventListener('touchend', function(e) {
 let wheelAccumX = 0;
 let wheelAccumY = 0;
 let wheelTimer = null;
-const WHEEL_PAGE_DIST = 200;    // ページ送り閾値
+const WHEEL_PAGE_DIST = 300;    // ページ送り閾値（上げて誤送り防止）
 const WHEEL_VEIL_DIST = 80;     // Veil 開閉閾値
 
 booklet.addEventListener('wheel', function(e) {
