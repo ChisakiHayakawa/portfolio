@@ -489,7 +489,7 @@ function doFlip() {
       function navigate() {
         if (navigated) return;
         navigated = true;
-        sessionStorage.setItem('bside-forward', '1');
+        sessionStorage.setItem('bside-forward', JSON.stringify({ time: Date.now() }));
         window.location.href = dest;
       }
       overlay.addEventListener('transitionend', navigate);

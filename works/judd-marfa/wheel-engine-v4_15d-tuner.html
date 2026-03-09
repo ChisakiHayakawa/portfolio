@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wheel Engine v4.15d — Idle Gap + Large Delta</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --bg: #1c1b18; --surface: #252420; --border: #35332e;
+    --text: #f0ede8; --text-dim: #7d7a73; --text-mid: #b5b2ab;
+    --accent-tp: #6ba3be; --accent-ms: #be8a6b;
+    --accent-go: #7bbe6b; --accent-warn: #be6b6b; --accent-momentum: #9b6bbe;
+    --accent-glide: #be9b6b; --accent-settle: #6bbe9b;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px; line-height: 1.5;
+    overflow: hidden; height: 100vh; display: flex; flex-direction: column;
+  }
+  .header {
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 16px; flex-shrink: 0;
+  }
+  .header h1 { font-size: 14px; font-weight: 600; }
+  .header .version { font-size: 11px; color: var(--text-dim); }
+  .main { flex: 1; display: flex; overflow: hidden; }
+
+  .sim-area {
+    flex: 1; position: relative; overflow: hidden;
+    border-right: 1px solid var(--border);
+  }
+  .sim-viewport { width: 100%; height: 100%; overflow: hidden; position: relative; }
+  .sim-strip { display: flex; height: 100%; will-change: transform; }
+  .sim-page {
+    flex-shrink: 0; width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 64px; font-weight: 200; color: rgba(255,255,255,0.12);
+    position: relative;
+  }
+  .sim-page::after {
+    content: attr(data-label);
+    position: absolute; bottom: 20px; left: 20px;
+    font-size: 11px; color: rgba(255,255,255,0.2);
+  }
+  .sim-dots {
+    position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 8px;
+  }
+  .sim-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--text-dim); opacity: 0.4; transition: opacity 0.3s;
+  }
+  .sim-dot.active { opacity: 1; background: var(--text); }
+  .sim-page-indicator {
+    position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; color: var(--text-mid);
+  }
+  .sim-hud {
+    position: absolute; top: 16px; right: 20px;
+    font-size: 11px; color: var(--text-dim); text-align: right;
+    font-variant-numeric: tabular-nums; line-height: 1.8;
+  }
+  .progress-bar {
+    position: absolute; bottom: 30px; left: 10%; width: 80%; height: 4px;
+    background: var(--border); border-radius: 2px; overflow: visible;
+    opacity: 0; transition: opacity 0.25s;
+  }
+  .progress-bar.visible { opacity: 1; }
+  .progress-fill {
+    position: absolute; top: 0; height: 100%; border-radius: 2px;
+    background: var(--accent-tp); transition: none;
+  }
+  .progress-commit-mark {
+    position: absolute; top: -4px; bottom: -4px; width: 2px;
+    background: var(--text); opacity: 0.5; border-radius: 1px;
+  }
+  .instruction {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    text-align: center; color: var(--text-dim); font-size: 13px;
+    line-height: 2; pointer-events: none; opacity: 0.6;
+  }
+
+  .panel {
+    width: 420px; flex-shrink: 0; overflow-y: auto; padding: 16px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px;
+  }
+  .card-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-dim); margin-bottom: 10px;
+  }
+  .state-row { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+  .state-badge {
+    padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+    background: var(--border); color: var(--text-dim); transition: all 0.15s;
+  }
+  .state-badge.on-idle { background: var(--border); color: var(--text-mid); }
+  .state-badge.on-tracking { background: rgba(107,163,190,0.2); color: var(--accent-tp); }
+  .state-badge.on-glide { background: rgba(190,155,107,0.2); color: var(--accent-glide); }
+  .state-badge.on-settling { background: rgba(107,190,155,0.2); color: var(--accent-settle); }
+  .device-badge {
+    padding: 3px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;
+  }
+  .device-tp { background: rgba(107,163,190,0.2); color: var(--accent-tp); }
+  .device-ms { background: rgba(190,138,107,0.2); color: var(--accent-ms); }
+  .device-unknown { background: var(--border); color: var(--text-dim); }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; }
+  .stat-item { display: flex; justify-content: space-between; font-size: 11px; }
+  .stat-label { color: var(--text-dim); }
+  .stat-value { color: var(--text-mid); font-variant-numeric: tabular-nums; }
+
+  .slider-group { margin-bottom: 10px; }
+  .slider-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+  }
+  .slider-name { font-size: 12px; font-weight: 500; }
+  .slider-desc { color: var(--text-dim); font-weight: 400; font-size: 11px; }
+  .slider-value {
+    font-size: 12px; font-variant-numeric: tabular-nums;
+    color: var(--text-mid); min-width: 3.5em; text-align: right;
+  }
+  input[type="range"] {
+    -webkit-appearance: none; width: 100%; height: 4px;
+    border-radius: 2px; background: var(--border); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--text-mid); cursor: pointer; border: 2px solid var(--bg);
+  }
+  .slider-section-label {
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--text-dim); margin: 6px 0 8px 0;
+    padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .reset-btn {
+    background: var(--border); color: var(--text-mid); border: none;
+    padding: 6px 14px; border-radius: 4px; font-size: 11px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .reset-btn:hover { background: var(--text-dim); color: var(--bg); }
+  .event-log {
+    font-family: 'SF Mono', 'Menlo', monospace; font-size: 10px; line-height: 1.6;
+    max-height: 240px; overflow-y: auto; color: var(--text-dim);
+  }
+  .event-log .log-turn { color: var(--accent-go); }
+  .event-log .log-tracking { color: var(--accent-tp); }
+  .event-log .log-glide { color: var(--accent-glide); }
+  .event-log .log-settle { color: var(--accent-settle); }
+  .event-log .log-snap { color: var(--accent-warn); }
+  .event-log .log-info { color: var(--text-dim); }
+  .event-log .log-momentum { color: var(--accent-momentum); }
+  .event-log .log-drop { color: #e06060; font-weight: 600; }
+  .event-log .log-axis { color: #c0a050; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Wheel Engine v4.15d — Idle Gap + Large Delta</h1>
+  <span class="version">v4.15d: idle gap > 300ms → birth スキップ + 初期delta平均 > 50px → 強制 momentum 判定</span>
+</div>
+
+<div class="main">
+  <div class="sim-area" id="simArea">
+    <div class="instruction" id="instruction">
+      trackpad で横スワイプしてください<br>
+      v4.15d: idle gap trust + large delta override + settle interrupt trust
+    </div>
+    <div class="sim-viewport">
+      <div class="sim-strip" id="strip">
+        <div class="sim-page" style="background:#252420" data-label="Cover">0</div>
+        <div class="sim-page" style="background:#2a2520" data-label="Page 1">1</div>
+        <div class="sim-page" style="background:#20252a" data-label="Page 2">2</div>
+        <div class="sim-page" style="background:#252a20" data-label="Page 3">3</div>
+        <div class="sim-page" style="background:#2a2025" data-label="Page 4">4</div>
+        <div class="sim-page" style="background:#202a25" data-label="Page 5">5</div>
+        <div class="sim-page" style="background:#25202a" data-label="Page 6">6</div>
+        <div class="sim-page" style="background:#2a2520" data-label="Page 7">7</div>
+        <div class="sim-page" style="background:#252420" data-label="Endmatter">8</div>
+      </div>
+    </div>
+    <div class="sim-page-indicator" id="pageIndicator">0 / 8</div>
+    <div class="sim-hud" id="hud">
+      <div id="hudOffset">offset: 0px</div>
+      <div id="hudVelocity">velocity: 0.000</div>
+      <div id="hudProgress">progress: 0.000</div>
+    </div>
+    <div class="progress-bar" id="progressBar">
+      <div class="progress-fill" id="progressFill"></div>
+      <div class="progress-commit-mark" id="commitMarkL"></div>
+      <div class="progress-commit-mark" id="commitMarkR"></div>
+    </div>
+    <div class="sim-dots" id="dots"></div>
+  </div>
+
+  <div class="panel">
+
+    <div class="card">
+      <div class="card-title">State & Device</div>
+      <div class="state-row">
+        <div class="state-badge on-idle" id="badge-idle">IDLE</div>
+        <div class="state-badge" id="badge-tracking">TRACKING</div>
+        <div class="state-badge" id="badge-glide">GLIDE</div>
+        <div class="state-badge" id="badge-settling">SETTLING</div>
+      </div>
+      <div class="state-row">
+        <div class="device-badge device-unknown" id="badge-device">未分類</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Live Stats</div>
+      <div class="stats-grid">
+        <div class="stat-item"><span class="stat-label">offsetPx</span><span class="stat-value" id="statOffset">0</span></div>
+        <div class="stat-item"><span class="stat-label">velocity/frame</span><span class="stat-value" id="statVelo">0.000</span></div>
+        <div class="stat-item"><span class="stat-label">progress (pages)</span><span class="stat-value" id="statProgress">0.000</span></div>
+        <div class="stat-item"><span class="stat-label">target page</span><span class="stat-value" id="statTarget">—</span></div>
+        <div class="stat-item"><span class="stat-label">gesture dx</span><span class="stat-value" id="statGestureDx">0</span></div>
+        <div class="stat-item"><span class="stat-label">release vel</span><span class="stat-value" id="statReleaseVel">0.000</span></div>
+        <div class="stat-item"><span class="stat-label">events</span><span class="stat-value" id="statCount">0</span></div>
+        <div class="stat-item"><span class="stat-label">page turns</span><span class="stat-value" id="statTurns">0</span></div>
+        <div class="stat-item"><span class="stat-label">gesture #</span><span class="stat-value" id="statGestureId">0</span></div>
+        <div class="stat-item"><span class="stat-label">birth rejected</span><span class="stat-value" id="statBirthRejected">0</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Tuning</div>
+
+      <div class="slider-section-label" style="border-top:none;padding-top:0;margin-top:0">Tracking（指への追従）</div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">followGain <span class="slider-desc">追従の強さ</span></span>
+          <span class="slider-value" id="valFollowGain">2.50</span>
+        </div>
+        <input type="range" id="sliderFollowGain" min="0.50" max="5.00" value="2.50" step="0.05">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">edgeResistance <span class="slider-desc">端の粘り</span></span>
+          <span class="slider-value" id="valEdgeResist">0.20</span>
+        </div>
+        <input type="range" id="sliderEdgeResist" min="0.05" max="0.80" value="0.20" step="0.01">
+      </div>
+
+      <div class="slider-section-label">Commit（送る判定）</div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">commitDistanceRatio <span class="slider-desc">距離閾値（ページ幅比）</span></span>
+          <span class="slider-value" id="valCommitDist">0.15</span>
+        </div>
+        <input type="range" id="sliderCommitDist" min="0.05" max="0.50" value="0.15" step="0.01">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">flickVelocity <span class="slider-desc">release速度判定（pages/sec）</span></span>
+          <span class="slider-value" id="valFlick">0.80</span>
+        </div>
+        <input type="range" id="sliderFlick" min="0.30" max="3.00" value="0.80" step="0.02">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">directFlickVelocity <span class="slider-desc">高速時は即吸着</span></span>
+          <span class="slider-value" id="valDirectFlick">1.60</span>
+        </div>
+        <input type="range" id="sliderDirectFlick" min="0.50" max="3.50" value="1.60" step="0.05">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">microReverseTolerance <span class="slider-desc">微逆戻し許容</span></span>
+          <span class="slider-value" id="valMicroRev">0.03</span>
+        </div>
+        <input type="range" id="sliderMicroRev" min="0.00" max="0.20" value="0.03" step="0.01">
+      </div>
+
+      <div class="slider-section-label">Glide（離した後の流れ）</div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">glideDecay <span class="slider-desc">速度の減衰（高い=よく滑る）</span></span>
+          <span class="slider-value" id="valGlideDecay">0.82</span>
+        </div>
+        <input type="range" id="sliderGlideDecay" min="0.70" max="0.98" value="0.82" step="0.01">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">snapAttraction <span class="slider-desc">スナップ吸着の強さ</span></span>
+          <span class="slider-value" id="valSnapAttr">0.13</span>
+        </div>
+        <input type="range" id="sliderSnapAttr" min="0.02" max="0.50" value="0.13" step="0.01">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">releaseGraceMs <span class="slider-desc">入力切れ猶予（ms）</span></span>
+          <span class="slider-value" id="valReleaseGrace">80</span>
+        </div>
+        <input type="range" id="sliderReleaseGrace" min="20" max="150" value="80" step="2">
+      </div>
+
+      <div class="slider-section-label">Settling（最終吸着）</div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">settleDurationMin <span class="slider-desc">着地の下限（ms）</span></span>
+          <span class="slider-value" id="valSettleMin">200</span>
+        </div>
+        <input type="range" id="sliderSettleMin" min="80" max="400" value="200" step="10">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">settleDurationMax <span class="slider-desc">着地の上限（ms）</span></span>
+          <span class="slider-value" id="valSettleMax">350</span>
+        </div>
+        <input type="range" id="sliderSettleMax" min="200" max="600" value="350" step="10">
+      </div>
+
+      <div class="slider-section-label">Birth Classifier（momentum 検出）</div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">birthSampleCount <span class="slider-desc">判定に使うイベント数</span></span>
+          <span class="slider-value" id="valBirthSamples">6</span>
+        </div>
+        <input type="range" id="sliderBirthSamples" min="3" max="12" value="6" step="1">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">birthDecayRatio <span class="slider-desc">減衰判定（高い=厳密）</span></span>
+          <span class="slider-value" id="valBirthDecay">0.60</span>
+        </div>
+        <input type="range" id="sliderBirthDecay" min="0.30" max="0.90" value="0.60" step="0.05">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">birthSkipGapMs <span class="slider-desc">idle gap でスキップ（ms）</span></span>
+          <span class="slider-value" id="valBirthSkipGap">300</span>
+        </div>
+        <input type="range" id="sliderBirthSkipGap" min="100" max="800" value="300" step="50">
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-header">
+          <span class="slider-name">birthLargeDelta <span class="slider-desc">初期delta閾値（px）</span></span>
+          <span class="slider-value" id="valBirthLargeDelta">50</span>
+        </div>
+        <input type="range" id="sliderBirthLargeDelta" min="20" max="100" value="50" step="5">
+      </div>
+
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="reset-btn" id="btnReset">Reset defaults</button>
+        <button class="reset-btn" id="btnCopy">Copy params</button>
+      </div>
+    </div>
+
+    <div class="card" style="flex:1;min-height:0">
+      <div class="card-title" style="display:flex;justify-content:space-between">
+        <span>Event Log</span>
+        <span style="display:flex;gap:4px">
+          <button class="reset-btn" id="btnCopyLog" style="padding:2px 8px;font-size:10px">Copy Log</button>
+          <button class="reset-btn" id="btnClearLog" style="padding:2px 8px;font-size:10px">Clear</button>
+        </span>
+      </div>
+      <div class="event-log" id="eventLog"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// Wheel Engine v4.15 — Birth Pattern Detector
+//
+// Base: v4.12d (diagnostic logging, clean — NO v4.13-v4.14b patches)
+//
+// v4.15 approach:
+//   Problem: After commit → settle → idle, trackpad momentum tail
+//     events arrive as a "new gesture" → chain commits (2-3 page jump)
+//     or partial commit + snap back ("進んで戻る").
+//
+//   v4.13-v4.14b tried: cap saturation, early commit, suppress chain.
+//   All failed due to cascading side effects. Removed entirely.
+//
+//   v4.15 insight: Real swipes and momentum tails have opposite
+//   "birth patterns":
+//     Real swipe:    delta starts small → grows (finger touches → accelerates)
+//     Momentum tail: delta starts large → decays (residual energy dissipating)
+//
+//   Implementation: Buffer first N events of each new gesture.
+//   Classify based on delta pattern. Momentum → reject entire gesture.
+//   Real → replay buffered events and continue normally.
+//   Page doesn't move during classification (~40-50ms, imperceptible).
+// ============================================================
+
+const DEFAULTS = {
+  followGain: 2.50,              // v4.12: 0.94→2.50 (trackpad dx ~300px, page ~1200px, need ~2.5x gain)
+  edgeResistance: 0.20,
+  commitDistanceRatio: 0.15,   // v4.12: 0.25→0.15 (non-linear gain reduces cumulative distance)
+  flickVelocity: 0.80,         // v4.10: 0.72 → slightly harder (v5.0 was 1.05, too hard)
+  directFlickVelocity: 1.60,   // v4.10: 1.35 → moderately harder (v5.0 was 2.10, too hard)
+  microReverseTolerance: 0.03,
+  glideDecay: 0.82,            // v4.10: 0.84 → slightly faster stop
+  snapAttraction: 0.13,
+  releaseGraceMs: 80,          // v4.10: 56 → longer to avoid mid-gesture splits
+  settleDurationMin: 200,
+  settleDurationMax: 350,      // v4.12: longer settle for visible "スーッ" landing
+};
+
+const INTERNAL = {
+  // Axis lock — relaxed from v4.10 (from v5.0 analysis)
+  axisLockMinDeltaPx: 10,        // v4.10: 7 → more data before deciding
+  axisLockRatio: 1.06,           // v4.10: 1.12 → easier horizontal lock
+  axisUnlockVerticalRatio: 1.24, // v4.10: 1.28
+  lockCarryGain: 0.28,           // v4.10: 0.42 → less carry jolt
+  preFollowGain: 0.16,           // NEW: micro-follow before axis lock
+  minWheelDeltaPx: 0.05,
+  gestureSampleWindowMs: 260,    // v4.10: 220
+
+  // Momentum filter — NEW in v4.11
+  idleMomentumGapMs: 80,        // Events closer than 80ms after idle = ghost momentum
+
+  // Commit min distance gates (from v5.0 analysis)
+  flickMinDistance: 0.10,        // v4.12: 0.18→0.10 (non-linear gain makes distance harder to reach)
+  directFlickMinDistance: 0.08,  // v4.12: 0.12→0.08
+
+  // v4.15: Birth pattern detector — classify new gestures as real or momentum
+  birthSampleCount: 6,           // events to buffer before classifying
+  birthDecayRatio: 0.60,         // if this fraction of consecutive pairs decrease → momentum
+  // v4.15d: skip birth if idle gap exceeds this — momentum can't last this long
+  birthSkipGapMs: 300,
+  // v4.15d: if avg of first 3 deltas exceeds this, force momentum regardless of pattern
+  birthLargeDeltaThreshold: 50,  // px — real finger starts can't produce 50px/event average
+};
+
+const P = { ...DEFAULTS };
+
+const S = {
+  phase: 'idle',
+  inputType: 'unknown',
+  pageIndex: 0,
+  offsetPx: 0,
+  velocityPxPerFrame: 0,
+  lastInputAt: 0,
+  lastTimestamp: 0,
+  lastWheelDx: 0,
+  settleFrom: 0,
+  settleTo: 0,
+  settleStartedAt: 0,
+  settleDuration: 180,
+  eventCount: 0,
+  turnCount: 0,
+  rafId: 0,
+  axisLocked: false,
+  inputSamples: [],
+  glideTargetIndex: 0,
+  targetLocked: false,
+  trackingStartOffset: 0,
+  gestureAccumX: 0,
+  gestureAccumY: 0,
+  gesturePeakVelocity: 0,
+  gestureReleaseVelocity: 0,
+  gestureEventCount: 0,
+  pendingAxisX: 0,
+  pendingAxisY: 0,
+  pendingAxisSamples: 0,
+  // v4.11 additions
+  gestureId: 0,
+  finishInteractionAt: 0,
+  momentumFilteredCount: 0,
+  // v4.15: birth pattern detector
+  birthBuffer: [],
+  birthClassifying: false,
+  birthRejectedCount: 0,
+};
+
+const strip = document.getElementById('strip');
+const simArea = document.getElementById('simArea');
+const instruction = document.getElementById('instruction');
+const totalPages = 9;
+let simWidth = simArea.offsetWidth;
+
+const dotsEl = document.getElementById('dots');
+for (let i = 0; i < totalPages; i++) {
+  const d = document.createElement('div');
+  d.className = 'sim-dot' + (i === 0 ? ' active' : '');
+  dotsEl.appendChild(d);
+}
+
+function updateDots() {
+  dotsEl.querySelectorAll('.sim-dot').forEach((d, i) => d.classList.toggle('active', i === S.pageIndex));
+  document.getElementById('pageIndicator').textContent = `${S.pageIndex} / ${totalPages - 1}`;
+}
+
+function applyTransform() {
+  strip.style.transform = `translate3d(${S.offsetPx}px,0,0)`;
+}
+
+function onResize() {
+  simWidth = simArea.offsetWidth;
+  strip.querySelectorAll('.sim-page').forEach(p => p.style.width = simWidth + 'px');
+  S.offsetPx = -(S.pageIndex * simWidth);
+  applyTransform();
+}
+window.addEventListener('resize', onResize);
+onResize();
+
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+function lerp(a, b, t) { return a + (b - a) * t; }
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function minOffset() { return -((totalPages - 1) * simWidth); }
+function maxOffset() { return 0; }
+
+function dampedOffset(nextOffset) {
+  if (nextOffset > maxOffset()) return maxOffset() + (nextOffset - maxOffset()) * P.edgeResistance;
+  if (nextOffset < minOffset()) return minOffset() + (nextOffset - minOffset()) * P.edgeResistance;
+  return nextOffset;
+}
+
+function nearestPageIndex(offsetPx) {
+  return clamp(Math.round(-offsetPx / simWidth), 0, totalPages - 1);
+}
+
+function pagesPerSecFromVelocity(vPxPerFrame) {
+  return Math.abs(vPxPerFrame) * 60 / simWidth;
+}
+
+// ============================================================
+// Gesture buffer management
+// ============================================================
+
+function resetGestureBuffers() {
+  S.axisLocked = false;
+  S.pendingAxisX = 0;
+  S.pendingAxisY = 0;
+  S.pendingAxisSamples = 0;
+  S.gestureAccumX = 0;
+  S.gestureAccumY = 0;
+  S.gesturePeakVelocity = 0;
+  S.gestureReleaseVelocity = 0;
+  S.gestureEventCount = 0;
+  S.lastWheelDx = 0;
+  S.birthBuffer = [];       // v4.15
+  S.birthClassifying = false; // v4.15
+}
+
+function finishInteraction() {
+  S.phase = 'idle';
+  S.inputType = 'unknown';
+  S.inputSamples = [];
+  S.velocityPxPerFrame = 0;
+  S.targetLocked = false;
+  S.finishInteractionAt = performance.now();
+
+  progressBar.classList.remove('visible');
+  resetGestureBuffers();
+}
+
+// ============================================================
+// Target selection — boolean commit (from v5.0 analysis)
+// Distance is primary, velocity is secondary with min distance gates
+// ============================================================
+
+function chooseTargetIndex() {
+  const progressPages = -S.offsetPx / simWidth;
+  const base = S.pageIndex;
+  const deltaPages = progressPages - base;
+  const absDelta = Math.abs(deltaPages);
+  const releasePps = pagesPerSecFromVelocity(S.gestureReleaseVelocity);
+  const peakPps = pagesPerSecFromVelocity(S.gesturePeakVelocity);
+
+  // Direction: position first, then velocity, then accumulated dx
+  let direction = 0;
+  let dirSource = 'none';
+  if (absDelta > P.microReverseTolerance) {
+    direction = Math.sign(deltaPages);
+    dirSource = 'position';
+  } else if (Math.abs(S.gestureReleaseVelocity) > 0.01) {
+    direction = -Math.sign(S.gestureReleaseVelocity);
+    dirSource = 'velocity';
+  } else if (Math.abs(S.gestureAccumX) > 0.01) {
+    direction = Math.sign(S.gestureAccumX);
+    dirSource = 'accumX';
+  }
+
+  if (direction === 0) {
+    addLog('drop', `[COMMIT:no-dir] delta=${deltaPages.toFixed(3)} relVel=${releasePps.toFixed(2)}pps accumX=${S.gestureAccumX.toFixed(1)} → no direction`);
+    return base;
+  }
+
+  // Boolean commit checks (distance-first, velocity as assist)
+  const distanceCommit = absDelta >= P.commitDistanceRatio;
+  const releaseCommit = releasePps >= P.flickVelocity
+                        && absDelta >= INTERNAL.flickMinDistance;
+  const fastCommit = peakPps >= P.directFlickVelocity
+                     && absDelta >= INTERNAL.directFlickMinDistance;
+
+  if (distanceCommit || releaseCommit || fastCommit) {
+    const reasons = [];
+    if (distanceCommit) reasons.push(`dist ${absDelta.toFixed(3)}>=${P.commitDistanceRatio}`);
+    if (releaseCommit) reasons.push(`flick ${releasePps.toFixed(2)}>=${P.flickVelocity}pps`);
+    if (fastCommit) reasons.push(`fast ${peakPps.toFixed(2)}>=${P.directFlickVelocity}pps`);
+    addLog('info', `[COMMIT:yes] dir=${dirSource} ${reasons.join(' + ')} → page ${base}→${clamp(base + direction, 0, totalPages - 1)}`);
+    return clamp(base + direction, 0, totalPages - 1);
+  }
+
+  // Failed — log why each check failed
+  const fails = [];
+  fails.push(`dist ${absDelta.toFixed(3)}<${P.commitDistanceRatio}`);
+  if (peakPps < P.directFlickVelocity) fails.push(`peakVel ${peakPps.toFixed(2)}<${P.directFlickVelocity}pps`);
+  else fails.push(`fastDist ${absDelta.toFixed(3)}<${INTERNAL.directFlickMinDistance}`);
+  if (releasePps < P.flickVelocity) fails.push(`relVel ${releasePps.toFixed(2)}<${P.flickVelocity}pps`);
+  else fails.push(`flickDist ${absDelta.toFixed(3)}<${INTERNAL.flickMinDistance}`);
+  addLog('drop', `[COMMIT:fail] dir=${dirSource} ${fails.join(' | ')} → snap back to page ${base}`);
+  return base;
+}
+
+// ============================================================
+// Input classification
+// ============================================================
+
+function classifyInput(samples) {
+  const abs = samples.map(s => Math.abs(s.d));
+  const avgDelta = abs.reduce((a, b) => a + b, 0) / abs.length;
+  const dts = [];
+  for (let i = 1; i < samples.length; i++) dts.push(samples[i].t - samples[i - 1].t);
+  const avgDt = dts.length ? dts.reduce((a, b) => a + b, 0) / dts.length : 16;
+  const smallMoves = abs.filter(v => v < 15).length;
+  if (smallMoves >= 2 && avgDt < 28 && avgDelta < 20) return 'trackpad';
+  if (avgDelta > 28 && avgDt >= 22) return 'mouse';
+  return 'trackpad';
+}
+
+function normalizeWheel(e) {
+  let x = e.deltaX, y = e.deltaY;
+  if (e.deltaMode === 1) { x *= 16; y *= 16; }
+  else if (e.deltaMode === 2) { x *= window.innerHeight; y *= window.innerHeight; }
+  return { x, y };
+}
+
+// ============================================================
+// Tracking entry — v4.15d: idle gap trust + settle interrupt trust
+// ============================================================
+
+function beginTrackingIfNeeded(now) {
+  if (S.phase === 'tracking') return true;
+
+  if (S.phase === 'settling') {
+    const settleElapsed = now - S.settleStartedAt;
+
+    if (settleElapsed < 50) {
+      // Too soon after settle start — likely ghost momentum, block it
+      addLog('drop', `[DROP:settle-protect] ${Math.round(settleElapsed)}ms after settle start, dx blocked (phase=settling)`);
+      return false;
+    }
+    // Past protection window — this is a new intentional swipe
+    // SNAP to settle target first, then start new tracking from there.
+    S.offsetPx = S.settleTo;
+    S.pageIndex = nearestPageIndex(S.offsetPx);
+    applyTransform();
+    S.gestureId++;
+    S.phase = 'tracking';
+    S.trackingStartOffset = S.offsetPx;
+    S.targetLocked = false;
+    S.velocityPxPerFrame = 0;
+    resetGestureBuffers();
+    // v4.15c: NO birth classification for settle interrupts
+    // 50ms settle-protect already blocks momentum. Events past 50ms = real swipe.
+    // Birth classifier was false-rejecting real continuous swipes here.
+    addLog('tracking', `Interrupted settle → snapped to page ${S.pageIndex} → new gesture #${S.gestureId} (no birth — settle interrupt)`);
+    progressBar.classList.add('visible');
+    return true;
+  }
+
+  if (S.phase === 'glide') {
+    addLog('drop', `[DROP:glide-guard] Event during glide phase`);
+    return false;
+  }
+
+  // === Momentum gap filter (80ms) ===
+  // v4.15d: also track gap duration for birth skip decision
+  let idleGapMs = Infinity;  // no recent finish = very long gap = skip birth
+  if (S.finishInteractionAt > 0) {
+    const gapSinceFinish = now - S.finishInteractionAt;
+    if (gapSinceFinish < INTERNAL.idleMomentumGapMs) {
+      S.momentumFilteredCount++;
+      addLog('drop', `[DROP:momentum] Ghost ${Math.round(gapSinceFinish)}ms after finish (threshold ${INTERNAL.idleMomentumGapMs}ms)`);
+      return false;
+    }
+    idleGapMs = gapSinceFinish;
+    S.finishInteractionAt = 0;
+  }
+
+  // Fresh gesture from idle
+  S.gestureId++;
+  S.phase = 'tracking';
+  S.trackingStartOffset = -(S.pageIndex * simWidth);
+  S.targetLocked = false;
+
+  // v4.15d: skip birth classification if idle gap is long enough
+  // Momentum can't persist beyond ~200-300ms of birth rejection cycles.
+  // Long gap = definitely a new human swipe, not momentum tail.
+  if (idleGapMs > INTERNAL.birthSkipGapMs) {
+    addLog('tracking', `Tracking started (gesture #${S.gestureId}, no birth — ${Math.round(idleGapMs)}ms idle gap > ${INTERNAL.birthSkipGapMs}ms)`);
+  } else {
+    S.birthClassifying = true;
+    S.birthBuffer = [];
+    addLog('tracking', `Tracking started (gesture #${S.gestureId}, birth classifying — ${Math.round(idleGapMs)}ms gap)`);
+  }
+  progressBar.classList.add('visible');
+  return true;
+}
+
+// ============================================================
+// v4.15: Birth pattern classifier
+// ============================================================
+
+function classifyBirth(buffer) {
+  const deltas = buffer.map(b => b.absDx);
+
+  // v4.15d: Delta magnitude override — if first 3 deltas avg > threshold, force momentum.
+  // Real finger contact starts small (~1-15px). Momentum tail starts large (50-200px).
+  // This catches momentum with increasing patterns (e.g. [109, 93, 166, 206, 217, 213]).
+  const earlyAvg = (deltas[0] + deltas[1] + deltas[2]) / 3;
+  if (earlyAvg > INTERNAL.birthLargeDeltaThreshold) {
+    addLog('info', `[BIRTH:classify] earlyAvg=${earlyAvg.toFixed(0)}px > ${INTERNAL.birthLargeDeltaThreshold}px → forced momentum (deltas too large for finger start)`);
+    return 'momentum';
+  }
+
+  // Count decreasing consecutive pairs
+  let decreasingPairs = 0;
+  for (let i = 1; i < deltas.length; i++) {
+    if (deltas[i] < deltas[i - 1]) decreasingPairs++;
+  }
+  const totalPairs = deltas.length - 1;
+  const decayRatio = decreasingPairs / totalPairs;
+
+  addLog('info', `[BIRTH:classify] earlyAvg=${earlyAvg.toFixed(0)}px, decay=${decreasingPairs}/${totalPairs} (${(decayRatio * 100).toFixed(0)}%), threshold=${(INTERNAL.birthDecayRatio * 100).toFixed(0)}%`);
+  return decayRatio >= INTERNAL.birthDecayRatio ? 'momentum' : 'real';
+}
+
+function replayBirthBuffer() {
+  // Apply all buffered events' movement to offset at once
+  const softCap = simWidth * 0.10;
+  for (const sample of S.birthBuffer) {
+    const rawMove = sample.dx * P.followGain;
+    const effectiveMove = softCap > 0
+      ? Math.sign(rawMove) * softCap * Math.tanh(Math.abs(rawMove) / softCap)
+      : rawMove;
+    const nextRaw = S.offsetPx - effectiveMove;
+    S.offsetPx = dampedOffset(nextRaw);
+
+    // ±1 page cap
+    const maxTravel = simWidth;
+    const upperBound = S.trackingStartOffset + maxTravel;
+    const lowerBound = S.trackingStartOffset - maxTravel;
+    S.offsetPx = clamp(
+      S.offsetPx,
+      Math.max(lowerBound, minOffset()),
+      Math.min(upperBound, maxOffset())
+    );
+
+    S.gestureAccumX += sample.dx;
+    S.gestureEventCount++;
+  }
+}
+
+// ============================================================
+// Wheel handler
+// ============================================================
+
+function handleWheel(e) {
+  const now = performance.now();
+  if (instruction.style.display !== 'none') instruction.style.display = 'none';
+
+  const { x, y } = normalizeWheel(e);
+  const absX = Math.abs(x);
+  const absY = Math.abs(y);
+
+  if (absX < 0.01 && absY < 0.01) {
+    // Don't log this — truly zero events are noise, not interesting
+    return;
+  }
+
+  let dx = x;
+
+  // === Axis lock with pre-follow (v4.11 hybrid) ===
+  if (!S.axisLocked) {
+    S.pendingAxisX += x;
+    S.pendingAxisY += y;
+    S.pendingAxisSamples += 1;
+
+    // v4.11 NEW: pre-follow — if horizontal-ish, apply micro movement
+    // This gives "finger following" feel before axis lock confirms
+    if (absX > absY * 0.95) {
+      const previewRaw = S.offsetPx - x * INTERNAL.preFollowGain * P.followGain;
+      S.offsetPx = dampedOffset(previewRaw);
+      applyTransform();
+    }
+
+    const lockX = Math.abs(S.pendingAxisX);
+    const lockY = Math.abs(S.pendingAxisY);
+    const enoughIntent = (lockX + lockY) >= INTERNAL.axisLockMinDeltaPx || S.pendingAxisSamples >= 4;
+
+    if (!enoughIntent) {
+      // Keep RAF running for release detection even during axis accumulation
+      addLog('axis', `[AXIS:accumulating] sample#${S.pendingAxisSamples} accX=${S.pendingAxisX.toFixed(1)} accY=${S.pendingAxisY.toFixed(1)} dx=${x.toFixed(1)} (need ${INTERNAL.axisLockMinDeltaPx}px or 4 samples)`);
+      S.lastInputAt = now;
+      cancelAnimationFrame(S.rafId);
+      S.rafId = requestAnimationFrame(tick);
+      return;
+    }
+
+    if (lockX > lockY * INTERNAL.axisLockRatio) {
+      S.axisLocked = true;
+      dx = x + clamp(S.pendingAxisX * INTERNAL.lockCarryGain, -20, 20);
+      addLog('axis', `[AXIS:locked-H] lockX=${lockX.toFixed(1)} lockY=${lockY.toFixed(1)} carry=${(dx-x).toFixed(1)} → horizontal confirmed`);
+      S.pendingAxisX = 0;
+      S.pendingAxisY = 0;
+      S.pendingAxisSamples = 0;
+    } else if (lockY > lockX * INTERNAL.axisUnlockVerticalRatio) {
+      addLog('axis', `[AXIS:vertical] lockX=${lockX.toFixed(1)} lockY=${lockY.toFixed(1)} → vertical scroll, reset`);
+      S.pendingAxisX *= 0.40;
+      S.pendingAxisY *= 0.40;
+      S.pendingAxisSamples = 1;
+      S.lastInputAt = now;
+      cancelAnimationFrame(S.rafId);
+      S.rafId = requestAnimationFrame(tick);
+      return;
+    } else {
+      addLog('axis', `[AXIS:ambiguous] lockX=${lockX.toFixed(1)} lockY=${lockY.toFixed(1)} → waiting for clearer direction`);
+      S.lastInputAt = now;
+      cancelAnimationFrame(S.rafId);
+      S.rafId = requestAnimationFrame(tick);
+      return;
+    }
+  }
+
+  e.preventDefault();
+
+  if (Math.abs(dx) < INTERNAL.minWheelDeltaPx) {
+    addLog('drop', `[DROP:min-delta] dx=${dx.toFixed(3)} < threshold ${INTERNAL.minWheelDeltaPx}`);
+    return;
+  }
+
+  if (!beginTrackingIfNeeded(now)) {
+    // Momentum filtered — do NOT update lastInputAt (that would chain-block all events)
+    // Reset axis state so momentum doesn't pollute next real gesture
+    addLog('drop', `[DROP:begin-failed] phase=${S.phase} dx=${dx.toFixed(1)} — beginTracking returned false`);
+    S.axisLocked = false;
+    S.pendingAxisX = 0;
+    S.pendingAxisY = 0;
+    S.pendingAxisSamples = 0;
+    return;
+  }
+
+  const dt = Math.max(now - (S.lastInputAt || now), 8);
+
+  // === v4.15b: Birth pattern classifier ===
+  // Buffer first N events without applying to offset.
+  // Classify as real (ramp-up) or momentum (decay), then proceed or reject.
+  // v4.15b: removed real-quick shortcut — momentum tail with small delta bypassed classification
+  if (S.birthClassifying) {
+    S.birthBuffer.push({ dx, absDx: Math.abs(dx), t: now });
+
+    // Enough samples → classify
+    if (S.birthBuffer.length >= INTERNAL.birthSampleCount) {
+      S.lastInputAt = now;
+      S.eventCount++;
+      const result = classifyBirth(S.birthBuffer);
+      if (result === 'momentum') {
+        S.birthRejectedCount++;
+        const deltas = S.birthBuffer.map(b => b.absDx.toFixed(1)).join(', ');
+        addLog('momentum', `[BIRTH:momentum] g${S.gestureId} rejected — deltas: [${deltas}]`);
+        // Reset to idle — treat as if this gesture never happened
+        S.phase = 'idle';
+        S.finishInteractionAt = performance.now();
+        resetGestureBuffers();
+        progressBar.classList.remove('visible');
+        updateUI();
+        cancelAnimationFrame(S.rafId);
+        S.rafId = requestAnimationFrame(tick);
+        return;
+      }
+      // Real gesture — replay buffered events, then continue normally
+      S.birthClassifying = false;
+      const deltas = S.birthBuffer.map(b => b.absDx.toFixed(1)).join(', ');
+      addLog('info', `[BIRTH:real] g${S.gestureId} confirmed — deltas: [${deltas}]`);
+      replayBirthBuffer();
+      applyTransform();
+      updateUI();
+
+      // Input samples from buffer
+      for (const sample of S.birthBuffer) {
+        S.inputSamples.push({ t: sample.t, d: sample.dx });
+      }
+      S.inputSamples = S.inputSamples.filter(s => now - s.t <= INTERNAL.gestureSampleWindowMs);
+      if (S.inputType === 'unknown' && S.inputSamples.length >= 3) {
+        S.inputType = classifyInput(S.inputSamples);
+        addLog('info', `Input: ${S.inputType}`);
+      }
+
+      cancelAnimationFrame(S.rafId);
+      S.rafId = requestAnimationFrame(tick);
+      return;
+    }
+    else {
+      // Still buffering — update time so release detection doesn't fire prematurely
+      S.lastInputAt = now;
+      S.eventCount++;
+      addLog('info', `[BIRTH:buffering] ${S.birthBuffer.length}/${INTERNAL.birthSampleCount} dx=${dx.toFixed(1)} (g${S.gestureId})`);
+      cancelAnimationFrame(S.rafId);
+      S.rafId = requestAnimationFrame(tick);
+      return;
+    }
+  }
+
+  // === Normal delta application (birth classification passed) ===
+  // v4.12: non-linear gain — responsive for gentle swipes, controlled for strong ones
+  const rawMove = dx * P.followGain;
+  const softCap = simWidth * 0.10;
+  const effectiveMove = softCap > 0
+    ? Math.sign(rawMove) * softCap * Math.tanh(Math.abs(rawMove) / softCap)
+    : rawMove;
+  const nextRaw = S.offsetPx - effectiveMove;
+  S.offsetPx = dampedOffset(nextRaw);
+
+  // ±1 page cap from tracking start (v4.10 preserved)
+  const maxTravel = simWidth;
+  const upperBound = S.trackingStartOffset + maxTravel;
+  const lowerBound = S.trackingStartOffset - maxTravel;
+  S.offsetPx = clamp(
+    S.offsetPx,
+    Math.max(lowerBound, minOffset()),
+    Math.min(upperBound, maxOffset())
+  );
+
+  // v4.12 FIX: velocity from effectiveMove (non-linear gain applied)
+  const rawVelocity = -effectiveMove / (dt / 16.6667);
+  const maxVelocityPxPerFrame = simWidth * 0.15;
+  const cappedVelocity = clamp(rawVelocity, -maxVelocityPxPerFrame, maxVelocityPxPerFrame);
+  S.velocityPxPerFrame = lerp(S.velocityPxPerFrame, cappedVelocity, 0.36);
+
+  S.lastWheelDx = dx;
+  S.lastInputAt = now;
+  S.eventCount++;
+  S.gestureEventCount++;
+  S.gestureAccumX += dx;
+  S.gestureAccumY += y;
+  S.gesturePeakVelocity = Math.max(S.gesturePeakVelocity, Math.abs(S.velocityPxPerFrame));
+
+  S.inputSamples.push({ t: now, d: dx });
+  S.inputSamples = S.inputSamples.filter(s => now - s.t <= INTERNAL.gestureSampleWindowMs);
+  if (S.inputType === 'unknown' && S.inputSamples.length >= 3) {
+    S.inputType = classifyInput(S.inputSamples);
+    addLog('info', `Input: ${S.inputType}`);
+  }
+
+  applyTransform();
+  updateUI();
+  cancelAnimationFrame(S.rafId);
+  S.rafId = requestAnimationFrame(tick);
+}
+
+simArea.addEventListener('wheel', handleWheel, { passive: false });
+
+// ============================================================
+// Animation tick
+// ============================================================
+
+function tick(now) {
+  if (!S.lastTimestamp) S.lastTimestamp = now;
+  const frameDtMs = clamp(now - S.lastTimestamp, 8, 34);
+  const frameScale = frameDtMs / 16.6667;
+  S.lastTimestamp = now;
+
+  if (S.phase === 'tracking' && now - S.lastInputAt > P.releaseGraceMs) {
+    // v4.15: if still classifying at release, events stopped → reject as momentum
+    if (S.birthClassifying) {
+      S.birthRejectedCount++;
+      const deltas = S.birthBuffer.map(b => b.absDx.toFixed(1)).join(', ');
+      addLog('momentum', `[BIRTH:release-reject] g${S.gestureId} events stopped during classification — deltas: [${deltas}]`);
+      S.phase = 'idle';
+      S.finishInteractionAt = performance.now();
+      resetGestureBuffers();
+      progressBar.classList.remove('visible');
+      updateUI();
+      return;  // don't schedule another RAF — we're idle
+    }
+
+    const releaseGap = Math.round(now - S.lastInputAt);
+    if (S.targetLocked) {
+      // C (v4.10): target already decided — settle to same target
+      addLog('glide', `Release → target:${S.glideTargetIndex} (locked, gap ${releaseGap}ms, g${S.gestureId})`);
+    } else {
+      // B (v4.10): save velocity NOW, at the moment of release detection
+      S.gestureReleaseVelocity = S.velocityPxPerFrame;
+      S.glideTargetIndex = chooseTargetIndex();
+      S.targetLocked = true;
+      addLog('glide', `Release → target:${S.glideTargetIndex} release:${pagesPerSecFromVelocity(S.gestureReleaseVelocity).toFixed(2)}pps gap:${releaseGap}ms events:${S.gestureEventCount} (g${S.gestureId})`);
+    }
+
+    // v4.12: always direct settle — no glide phase
+    // With followGain 2.5+, tracking does most of the movement.
+    // Glide physics (decay+attraction) caused 10-20s delays and bounce.
+    // easeOutCubic settle handles any remaining distance cleanly.
+    startSettle(S.glideTargetIndex);
+  }
+
+  // v4.12: glide phase removed — all releases go directly to settle
+  // (glide physics block was here in v4.11b, removed because
+  //  followGain 2.5+ makes tracking do the work, glide just bounced)
+
+  if (S.phase === 'settling') {
+    const t = clamp((now - S.settleStartedAt) / S.settleDuration, 0, 1);
+    const eased = easeOutCubic(t);
+    S.offsetPx = lerp(S.settleFrom, S.settleTo, eased);
+    S.velocityPxPerFrame = lerp(S.velocityPxPerFrame, 0, 0.22);
+
+    if (t >= 1) {
+      S.offsetPx = S.settleTo;
+      addLog('info', `Settled on page ${S.pageIndex} (g${S.gestureId})`);
+      finishInteraction();
+    }
+  }
+
+  applyTransform();
+  updateUI();
+
+  if (S.phase !== 'idle') {
+    S.rafId = requestAnimationFrame(tick);
+  } else {
+    S.lastTimestamp = 0;
+  }
+}
+
+function startSettle(targetIndex) {
+  const prevPage = S.pageIndex;
+  S.pageIndex = clamp(targetIndex, 0, totalPages - 1);
+  S.settleTo = -(S.pageIndex * simWidth);
+  S.settleFrom = S.offsetPx;
+
+  // v4.12: duration scales with both speed and remaining distance
+  const remainingRatio = simWidth > 0 ? Math.abs(S.settleTo - S.settleFrom) / simWidth : 0;
+  const releaseSpeedNorm = clamp(pagesPerSecFromVelocity(S.gestureReleaseVelocity) / Math.max(P.directFlickVelocity, 0.001), 0, 1);
+  // Fast release or short distance → shorter duration
+  const speedFactor = lerp(1.0, 0.4, releaseSpeedNorm);
+  const distFactor = clamp(remainingRatio / 0.5, 0.3, 1.0);  // 0% remaining → 0.3x, 50%+ → 1.0x
+  S.settleDuration = P.settleDurationMax * speedFactor * distFactor;
+  S.settleDuration = clamp(S.settleDuration, P.settleDurationMin, P.settleDurationMax);
+
+  S.settleStartedAt = performance.now();
+  S.phase = 'settling';
+
+  if (prevPage !== S.pageIndex) {
+    S.turnCount++;
+    addLog('turn', `Page ${prevPage} → ${S.pageIndex} (settle ${Math.round(S.settleDuration)}ms, g${S.gestureId})`);
+  } else {
+    addLog('settle', `Settling back to page ${S.pageIndex} (${Math.round(S.settleDuration)}ms, g${S.gestureId})`);
+  }
+
+  updateDots();
+}
+
+// ============================================================
+// UI bindings
+// ============================================================
+
+const badges = {
+  idle: document.getElementById('badge-idle'),
+  tracking: document.getElementById('badge-tracking'),
+  glide: document.getElementById('badge-glide'),
+  settling: document.getElementById('badge-settling'),
+};
+const badgeDevice = document.getElementById('badge-device');
+const hudOffset = document.getElementById('hudOffset');
+const hudVelocity = document.getElementById('hudVelocity');
+const hudProgress = document.getElementById('hudProgress');
+const progressBar = document.getElementById('progressBar');
+const progressFill = document.getElementById('progressFill');
+const commitMarkL = document.getElementById('commitMarkL');
+const commitMarkR = document.getElementById('commitMarkR');
+
+const statOffset = document.getElementById('statOffset');
+const statVelo = document.getElementById('statVelo');
+const statProgress = document.getElementById('statProgress');
+const statTarget = document.getElementById('statTarget');
+const statGestureDx = document.getElementById('statGestureDx');
+const statReleaseVel = document.getElementById('statReleaseVel');
+const statCount = document.getElementById('statCount');
+const statTurns = document.getElementById('statTurns');
+const statGestureId = document.getElementById('statGestureId');
+const statBirthRejected = document.getElementById('statBirthRejected');
+
+function updateCommitMarks() {
+  const pct = P.commitDistanceRatio * 100;
+  commitMarkL.style.left = `${50 - pct}%`;
+  commitMarkR.style.left = `${50 + pct}%`;
+}
+updateCommitMarks();
+
+function updateUI() {
+  Object.keys(badges).forEach(k => {
+    badges[k].className = 'state-badge' + (S.phase === k ? ` on-${k}` : '');
+  });
+
+  const labels = { trackpad: 'TRACKPAD', mouse: 'MOUSE', unknown: '未分類' };
+  const classes = { trackpad: 'device-tp', mouse: 'device-ms', unknown: 'device-unknown' };
+  badgeDevice.textContent = labels[S.inputType];
+  badgeDevice.className = 'device-badge ' + classes[S.inputType];
+
+  const progressPages = simWidth > 0 ? -S.offsetPx / simWidth : 0;
+  statOffset.textContent = Math.round(S.offsetPx);
+  statVelo.textContent = S.velocityPxPerFrame.toFixed(3);
+  statProgress.textContent = progressPages.toFixed(3);
+  statTarget.textContent = S.phase === 'settling' ? S.glideTargetIndex : '—';
+  statGestureDx.textContent = S.gestureAccumX.toFixed(1);
+  statReleaseVel.textContent = pagesPerSecFromVelocity(S.gestureReleaseVelocity).toFixed(3);
+  statCount.textContent = S.eventCount;
+  statTurns.textContent = S.turnCount;
+  statGestureId.textContent = S.gestureId;
+  statBirthRejected.textContent = S.birthRejectedCount;
+
+  hudOffset.textContent = `offset: ${Math.round(S.offsetPx)}px`;
+  hudVelocity.textContent = `velocity: ${S.velocityPxPerFrame.toFixed(3)}`;
+  hudProgress.textContent = `progress: ${progressPages.toFixed(3)}`;
+
+  const deltaPages = progressPages - S.pageIndex;
+  const absDelta = Math.abs(deltaPages);
+  const barMax = 0.5;
+  const pct = Math.min(absDelta / barMax, 1) * 50;
+  if (deltaPages >= 0) {
+    progressFill.style.left = '50%';
+    progressFill.style.right = 'auto';
+    progressFill.style.width = pct + '%';
+  } else {
+    progressFill.style.right = '50%';
+    progressFill.style.left = 'auto';
+    progressFill.style.width = pct + '%';
+  }
+  progressFill.style.background = absDelta >= P.commitDistanceRatio ? 'var(--accent-go)' : 'var(--accent-tp)';
+}
+
+// ============================================================
+// Slider bindings
+// ============================================================
+
+function bind(id, valId, key, parse, onChange, decimals) {
+  const slider = document.getElementById(id);
+  const valEl = document.getElementById(valId);
+  const dp = decimals ?? 2;
+  slider.addEventListener('input', () => {
+    P[key] = parse(slider.value);
+    valEl.textContent = typeof P[key] === 'number' && P[key] < 10 ? P[key].toFixed(dp) : P[key];
+    onChange?.();
+  });
+}
+
+bind('sliderFollowGain', 'valFollowGain', 'followGain', parseFloat);
+bind('sliderEdgeResist', 'valEdgeResist', 'edgeResistance', parseFloat);
+bind('sliderCommitDist', 'valCommitDist', 'commitDistanceRatio', parseFloat, updateCommitMarks);
+bind('sliderFlick', 'valFlick', 'flickVelocity', parseFloat);
+bind('sliderDirectFlick', 'valDirectFlick', 'directFlickVelocity', parseFloat);
+bind('sliderMicroRev', 'valMicroRev', 'microReverseTolerance', parseFloat);
+bind('sliderGlideDecay', 'valGlideDecay', 'glideDecay', parseFloat);
+bind('sliderSnapAttr', 'valSnapAttr', 'snapAttraction', parseFloat);
+bind('sliderReleaseGrace', 'valReleaseGrace', 'releaseGraceMs', v => parseInt(v));
+bind('sliderSettleMin', 'valSettleMin', 'settleDurationMin', v => parseInt(v));
+bind('sliderSettleMax', 'valSettleMax', 'settleDurationMax', v => parseInt(v));
+
+// Birth classifier bindings (INTERNAL params)
+function bindInternal(id, valId, key, parse, decimals) {
+  const slider = document.getElementById(id);
+  const valEl = document.getElementById(valId);
+  const dp = decimals ?? 2;
+  slider.addEventListener('input', () => {
+    INTERNAL[key] = parse(slider.value);
+    valEl.textContent = typeof INTERNAL[key] === 'number' && INTERNAL[key] < 10 ? INTERNAL[key].toFixed(dp) : INTERNAL[key];
+  });
+}
+bindInternal('sliderBirthSamples', 'valBirthSamples', 'birthSampleCount', v => parseInt(v), 0);
+bindInternal('sliderBirthDecay', 'valBirthDecay', 'birthDecayRatio', parseFloat, 2);
+bindInternal('sliderBirthSkipGap', 'valBirthSkipGap', 'birthSkipGapMs', v => parseInt(v), 0);
+bindInternal('sliderBirthLargeDelta', 'valBirthLargeDelta', 'birthLargeDeltaThreshold', v => parseInt(v), 0);
+
+document.getElementById('btnReset').addEventListener('click', () => {
+  Object.assign(P, { ...DEFAULTS });
+  const syncs = [
+    ['sliderFollowGain', 'valFollowGain', 'followGain', 2],
+    ['sliderEdgeResist', 'valEdgeResist', 'edgeResistance', 2],
+    ['sliderCommitDist', 'valCommitDist', 'commitDistanceRatio', 2],
+    ['sliderFlick', 'valFlick', 'flickVelocity', 2],
+    ['sliderDirectFlick', 'valDirectFlick', 'directFlickVelocity', 2],
+    ['sliderMicroRev', 'valMicroRev', 'microReverseTolerance', 2],
+    ['sliderGlideDecay', 'valGlideDecay', 'glideDecay', 2],
+    ['sliderSnapAttr', 'valSnapAttr', 'snapAttraction', 2],
+    ['sliderReleaseGrace', 'valReleaseGrace', 'releaseGraceMs', 0],
+    ['sliderSettleMin', 'valSettleMin', 'settleDurationMin', 0],
+    ['sliderSettleMax', 'valSettleMax', 'settleDurationMax', 0],
+  ];
+  syncs.forEach(([sliderId, valId, key, decimals]) => {
+    document.getElementById(sliderId).value = P[key];
+    document.getElementById(valId).textContent = decimals > 0 ? P[key].toFixed(decimals) : P[key];
+  });
+  updateCommitMarks();
+  // Reset birth classifier INTERNAL params
+  INTERNAL.birthSampleCount = 6;
+  INTERNAL.birthDecayRatio = 0.60;
+  INTERNAL.birthSkipGapMs = 300;
+  INTERNAL.birthLargeDeltaThreshold = 50;
+  document.getElementById('sliderBirthSamples').value = 6;
+  document.getElementById('valBirthSamples').textContent = '6';
+  document.getElementById('sliderBirthDecay').value = 0.60;
+  document.getElementById('valBirthDecay').textContent = '0.60';
+  document.getElementById('sliderBirthSkipGap').value = 300;
+  document.getElementById('valBirthSkipGap').textContent = '300';
+  document.getElementById('sliderBirthLargeDelta').value = 50;
+  document.getElementById('valBirthLargeDelta').textContent = '50';
+  updateUI();
+});
+
+document.getElementById('btnCopy').addEventListener('click', () => {
+  const text = `// Wheel Engine v4.15d — Idle Gap + Large Delta\nconst WHEEL_V415D = {\n  followGain: ${P.followGain.toFixed(2)},\n  edgeResistance: ${P.edgeResistance.toFixed(2)},\n  commitDistanceRatio: ${P.commitDistanceRatio.toFixed(2)},\n  flickVelocity: ${P.flickVelocity.toFixed(2)},\n  directFlickVelocity: ${P.directFlickVelocity.toFixed(2)},\n  microReverseTolerance: ${P.microReverseTolerance.toFixed(2)},\n  glideDecay: ${P.glideDecay.toFixed(2)},\n  snapAttraction: ${P.snapAttraction.toFixed(2)},\n  releaseGraceMs: ${P.releaseGraceMs},\n  settleDurationMin: ${P.settleDurationMin},\n  settleDurationMax: ${P.settleDurationMax},\n};\n\nconst WHEEL_V415D_INTERNAL = {\n  birthSampleCount: ${INTERNAL.birthSampleCount},\n  birthDecayRatio: ${INTERNAL.birthDecayRatio.toFixed(2)},\n  birthSkipGapMs: ${INTERNAL.birthSkipGapMs},\n  birthLargeDeltaThreshold: ${INTERNAL.birthLargeDeltaThreshold},\n};`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy params', 1200);
+  });
+});
+
+const eventLogEl = document.getElementById('eventLog');
+function addLog(type, msg) {
+  const line = document.createElement('div');
+  line.className = `log-${type}`;
+  line.textContent = `${new Date().toLocaleTimeString('ja-JP', { hour12: false })} ${msg}`;
+  eventLogEl.appendChild(line);
+  eventLogEl.scrollTop = eventLogEl.scrollHeight;
+  while (eventLogEl.children.length > 500) eventLogEl.removeChild(eventLogEl.firstChild);
+}
+document.getElementById('btnClearLog').addEventListener('click', () => eventLogEl.innerHTML = '');
+document.getElementById('btnCopyLog').addEventListener('click', () => {
+  const lines = Array.from(eventLogEl.children).map(el => el.textContent);
+  const text = `--- Wheel Engine v4.15d Diagnostic Log ---\n${lines.join('\n')}\n--- End ---`;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopyLog');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy Log', 1200);
+  });
+});
+
+addLog('info', 'Wheel Engine v4.15d — Idle Gap + Large Delta');
+addLog('info', 'Rule 1: idle gap > 300ms → birth スキップ (間隔が空いた後のスワイプ誤拒否を防止)');
+addLog('info', 'Rule 2: 初期3イベントの平均delta > 50px → 強制 momentum (増加パターンの momentum を捕捉)');
+addLog('info', '  + v4.15c: settle interrupt → birth スキップ | v4.15b: real-quick 廃止');
+addLog('info', 'Diagnostic: [BIRTH:*] [DROP:*] [AXIS:*] [COMMIT:*] logs active');
+updateUI();
+</script>
+</body>
+</html>
