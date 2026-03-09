@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Veil Interaction Prototype — 操作干渉検証</title>
+<style>
+  :root {
+    --color-title: #f0ede8;
+    --color-credit: #b5b2ab;
+    --color-note: #7d7a73;
+    --color-rule: #35332e;
+    --color-bg: #1c1b18;
+    --font: -apple-system, "Helvetica Neue", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--color-title);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    touch-action: none;
+    user-select: none;
+  }
+
+  /* ════════════════════════════════════════
+     BOOKLET — 現行judd-indexと同じ構造
+     ════════════════════════════════════════ */
+  .booklet {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    will-change: transform;
+    transform: translate3d(0,0,0);
+    touch-action: none;
+  }
+
+  .page {
+    flex: 0 0 100vw;
+    width: 100vw;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    contain: paint;
+    touch-action: none;
+  }
+
+  /* ════════════════════════════════════════
+     写真ページ（シミュレーション）
+     ════════════════════════════════════════ */
+  .page-photo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .photo-bg {
+    position: absolute;
+    inset: 0;
+  }
+  .photo-bg-1 {
+    background:
+      radial-gradient(ellipse at 30% 60%, rgba(180,140,100,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 70% 30%, rgba(160,130,110,0.2) 0%, transparent 50%),
+      linear-gradient(170deg, #2a2520 0%, #1c1b18 40%, #252220 100%);
+  }
+  .photo-bg-2 {
+    background:
+      radial-gradient(ellipse at 60% 40%, rgba(100,140,180,0.25) 0%, transparent 60%),
+      radial-gradient(ellipse at 30% 70%, rgba(80,120,160,0.15) 0%, transparent 50%),
+      linear-gradient(200deg, #1e2228 0%, #1c1b18 50%, #202225 100%);
+  }
+  .photo-bg-3 {
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(180,160,100,0.3) 0%, transparent 55%),
+      radial-gradient(ellipse at 25% 75%, rgba(160,140,80,0.15) 0%, transparent 50%),
+      linear-gradient(150deg, #28251e 0%, #1c1b18 45%, #252218 100%);
+  }
+
+  .page-label {
+    position: relative;
+    z-index: 2;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--color-credit);
+    text-align: center;
+    pointer-events: none;
+  }
+  .page-label strong {
+    display: block;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--color-title);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  /* ════════════════════════════════════════
+     VEIL — 各写真ページのオーバーレイ
+     ════════════════════════════════════════ */
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(28,27,24,0.88);
+    z-index: 10;
+
+    /* 閉じた状態 */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* 縦スクロール空間 */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .veil.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .veil-content {
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px 100px;
+  }
+
+  .veil-text {
+    max-width: 480px;
+    text-align: center;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s,
+                opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s;
+  }
+  .veil.open .veil-text {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .veil-text p {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 2.2;
+    margin-bottom: 1.6em;
+    color: var(--color-title);
+  }
+  .veil-text p:last-child { margin-bottom: 0; }
+
+  /* Close ボタン */
+  .veil-close {
+    position: sticky;
+    top: 16px;
+    float: right;
+    margin-right: 16px;
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    padding: 8px;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.25s, color 0.2s;
+    z-index: 11;
+  }
+  .veil.open .veil-close { opacity: 1; }
+  .veil-close:hover { color: var(--color-title); }
+
+  /* Read ヒント */
+  .veil-hint {
+    position: absolute;
+    bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--color-note);
+    opacity: 0.4;
+    z-index: 5;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.4s ease;
+  }
+  .veil-hint::before {
+    content: '';
+    display: block;
+    width: 1px;
+    height: 14px;
+    background: var(--color-note);
+    margin: 0 auto 6px;
+    opacity: 0.4;
+    animation: hint-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 0.2; transform: scaleY(1); }
+    50% { opacity: 0.5; transform: scaleY(1.15); }
+  }
+
+  /* Veil 開中はヒント非表示 */
+  .page.veil-active .veil-hint { opacity: 0; pointer-events: none; }
+  .page.veil-active .page-label { opacity: 0; transition: opacity 0.4s; }
+
+  /* ════════════════════════════════════════
+     COVER / CLOSING
+     ════════════════════════════════════════ */
+  .page-cover, .page-closing {
+    background: var(--color-bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .page-cover h1, .page-closing h1 {
+    font-size: clamp(32px, 7vw, 56px);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+  .page-cover p, .page-closing p {
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    color: var(--color-note);
+    opacity: 0.5;
+  }
+  .page-closing h1 { font-size: clamp(28px, 6vw, 48px); }
+  .page-closing .home-link {
+    color: var(--color-note);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    opacity: 0.5;
+    margin-top: 16px;
+  }
+
+  /* ════════════════════════════════════════
+     DOT INDICATOR
+     ════════════════════════════════════════ */
+  .page-indicator {
+    position: fixed;
+    /* PC干渉回避: 上めに配置 */
+    bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 100;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-title);
+    opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+  .dot.active { opacity: 0.8; }
+
+  /* ════════════════════════════════════════
+     DEBUG LOG
+     ════════════════════════════════════════ */
+  .debug-log {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.85);
+    color: #8f8;
+    font-family: "SF Mono", "Menlo", monospace;
+    font-size: 10px;
+    line-height: 1.5;
+    padding: 8px 12px;
+    max-height: 30vh;
+    overflow-y: auto;
+    pointer-events: none;
+    display: none;
+  }
+  .debug-log.visible { display: block; pointer-events: auto; }
+
+  .debug-toggle {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    z-index: 300;
+    background: rgba(0,0,0,0.6);
+    border: 1px solid #444;
+    color: #8f8;
+    font-family: monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+
+  @media (max-width: 640px) {
+    .veil-content { padding: 48px 28px 80px; }
+    .page-indicator { bottom: calc(20px + env(safe-area-inset-bottom, 0px)); }
+  }
+</style>
+</head>
+<body>
+
+<main class="booklet" id="booklet">
+
+  <!-- COVER -->
+  <section class="page page-cover">
+    <h1>JUDD | Marfa</h1>
+    <p>Swipe to read →</p>
+  </section>
+
+  <!-- PHOTO 1 (2A) — 長いテキスト（スクロール検証用） -->
+  <section class="page page-photo" data-has-veil="true">
+    <div class="photo-bg photo-bg-1"></div>
+    <div class="page-label"><strong>2A — Material</strong>Untitled, 1967</div>
+    <div class="veil">
+      <button class="veil-close">CLOSE</button>
+      <div class="veil-content">
+        <div class="veil-text">
+          <p>雨の日の昼下がり<br>静かなワタリウム</p>
+          <p>マーファは雨が降るのだろうか。</p>
+          <p>そんなことを考えながら<br>ジャッドの世界に入る</p>
+          <p>Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
+          <p>しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
+          <p>予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
+          <p>春の気配がした</p>
+          <p style="margin-top:3em; color: var(--color-note); font-size:11px;">— ここから下はスクロール検証用のダミーテキスト —</p>
+          <p>ジャッドの作品は、見る角度によって異なる表情を見せる。正面から見れば静謐な矩形。斜めから見れば光の帯。近づけば素材の質感が語りかけてくる。</p>
+          <p>この素材そのものの存在感を、ジャッドは「Specific Objects」と呼んだ。絵画でも彫刻でもない、ただそこに在るもの。</p>
+          <p>亜鉛メッキ鉄板の表面に浮かぶスパングル結晶は、意図されたものではない。製造工程で偶然生まれる結晶パターン。ジャッドはそれを受け入れ、作品の一部とした。</p>
+          <p>偶然を受け入れること。それ自体がひとつの美学であり、マーファの荒野に通じる感覚がある。</p>
+        </div>
+      </div>
+    </div>
+    <div class="veil-hint">Read</div>
+  </section>
+
+  <!-- PHOTO 2 (W1) — 短いテキスト -->
+  <section class="page page-photo" data-has-veil="true">
+    <div class="photo-bg photo-bg-2"></div>
+    <div class="page-label"><strong>W1 — Light</strong>WATARI-UM, Mario Botta, 1990</div>
+    <div class="veil">
+      <button class="veil-close">CLOSE</button>
+      <div class="veil-content">
+        <div class="veil-text">
+          <p>三角形の窓から差す光が<br>コンクリートの壁を切り取る</p>
+          <p>ボッタの建築は光を演出する装置であり<br>ジャッドの作品のための舞台装置でもある</p>
+        </div>
+      </div>
+    </div>
+    <div class="veil-hint">Read</div>
+  </section>
+
+  <!-- PHOTO 3 (6D) — テキスト未記入 -->
+  <section class="page page-photo" data-has-veil="true">
+    <div class="photo-bg photo-bg-3"></div>
+    <div class="page-label"><strong>6D — Color</strong>Untitled, 1991</div>
+    <div class="veil">
+      <button class="veil-close">CLOSE</button>
+      <div class="veil-content">
+        <div class="veil-text">
+          <p style="color: var(--color-note); font-style: italic;">（テキスト準備中）</p>
+        </div>
+      </div>
+    </div>
+    <div class="veil-hint">Read</div>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="page page-closing">
+    <h1>B-Side</h1>
+    <p>Created by Chisaki</p>
+    <a class="home-link" href="#">Home →</a>
+  </section>
+
+</main>
+
+<nav class="page-indicator" id="indicator"></nav>
+
+<button class="debug-toggle" id="debugToggle">LOG</button>
+<div class="debug-log" id="debugLog"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// Veil Interaction Prototype
+// 検証: touch-action, veil scroll, swipe direction, wheel separation
+// ══════════════════════════════════════════════
+
+// ── Debug logger ──
+const debugLog = document.getElementById('debugLog');
+const debugToggle = document.getElementById('debugToggle');
+let debugVisible = false;
+const LOG_MAX = 60;
+
+debugToggle.addEventListener('click', function() {
+  debugVisible = !debugVisible;
+  debugLog.classList.toggle('visible', debugVisible);
+});
+
+function log(msg) {
+  const line = document.createElement('div');
+  line.textContent = `${(performance.now()/1000).toFixed(2)}  ${msg}`;
+  debugLog.prepend(line);
+  while (debugLog.childElementCount > LOG_MAX) debugLog.lastChild.remove();
+}
+
+// ── Core elements ──
+const booklet = document.getElementById('booklet');
+const pages = [...booklet.querySelectorAll('.page')];
+const indicator = document.getElementById('indicator');
+const totalPages = pages.length;
+
+let currentPage = 0;
+let isAnimating = false;
+
+// ── Veil state ──
+// 各写真ページの veil 要素を取得
+const veils = new Map(); // pageIndex → { veil, close, hint }
+pages.forEach(function(pg, i) {
+  const veil = pg.querySelector('.veil');
+  if (veil) {
+    veils.set(i, {
+      veil: veil,
+      close: pg.querySelector('.veil-close'),
+      hint: pg.querySelector('.veil-hint'),
+    });
+  }
+});
+
+function isVeilOpen(pageIndex) {
+  const v = veils.get(pageIndex);
+  return v && v.veil.classList.contains('open');
+}
+
+function openVeil(pageIndex) {
+  const v = veils.get(pageIndex);
+  if (!v || v.veil.classList.contains('open')) return;
+  v.veil.classList.add('open');
+  pages[pageIndex].classList.add('veil-active');
+  log(`VEIL OPEN page=${pageIndex}`);
+}
+
+function closeVeil(pageIndex) {
+  const v = veils.get(pageIndex);
+  if (!v || !v.veil.classList.contains('open')) return;
+  v.veil.classList.remove('open');
+  pages[pageIndex].classList.remove('veil-active');
+  log(`VEIL CLOSE page=${pageIndex}`);
+}
+
+function closeAllVeils() {
+  veils.forEach(function(v, i) {
+    v.veil.classList.remove('open');
+    pages[i].classList.remove('veil-active');
+  });
+}
+
+// Close ボタン
+veils.forEach(function(v, i) {
+  v.close.addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeVeil(i);
+  });
+  v.hint.addEventListener('click', function(e) {
+    e.stopPropagation();
+    openVeil(i);
+  });
+});
+
+// ── Page navigation ──
+const TRANSITION_DURATION = 420;
+const SWIPE_THRESHOLD = 50;
+const VELOCITY_THRESHOLD = 0.3;
+
+// Rubber-band
+const RB = { rubberC: 0.38, kick: 5, stiffness: 40, damping: 13 };
+function rubberBand(distance) {
+  const dim = window.innerWidth;
+  const c = RB.rubberC;
+  return (distance * dim * c) / (dim + c * Math.abs(distance));
+}
+
+function setPageOffset(px) {
+  booklet.style.transition = 'none';
+  booklet.style.transform = `translate3d(${px}px,0,0)`;
+}
+
+function parseCurrentX() {
+  const m = booklet.style.transform.match(/translate3d\((.+?)px/);
+  return m ? parseFloat(m[1]) : -currentPage * window.innerWidth;
+}
+
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+let animationId = 0;
+
+function cancelAnimation() {
+  animationId++;
+  isAnimating = false;
+  booklet.style.transition = 'none';
+}
+
+function snapToCurrentPage() {
+  setPageOffset(-currentPage * window.innerWidth);
+}
+
+function animateToPage(targetPage, duration) {
+  if (targetPage < 0 || targetPage >= totalPages) return;
+  if (targetPage === currentPage) {
+    const diff = Math.abs(parseCurrentX() - (-currentPage * window.innerWidth));
+    if (diff < 1) return;
+  }
+
+  isAnimating = true;
+  animationId++;
+  const myId = animationId;
+  const fromX = parseCurrentX();
+  const toX = -targetPage * window.innerWidth;
+  const startTime = performance.now();
+  duration = duration || TRANSITION_DURATION;
+
+  // ページ離脱時に Veil を閉じる
+  if (targetPage !== currentPage) {
+    closeVeil(currentPage);
+  }
+
+  const prevPage = currentPage;
+  currentPage = targetPage;
+  updateDots();
+  log(`NAV → page ${targetPage}`);
+
+  function tick(now) {
+    if (myId !== animationId) return;
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = easeOutCubic(progress);
+    setPageOffset(fromX + (toX - fromX) * eased);
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      setPageOffset(toX);
+      isAnimating = false;
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
+// ── Spring snap-back ──
+function springSnapBack() {
+  isAnimating = true;
+  animationId++;
+  const myId = animationId;
+  const targetX = -currentPage * window.innerWidth;
+  let currentX = parseCurrentX();
+  let velocity = -(currentX - targetX) * RB.kick;
+
+  function tick() {
+    if (myId !== animationId) return;
+    const disp = currentX - targetX;
+    velocity += (-RB.stiffness * disp + -RB.damping * velocity) * 0.016;
+    currentX += velocity * 0.016;
+    setPageOffset(currentX);
+
+    if (Math.abs(disp) < 0.5 && Math.abs(velocity) < 0.5) {
+      setPageOffset(targetX);
+      isAnimating = false;
+      return;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ══════════════════════════════════════════════
+// TOUCH HANDLING — 核心の検証ポイント
+// ══════════════════════════════════════════════
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchCurrentX = 0;
+let touchCurrentY = 0;
+let touchStartTime = 0;
+let isTouching = false;
+let touchDirection = null;  // null | 'horizontal' | 'vertical'
+let touchHistory = [];
+let touchTarget = null;
+
+// Veil 内スクロール用の状態
+let veilScrollState = {
+  isScrolling: false,  // Veil 内で縦スクロール中
+  startScrollTop: 0,
+};
+
+const DIRECTION_THRESHOLD = 10; // 方向確定までの最小移動距離
+
+document.addEventListener('touchstart', function(e) {
+  // ★ Veil 開中かつ Veil 内タッチの場合、preventDefault を呼ばない
+  // → ネイティブスクロールを許可する試み
+  const veilOpen = isVeilOpen(currentPage);
+  const touchedVeil = veilOpen && veils.get(currentPage) &&
+    veils.get(currentPage).veil.contains(e.target);
+
+  if (!touchedVeil) {
+    e.preventDefault();
+  }
+
+  if (isAnimating) {
+    cancelAnimation();
+    snapToCurrentPage();
+  }
+
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  touchCurrentX = touch.clientX;
+  touchCurrentY = touch.clientY;
+  touchStartTime = performance.now();
+  isTouching = true;
+  touchDirection = null;
+  touchTarget = e.target;
+  touchHistory = [{ x: touch.clientX, y: touch.clientY, t: touchStartTime }];
+
+  veilScrollState.isScrolling = false;
+  if (touchedVeil) {
+    veilScrollState.startScrollTop = veils.get(currentPage).veil.scrollTop;
+  }
+
+  log(`TOUCH START  veilOpen=${veilOpen}  touchedVeil=${!!touchedVeil}`);
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+  if (!isTouching) return;
+  const touch = e.touches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+  touchCurrentX = touch.clientX;
+  touchCurrentY = touch.clientY;
+
+  // ── 方向未確定 → 確定する ──
+  if (touchDirection === null) {
+    if (Math.abs(dx) > DIRECTION_THRESHOLD || Math.abs(dy) > DIRECTION_THRESHOLD) {
+      if (Math.abs(dx) > Math.abs(dy)) {
+        touchDirection = 'horizontal';
+        log(`DIR LOCK → horizontal`);
+      } else {
+        touchDirection = 'vertical';
+        log(`DIR LOCK → vertical`);
+      }
+    } else {
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // ── 縦方向 ──
+  if (touchDirection === 'vertical') {
+    const veilOpen = isVeilOpen(currentPage);
+
+    if (veilOpen) {
+      // Veil 開中 → Veil 内スクロールはネイティブに任せる
+      // ただし scrollTop === 0 で上スワイプ（下に引く = dy > 0）→ Veil 閉を予約
+      // ネイティブスクロール部分は preventDefault しない
+      veilScrollState.isScrolling = true;
+      // ネイティブスクロールを許可（preventDefault しない）
+      return;
+    } else {
+      // Veil 閉中、写真ページ → Veil 開のジェスチャー
+      // 上方向スワイプ（dy < 0）で Veil 開
+      e.preventDefault();
+      // ここでは開のアニメーションはまだ走らせない（touchend で判定）
+      return;
+    }
+  }
+
+  // ── 横方向 → ページドラッグ ──
+  e.preventDefault();
+  const baseX = -currentPage * window.innerWidth;
+  let dragDelta = dx;
+  if ((currentPage === 0 && dx > 0) || (currentPage === totalPages - 1 && dx < 0)) {
+    dragDelta = rubberBand(dx);
+  }
+  setPageOffset(baseX + dragDelta);
+
+  const now = performance.now();
+  touchHistory.push({ x: touch.clientX, y: touch.clientY, t: now });
+  touchHistory = touchHistory.filter(function(h) { return now - h.t < 100; });
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+  if (!isTouching) return;
+  isTouching = false;
+
+  const dx = touchCurrentX - touchStartX;
+  const dy = touchCurrentY - touchStartY;
+
+  // ── 方向未確定のまま終了 → タップ ──
+  if (touchDirection === null) {
+    if (touchTarget && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+      touchTarget.click();
+    }
+    touchTarget = null;
+    return;
+  }
+
+  // ── 縦方向の終了処理 ──
+  if (touchDirection === 'vertical') {
+    touchTarget = null;
+    const veilOpen = isVeilOpen(currentPage);
+
+    if (veilOpen) {
+      // Veil 開中: scrollTop === 0 付近で下方向に引いた → Veil 閉
+      const v = veils.get(currentPage);
+      if (v && v.veil.scrollTop <= 5 && dy > 40) {
+        closeVeil(currentPage);
+        log(`VEIL CLOSE by swipe-down (scrollTop=${v.veil.scrollTop})`);
+      }
+      return;
+    } else if (veils.has(currentPage)) {
+      // Veil 閉中: 上方向スワイプ → Veil 開
+      if (dy < -40) {
+        openVeil(currentPage);
+        log(`VEIL OPEN by swipe-up`);
+      }
+      return;
+    }
+    return;
+  }
+
+  // ── 横方向の終了処理 → ページ遷移判定 ──
+  touchTarget = null;
+  let velocity = 0;
+  if (touchHistory.length >= 2) {
+    const oldest = touchHistory[0];
+    const newest = touchHistory[touchHistory.length - 1];
+    const dt = newest.t - oldest.t;
+    if (dt > 0) velocity = (newest.x - oldest.x) / dt;
+  }
+
+  let targetPage = currentPage;
+  if (Math.abs(velocity) > VELOCITY_THRESHOLD) {
+    targetPage = velocity < 0 ? currentPage + 1 : currentPage - 1;
+  } else if (Math.abs(dx) > SWIPE_THRESHOLD) {
+    targetPage = dx < 0 ? currentPage + 1 : currentPage - 1;
+  }
+  targetPage = Math.max(0, Math.min(totalPages - 1, targetPage));
+
+  if (targetPage === currentPage) {
+    springSnapBack();
+  } else {
+    const remainingDist = Math.abs(-targetPage * window.innerWidth - parseCurrentX());
+    const ratio = Math.max(0.3, Math.min(1, remainingDist / window.innerWidth));
+    animateToPage(targetPage, Math.round(TRANSITION_DURATION * ratio));
+  }
+}, { passive: true });
+
+// ══════════════════════════════════════════════
+// WHEEL — deltaX / deltaY 分離
+// ══════════════════════════════════════════════
+
+// 暫定的な wheel 処理（v4.15d 統合前の検証用）
+// deltaX → ページ送り, deltaY → Veil 開閉 / Veil 内スクロール
+
+let wheelAccumX = 0;
+let wheelAccumY = 0;
+let wheelTimer = null;
+const WHEEL_PAGE_DIST = 200;    // ページ送り閾値
+const WHEEL_VEIL_DIST = 80;     // Veil 開閉閾値
+
+booklet.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  if (isAnimating) return;
+
+  const absX = Math.abs(e.deltaX);
+  const absY = Math.abs(e.deltaY);
+
+  // 主方向判定
+  if (absX > absY * 1.2) {
+    // 横 → ページ送り
+    wheelAccumX += e.deltaX;
+    log(`WHEEL X  dX=${e.deltaX.toFixed(1)}  accum=${wheelAccumX.toFixed(0)}`);
+
+    if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+      animateToPage(currentPage + 1);
+      wheelAccumX = 0; wheelAccumY = 0;
+    } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
+      animateToPage(currentPage - 1);
+      wheelAccumX = 0; wheelAccumY = 0;
+    }
+  } else if (absY > absX * 1.2) {
+    // 縦 → Veil 開閉
+    const veilOpen = isVeilOpen(currentPage);
+    const v = veils.get(currentPage);
+
+    if (v) {
+      if (!veilOpen) {
+        // Veil 閉中: 下スクロール（deltaY > 0）→ Veil 開
+        wheelAccumY += e.deltaY;
+        if (wheelAccumY > WHEEL_VEIL_DIST) {
+          openVeil(currentPage);
+          wheelAccumX = 0; wheelAccumY = 0;
+          log(`WHEEL → VEIL OPEN`);
+        }
+      } else {
+        // Veil 開中: Veil 内スクロールを JS で処理
+        v.veil.scrollTop += e.deltaY;
+
+        // scrollTop === 0 付近で上スクロール（deltaY < 0）→ Veil 閉
+        if (v.veil.scrollTop <= 0 && e.deltaY < -3) {
+          wheelAccumY += e.deltaY;
+          if (wheelAccumY < -WHEEL_VEIL_DIST) {
+            closeVeil(currentPage);
+            wheelAccumX = 0; wheelAccumY = 0;
+            log(`WHEEL → VEIL CLOSE (scrollTop=0)`);
+          }
+        } else {
+          wheelAccumY = 0;  // スクロール中はリセット
+        }
+      }
+    }
+  }
+  // 斜め（どちらも支配的でない）→ 無視
+
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(function() {
+    wheelAccumX = 0;
+    wheelAccumY = 0;
+  }, 200);
+}, { passive: false });
+
+// ══════════════════════════════════════════════
+// KEYBOARD
+// ══════════════════════════════════════════════
+
+document.addEventListener('keydown', function(e) {
+  if (isAnimating) return;
+
+  if (e.key === 'ArrowRight') {
+    animateToPage(currentPage + 1);
+  } else if (e.key === 'ArrowLeft') {
+    animateToPage(currentPage - 1);
+  } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    const veilOpen = isVeilOpen(currentPage);
+    if (e.key === 'ArrowDown' && !veilOpen && veils.has(currentPage)) {
+      openVeil(currentPage);
+    } else if (e.key === 'ArrowUp' && veilOpen) {
+      closeVeil(currentPage);
+    }
+  } else if (e.key === 'Escape') {
+    if (isVeilOpen(currentPage)) {
+      closeVeil(currentPage);
+    }
+  }
+});
+
+// ══════════════════════════════════════════════
+// DOTS
+// ══════════════════════════════════════════════
+
+pages.forEach(function(pg, i) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  indicator.appendChild(dot);
+});
+const dots = indicator.querySelectorAll('.dot');
+
+function updateDots() {
+  dots.forEach(function(d, i) { d.classList.toggle('active', i === currentPage); });
+}
+
+// ══════════════════════════════════════════════
+// RESIZE
+// ══════════════════════════════════════════════
+
+window.addEventListener('resize', function() {
+  setPageOffset(-currentPage * window.innerWidth);
+});
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+
+log('Prototype loaded. Pages: ' + totalPages);
+log('Touch: direction lock at ' + DIRECTION_THRESHOLD + 'px');
+log('Veil pages: ' + [...veils.keys()].join(', '));
+</script>
+
+</body>
+</html>
