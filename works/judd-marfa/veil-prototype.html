@@ -128,7 +128,8 @@
   .veil-content {
     padding: 60px 40px 100px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 
   .veil-text {
@@ -174,6 +175,25 @@
   }
   .veil.open .veil-close { opacity: 1; }
   .veil-close:hover { color: var(--color-title); }
+
+  /* 末尾 Close（スクロール後に使える） */
+  .veil-close-bottom {
+    display: block;
+    margin: 3em auto 0;
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    padding: 12px 16px;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.4s, color 0.2s;
+  }
+  .veil.open .veil-close-bottom { opacity: 1; }
+  .veil-close-bottom:hover { color: var(--color-title); }
 
   /* Read ヒント */
   .veil-hint {
@@ -341,6 +361,7 @@
           <p>亜鉛メッキ鉄板の表面に浮かぶスパングル結晶は、意図されたものではない。製造工程で偶然生まれる結晶パターン。ジャッドはそれを受け入れ、作品の一部とした。</p>
           <p>偶然を受け入れること。それ自体がひとつの美学であり、マーファの荒野に通じる感覚がある。</p>
         </div>
+        <button class="veil-close-bottom">CLOSE</button>
       </div>
     </div>
     <div class="veil-hint">Read</div>
@@ -357,6 +378,7 @@
           <p>三角形の窓から差す光が<br>コンクリートの壁を切り取る</p>
           <p>ボッタの建築は光を演出する装置であり<br>ジャッドの作品のための舞台装置でもある</p>
         </div>
+        <button class="veil-close-bottom">CLOSE</button>
       </div>
     </div>
     <div class="veil-hint">Read</div>
@@ -372,6 +394,7 @@
         <div class="veil-text">
           <p style="color: var(--color-note); font-style: italic;">（テキスト準備中）</p>
         </div>
+        <button class="veil-close-bottom">CLOSE</button>
       </div>
     </div>
     <div class="veil-hint">Read</div>
@@ -446,9 +469,19 @@ function isVeilOpen(pageIndex) {
 function openVeil(pageIndex) {
   const v = veils.get(pageIndex);
   if (!v || v.veil.classList.contains('open')) return;
-  v.veil.scrollTop = 0;  // テキスト先頭から表示
+  v.veil.scrollTop = 0;
   v.veil.classList.add('open');
   pages[pageIndex].classList.add('veil-active');
+  // 複数タイミングで scrollTop をリセット（ブラウザによって効くタイミングが異なる）
+  requestAnimationFrame(function() {
+    v.veil.scrollTop = 0;
+    requestAnimationFrame(function() {
+      v.veil.scrollTop = 0;
+    });
+  });
+  // 開くジェスチャーのスクロールを打ち消す
+  setTimeout(function() { v.veil.scrollTop = 0; }, 50);
+  setTimeout(function() { v.veil.scrollTop = 0; }, 150);
   log(`VEIL OPEN page=${pageIndex}`);
 }
 
@@ -457,6 +490,8 @@ function closeVeil(pageIndex) {
   if (!v || !v.veil.classList.contains('open')) return;
   v.veil.classList.remove('open');
   pages[pageIndex].classList.remove('veil-active');
+  // 閉じた後にスクロール位置をリセット（次回 open 時のため）
+  setTimeout(function() { v.veil.scrollTop = 0; }, 500);
   log(`VEIL CLOSE page=${pageIndex}`);
 }
 
@@ -467,12 +502,19 @@ function closeAllVeils() {
   });
 }
 
-// Close ボタン
+// Close ボタン（上部 + 末尾）
 veils.forEach(function(v, i) {
   v.close.addEventListener('click', function(e) {
     e.stopPropagation();
     closeVeil(i);
   });
+  var bottomClose = pages[i].querySelector('.veil-close-bottom');
+  if (bottomClose) {
+    bottomClose.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeVeil(i);
+    });
+  }
   v.hint.addEventListener('click', function(e) {
     e.stopPropagation();
     openVeil(i);
