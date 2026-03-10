@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Proto B+Pinch — Trackpad Pinch Zoom Test</title>
+<style>
+  :root {
+    --color-title: #f0ede8;
+    --color-credit: #b5b2ab;
+    --color-note: #7d7a73;
+    --color-rule: #35332e;
+    --color-bg: #1c1b18;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%; overflow: hidden;
+    font-family: -apple-system, "Helvetica Neue", sans-serif;
+    color: var(--color-title);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    touch-action: none;
+    user-select: none;
+  }
+
+  /* ── BOOKLET ── */
+  .booklet {
+    display: flex; width: 100%; height: 100%;
+    will-change: transform;
+    transform: translate3d(0,0,0);
+  }
+  .page {
+    flex: 0 0 100vw; width: 100vw; height: 100%;
+    position: relative; overflow: hidden; contain: paint;
+  }
+
+  /* ── PHOTO ── */
+  .page img.bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: object-fit 0s;
+    transform-origin: center center;
+  }
+  .page.pinching img.bg {
+    object-fit: contain;
+    background: var(--color-bg);
+  }
+
+  /* ── LABEL (top-left) ── */
+  .page-label {
+    position: absolute;
+    top: calc(36px + env(safe-area-inset-top, 0px));
+    left: calc(24px + env(safe-area-inset-left, 0px));
+    z-index: 2;
+    transition: opacity 0.35s ease;
+  }
+  .label-title {
+    font-size: 20px; font-weight: 400;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* ── CREDIT (bottom-right) ── */
+  .page-credit {
+    position: absolute;
+    bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    z-index: 2;
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 0.04em;
+    color: var(--color-credit);
+    text-align: right;
+    max-width: 60%;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transition: opacity 0.35s ease;
+  }
+
+  /* ── BOOK ICON (text access) ── */
+  .text-btn {
+    position: absolute;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    left: calc(24px + env(safe-area-inset-left, 0px));
+    z-index: 5;
+    background: none; border: none;
+    color: var(--color-note);
+    font-size: 18px;
+    cursor: pointer;
+    padding: 10px;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.5;
+    transition: opacity 0.35s ease;
+  }
+  .text-btn:active { opacity: 0.9; }
+
+  /* ── EXPANDED VIEW (tap) ── */
+  .page.expanded .page-label,
+  .page.expanded .page-credit,
+  .page.expanded .text-btn,
+  .page.expanded .mode-hint { opacity: 0; pointer-events: none; }
+
+  /* ── MODE HINT ── */
+  .mode-hint {
+    position: absolute;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 300;
+    letter-spacing: 0.08em;
+    color: var(--color-note);
+    opacity: 0.5;
+    z-index: 2;
+    transition: opacity 0.35s ease;
+    white-space: nowrap;
+  }
+
+  /* ── VEIL ── */
+  .veil {
+    position: absolute; inset: 0;
+    background: rgba(28,27,24,0.90);
+    z-index: 10;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .veil.open { opacity: 1; pointer-events: auto; }
+  .veil-content {
+    padding: 80px 32px 80px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .veil-text {
+    max-width: 480px; text-align: center;
+    transform: translateY(16px); opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1) 0.06s,
+                opacity 0.5s cubic-bezier(0.4,0,0.2,1) 0.06s;
+  }
+  .veil.open .veil-text { transform: translateY(0); opacity: 1; }
+  .veil-text p {
+    font-size: 14px; font-weight: 300;
+    line-height: 2.2; margin-bottom: 1.4em;
+    color: var(--color-title);
+  }
+
+  /* ── VEIL CLOSE ── */
+  .veil-close {
+    position: absolute;
+    top: calc(24px + env(safe-area-inset-top, 0px));
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    z-index: 12; background: none; border: none;
+    color: var(--color-note); font-size: 20px;
+    cursor: pointer; padding: 10px;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease 0.15s;
+  }
+  .page.veil-active .veil-close { opacity: 0.6; pointer-events: auto; }
+  .page.veil-active .page-label,
+  .page.veil-active .page-credit,
+  .page.veil-active .text-btn,
+  .page.veil-active .mode-hint { opacity: 0; pointer-events: none; }
+
+  /* ── COVER ── */
+  .page-cover {
+    background: var(--color-bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .page-cover h1 {
+    font-size: clamp(28px, 6vw, 48px);
+    font-weight: 300; letter-spacing: -0.01em;
+  }
+  .page-cover .sub {
+    margin-top: 8px; font-size: 12px;
+    font-weight: 300; letter-spacing: 0.1em;
+    color: var(--color-note); opacity: 0.6;
+  }
+  .page-cover .proto-label {
+    position: absolute;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    left: 20px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em;
+    color: #4ca0e8;
+    opacity: 0.8;
+  }
+
+  /* ── DOT INDICATOR ── */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 100;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-title); opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+  .dot.active { opacity: 0.8; }
+
+  /* ── DEBUG ── */
+  .debug {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 300;
+    background: rgba(0,0,0,0.85);
+    color: #8af; font-family: "SF Mono", monospace;
+    font-size: 10px; line-height: 1.5;
+    padding: 8px 12px;
+    max-height: 25vh; overflow-y: auto;
+    display: none;
+  }
+  .debug.visible { display: block; }
+  .debug-toggle {
+    position: fixed;
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    right: 8px;
+    z-index: 301;
+    background: rgba(0,0,0,0.5);
+    color: #8af; border: none; font-size: 10px;
+    padding: 4px 8px; border-radius: 4px;
+    cursor: pointer;
+    font-family: "SF Mono", monospace;
+  }
+</style>
+</head>
+<body>
+
+<main class="booklet" id="booklet">
+  <!-- COVER -->
+  <section class="page page-cover">
+    <div class="proto-label">PINCH TEST</div>
+    <h1>Trackpad Pinch Zoom</h1>
+    <div class="sub">PINCH = BROWSER ZOOM (ctrlKey bypass) &nbsp;/&nbsp; SWIPE = PAGE</div>
+  </section>
+
+  <!-- PHOTO 1 -->
+  <section class="page photo-page" data-has-veil="true">
+    <img class="bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Crect fill='%23282520'/%3E%3Crect x='80' y='60' width='200' height='880' fill='%23c4956a' rx='4'/%3E%3Crect x='340' y='60' width='200' height='880' fill='%23b08858' rx='4'/%3E%3Crect x='600' y='60' width='200' height='880' fill='%23c4956a' rx='4'/%3E%3Crect x='860' y='60' width='200' height='880' fill='%23b08858' rx='4'/%3E%3Crect x='1120' y='60' width='200' height='880' fill='%23c4956a' rx='4'/%3E%3Crect x='1380' y='60' width='200' height='880' fill='%23b08858' rx='4'/%3E%3Ctext x='800' y='30' text-anchor='middle' fill='%23706050' font-size='18' font-family='sans-serif'%3E← EDGE (cropped in cover) →%3C/text%3E%3Ctext x='800' y='990' text-anchor='middle' fill='%23706050' font-size='18' font-family='sans-serif'%3E← EDGE (cropped in cover) →%3C/text%3E%3Ctext x='20' y='500' fill='%23706050' font-size='14' font-family='sans-serif' transform='rotate(-90 20 500)'%3ELEFT EDGE%3C/text%3E%3Ctext x='1580' y='500' fill='%23706050' font-size='14' font-family='sans-serif' transform='rotate(90 1580 500)'%3ERIGHT EDGE%3C/text%3E%3C/svg%3E" alt="Test: Judd-like boxes">
+    <div class="page-label">
+      <div class="label-title">Material</div>
+    </div>
+    <div class="page-credit">Untitled, 1991, Anodized aluminum</div>
+    <button class="text-btn" data-page-idx="1">📖</button>
+    <div class="mode-hint">tap → expand ・ 📖 → read</div>
+    <div class="veil">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p>雨の午後<br>静かなワタリウム</p>
+          <p>マーファにも、雨は降るのだろうか</p>
+          <p>そう思いながら<br>ジャッドの世界に入る</p>
+          <p>Untitled,<br>日用のトタンから<br>硬い影が落ちていた<br>雨粒のリズムが聞こえた気がした</p>
+          <p>けれどその表面は柔らかく温かく<br>流れる光をまとっていた</p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+  </section>
+
+  <!-- PHOTO 2 -->
+  <section class="page photo-page" data-has-veil="true">
+    <img class="bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Crect fill='%231e2228'/%3E%3Ccircle cx='400' cy='500' r='300' fill='none' stroke='%23506080' stroke-width='3'/%3E%3Ccircle cx='800' cy='500' r='300' fill='none' stroke='%23506080' stroke-width='3'/%3E%3Ccircle cx='1200' cy='500' r='300' fill='none' stroke='%23506080' stroke-width='3'/%3E%3Crect x='0' y='0' width='1600' height='40' fill='%23304060' opacity='0.3'/%3E%3Crect x='0' y='960' width='1600' height='40' fill='%23304060' opacity='0.3'/%3E%3Ctext x='800' y='25' text-anchor='middle' fill='%23506080' font-size='16' font-family='sans-serif'%3ETOP EDGE — visible in contain%3C/text%3E%3Ctext x='800' y='985' text-anchor='middle' fill='%23506080' font-size='16' font-family='sans-serif'%3EBOTTOM EDGE — visible in contain%3C/text%3E%3C/svg%3E" alt="Test: Circles">
+    <div class="page-label">
+      <div class="label-title">Light</div>
+    </div>
+    <div class="page-credit">WATARI-UM, Mario Botta, 1990</div>
+    <button class="text-btn" data-page-idx="2">📖</button>
+    <div class="mode-hint">tap → expand ・ 📖 → read</div>
+    <div class="veil">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p>コンクリートに落ちる光</p>
+          <p>ボッタの建築が<br>ジャッドの作品と共鳴する</p>
+          <p>光は時間を可視化する<br>——午前と午後で<br>同じ作品が違って見える</p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+  </section>
+</main>
+
+<nav class="page-indicator" id="indicator"></nav>
+<button class="debug-toggle" id="debugToggle">LOG</button>
+<div class="debug" id="debugLog"></div>
+
+<script>
+// ══════════════════════════════════════
+// PROTO B — Tap→Expand / Icon→Text
+// ══════════════════════════════════════
+
+const booklet = document.getElementById('booklet');
+const pages = [...booklet.querySelectorAll('.page')];
+const totalPages = pages.length;
+const indicator = document.getElementById('indicator');
+const debugLog = document.getElementById('debugLog');
+
+let currentPage = 0;
+let currentX = 0;
+let isAnimating = false;
+let animationId = 0;
+
+// ── Logging ──
+function log(msg) {
+  const line = document.createElement('div');
+  line.textContent = `${(performance.now()/1000).toFixed(2)}  ${msg}`;
+  debugLog.prepend(line);
+  if (debugLog.children.length > 60) debugLog.lastChild.remove();
+}
+document.getElementById('debugToggle').onclick = () => debugLog.classList.toggle('visible');
+
+// ── Dots ──
+pages.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  indicator.appendChild(d);
+});
+const dots = indicator.querySelectorAll('.dot');
+function updateDots() { dots.forEach((d, i) => d.classList.toggle('active', i === currentPage)); }
+
+// ── Veil ──
+function getVeil(pageIdx) {
+  const pg = pages[pageIdx];
+  if (!pg || pg.getAttribute('data-has-veil') !== 'true') return null;
+  return { veil: pg.querySelector('.veil'), close: pg.querySelector('.veil-close') };
+}
+function isVeilOpen(pageIdx) {
+  const v = getVeil(pageIdx);
+  return v && v.veil.classList.contains('open');
+}
+function openVeil(pageIdx) {
+  const v = getVeil(pageIdx);
+  if (!v) return;
+  v.veil.classList.add('open');
+  pages[pageIdx].classList.add('veil-active');
+  log(`VEIL OPEN page=${pageIdx}`);
+}
+function closeVeil(pageIdx) {
+  const v = getVeil(pageIdx);
+  if (!v) return;
+  v.veil.classList.remove('open');
+  pages[pageIdx].classList.remove('veil-active');
+  log(`VEIL CLOSE page=${pageIdx}`);
+}
+
+// Close buttons & text buttons
+pages.forEach((pg, i) => {
+  const closeBtn = pg.querySelector('.veil-close');
+  if (closeBtn) {
+    closeBtn.addEventListener('click', e => { e.stopPropagation(); closeVeil(i); });
+  }
+  const textBtn = pg.querySelector('.text-btn');
+  if (textBtn) {
+    textBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      openVeil(i);
+      log(`📖 ICON tap → VEIL OPEN page=${i}`);
+    });
+  }
+});
+
+// ── Expanded View ──
+function isExpanded(pageIdx) { return pages[pageIdx].classList.contains('expanded'); }
+function enterExpanded(pageIdx) {
+  pages[pageIdx].classList.add('expanded');
+  log(`EXPANDED ENTER page=${pageIdx}`);
+}
+function exitExpanded(pageIdx) {
+  pages[pageIdx].classList.remove('expanded');
+  log(`EXPANDED EXIT page=${pageIdx}`);
+}
+
+// ── Page Navigation ──
+function setOffset(x) {
+  currentX = x;
+  booklet.style.transform = `translate3d(${x}px, 0, 0)`;
+}
+
+function rubberBand(d) {
+  const c = 0.38;
+  return d > 0 ? Math.pow(d, c) * 5 : -Math.pow(-d, c) * 5;
+}
+
+function animateToPage(target, dur) {
+  target = Math.max(0, Math.min(totalPages - 1, target));
+  dur = dur || 350;
+  const from = currentX;
+  const to = -target * window.innerWidth;
+  const start = performance.now();
+  isAnimating = true;
+  const id = ++animationId;
+
+  function tick(now) {
+    if (id !== animationId) return;
+    let t = Math.min(1, (now - start) / dur);
+    t = 1 - Math.pow(1 - t, 3);
+    setOffset(from + (to - from) * t);
+    if (t < 1) { requestAnimationFrame(tick); }
+    else { setOffset(to); currentPage = target; updateDots(); isAnimating = false; }
+  }
+  requestAnimationFrame(tick);
+}
+
+function springSnapBack() {
+  const targetX = -currentPage * window.innerWidth;
+  const stiffness = 40, damping = 13;
+  let velocity = 0;
+  isAnimating = true;
+  const id = ++animationId;
+
+  function tick() {
+    if (id !== animationId) return;
+    const disp = currentX - targetX;
+    velocity += (-stiffness * disp + -damping * velocity) * 0.016;
+    currentX += velocity * 0.016;
+    setOffset(currentX);
+    if (Math.abs(disp) < 0.5 && Math.abs(velocity) < 0.5) {
+      setOffset(targetX); isAnimating = false; return;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ══════════════════════════════════════
+// TOUCH — 1finger: swipe/tap, 2finger: pinch
+// ══════════════════════════════════════
+
+let touchStartX = 0, touchStartY = 0;
+let touchCurrentX = 0, touchCurrentY = 0;
+let isTouching = false;
+let touchDir = null;
+let touchHistory = [];
+let touchTarget = null;
+const DIR_THRESH = 10;
+const SWIPE_THRESH = 50;
+const VEL_THRESH = 0.3;
+
+// Pinch
+let isPinching = false;
+let pinchStartDist = 0;
+let pinchPage = null;
+
+function getTouchDist(e) {
+  const t = e.touches;
+  const dx = t[1].clientX - t[0].clientX;
+  const dy = t[1].clientY - t[0].clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+document.addEventListener('touchstart', e => {
+  // ── 2-finger: pinch start ──
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    isPinching = true;
+    pinchStartDist = getTouchDist(e);
+    pinchPage = currentPage;
+    pages[pinchPage].classList.add('pinching');
+    log(`PINCH START dist=${pinchStartDist.toFixed(0)}`);
+    return;
+  }
+
+  if (e.touches.length !== 1) return;
+  e.preventDefault();
+
+  if (isAnimating) { animationId++; isAnimating = false; setOffset(-currentPage * window.innerWidth); }
+
+  const t = e.touches[0];
+  touchStartX = t.clientX;
+  touchStartY = t.clientY;
+  touchCurrentX = t.clientX;
+  touchCurrentY = t.clientY;
+  isTouching = true;
+  touchDir = null;
+  touchTarget = e.target;
+  touchHistory = [{ x: t.clientX, t: performance.now() }];
+}, { passive: false });
+
+document.addEventListener('touchmove', e => {
+  // ── Pinch move ──
+  if (isPinching && e.touches.length === 2) {
+    e.preventDefault();
+    const dist = getTouchDist(e);
+    const scale = dist / pinchStartDist;
+    const img = pages[pinchPage].querySelector('img.bg');
+    if (img) {
+      const s = Math.max(1, Math.min(3, scale));
+      img.style.transform = `scale(${s})`;
+    }
+    return;
+  }
+
+  if (!isTouching || e.touches.length !== 1) return;
+  const t = e.touches[0];
+  const dx = t.clientX - touchStartX;
+  const dy = t.clientY - touchStartY;
+  touchCurrentX = t.clientX;
+  touchCurrentY = t.clientY;
+
+  if (touchDir === null) {
+    if (Math.abs(dx) > DIR_THRESH || Math.abs(dy) > DIR_THRESH) {
+      touchDir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+    } else { e.preventDefault(); return; }
+  }
+
+  if (touchDir === 'v') {
+    if (isVeilOpen(currentPage)) {
+      const v = getVeil(currentPage);
+      if (v) v.veil.scrollTop -= (t.clientY - touchCurrentY + (touchCurrentY - t.clientY));
+    }
+    e.preventDefault();
+    return;
+  }
+
+  // Horizontal drag
+  e.preventDefault();
+  const base = -currentPage * window.innerWidth;
+  let drag = dx;
+  if ((currentPage === 0 && dx > 0) || (currentPage === totalPages - 1 && dx < 0)) {
+    drag = rubberBand(dx);
+  }
+  setOffset(base + drag);
+
+  const now = performance.now();
+  touchHistory.push({ x: t.clientX, t: now });
+  touchHistory = touchHistory.filter(h => now - h.t < 100);
+}, { passive: false });
+
+document.addEventListener('touchend', e => {
+  // ── Pinch end ──
+  if (isPinching) {
+    isPinching = false;
+    if (pinchPage !== null) {
+      const img = pages[pinchPage].querySelector('img.bg');
+      if (img) {
+        img.style.transition = 'transform 0.3s cubic-bezier(0.2,0,0,1)';
+        img.style.transform = 'scale(1)';
+        setTimeout(() => {
+          img.style.transition = '';
+          pages[pinchPage].classList.remove('pinching');
+        }, 350);
+      }
+      log(`PINCH END → snap back`);
+      pinchPage = null;
+    }
+    return;
+  }
+
+  if (!isTouching) return;
+  isTouching = false;
+
+  const dx = touchCurrentX - touchStartX;
+  const dy = touchCurrentY - touchStartY;
+
+  // ── Tap ──
+  if (touchDir === null) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+      // Check if tapped on a button (text-btn, veil-close)
+      if (touchTarget && (touchTarget.classList.contains('text-btn') || touchTarget.classList.contains('veil-close'))) {
+        touchTarget.click();
+        touchTarget = null;
+        return;
+      }
+
+      const pg = pages[currentPage];
+      const isPhoto = pg.classList.contains('photo-page');
+
+      if (isPhoto) {
+        if (isExpanded(currentPage)) {
+          exitExpanded(currentPage);
+          log(`TAP → exit expanded`);
+        } else if (isVeilOpen(currentPage)) {
+          closeVeil(currentPage);
+          log(`TAP → close veil`);
+        } else {
+          // TAP → EXPAND (Proto B behavior)
+          enterExpanded(currentPage);
+          log(`TAP → expand (Proto B)`);
+        }
+      }
+    }
+    touchTarget = null;
+    return;
+  }
+
+  touchTarget = null;
+
+  // ── Vertical end ──
+  if (touchDir === 'v') return;
+
+  // ── Horizontal end ──
+  let vel = 0;
+  if (touchHistory.length >= 2) {
+    const o = touchHistory[0], n = touchHistory[touchHistory.length - 1];
+    const dt = n.t - o.t;
+    if (dt > 0) vel = (n.x - o.x) / dt;
+  }
+
+  let target = currentPage;
+  if (Math.abs(vel) > VEL_THRESH) target = vel < 0 ? currentPage + 1 : currentPage - 1;
+  else if (Math.abs(dx) > SWIPE_THRESH) target = dx < 0 ? currentPage + 1 : currentPage - 1;
+  target = Math.max(0, Math.min(totalPages - 1, target));
+
+  if (target === currentPage) springSnapBack();
+  else animateToPage(target);
+}, { passive: true });
+
+// ══════════════════════════════════════
+// WHEEL — page navigation + trackpad pinch bypass
+// ══════════════════════════════════════
+
+let wheelAccumX = 0;
+let wheelTimer = null;
+const WHEEL_PAGE_DIST = 300;
+
+booklet.addEventListener('wheel', function(e) {
+  // ── Trackpad pinch → let browser handle zoom ──
+  if (e.ctrlKey || e.metaKey) {
+    log(`WHEEL BYPASS → ctrlKey=${e.ctrlKey} metaKey=${e.metaKey} deltaY=${e.deltaY.toFixed(1)} (browser zoom)`);
+    return;  // do NOT preventDefault — let browser zoom
+  }
+
+  e.preventDefault();
+  if (isAnimating) return;
+
+  const absX = Math.abs(e.deltaX);
+  const absY = Math.abs(e.deltaY);
+
+  if (absX > absY * 1.2) {
+    wheelAccumX += e.deltaX;
+    if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+      animateToPage(currentPage + 1);
+      wheelAccumX = 0;
+    } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
+      animateToPage(currentPage - 1);
+      wheelAccumX = 0;
+    }
+  } else if (absY > absX * 1.2) {
+    const v = getVeil(currentPage);
+    if (v && isVeilOpen(currentPage)) {
+      v.veil.scrollTop += e.deltaY;
+    }
+  }
+
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(function() { wheelAccumX = 0; }, 200);
+}, { passive: false });
+
+// ══════════════════════════════════════
+// KEYBOARD (Mac testing)
+// ══════════════════════════════════════
+
+document.addEventListener('keydown', e => {
+  if (isAnimating) return;
+  if (e.key === 'ArrowRight') animateToPage(currentPage + 1);
+  else if (e.key === 'ArrowLeft') animateToPage(currentPage - 1);
+  else if (e.key === 'Escape') {
+    if (isVeilOpen(currentPage)) closeVeil(currentPage);
+    else if (isExpanded(currentPage)) exitExpanded(currentPage);
+  }
+  else if (e.key === 'Enter') {
+    // Enter = expand (like tap)
+    if (pages[currentPage].classList.contains('photo-page')) {
+      if (isExpanded(currentPage)) exitExpanded(currentPage);
+      else enterExpanded(currentPage);
+    }
+  }
+  else if (e.key === ' ') {
+    e.preventDefault();
+    // Space = text (like icon)
+    if (pages[currentPage].classList.contains('photo-page')) {
+      if (isVeilOpen(currentPage)) closeVeil(currentPage);
+      else openVeil(currentPage);
+    }
+  }
+});
+
+// ══════════════════════════════════════
+// RESIZE
+// ══════════════════════════════════════
+window.addEventListener('resize', () => setOffset(-currentPage * window.innerWidth));
+
+log('Pinch Test loaded — wheel ctrlKey/metaKey bypass enabled, viewport max-scale removed');
+</script>
+</body>
+</html>
