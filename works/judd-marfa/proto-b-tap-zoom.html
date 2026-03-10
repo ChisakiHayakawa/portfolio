@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>Proto B — Tap→Zoom / Icon→Text</title>
+<style>
+  :root {
+    --color-title: #f0ede8;
+    --color-credit: #b5b2ab;
+    --color-note: #7d7a73;
+    --color-rule: #35332e;
+    --color-bg: #1c1b18;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%; overflow: hidden;
+    font-family: -apple-system, "Helvetica Neue", sans-serif;
+    color: var(--color-title);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    touch-action: none; user-select: none;
+  }
+  .booklet {
+    display: flex; width: 100%; height: 100%;
+    will-change: transform; transform: translate3d(0,0,0);
+  }
+  .page {
+    flex: 0 0 100vw; width: 100vw; height: 100%;
+    position: relative; overflow: hidden; contain: paint;
+  }
+  .page img.bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .page-label {
+    position: absolute;
+    top: calc(36px + env(safe-area-inset-top, 0px));
+    left: calc(24px + env(safe-area-inset-left, 0px));
+    z-index: 2; transition: opacity 0.35s ease;
+  }
+  .label-title {
+    font-size: 20px; font-weight: 400;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .page-credit {
+    position: absolute;
+    bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    z-index: 2; font-size: 10px; font-weight: 300;
+    color: var(--color-credit); text-align: right; max-width: 60%;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    transition: opacity 0.35s ease;
+  }
+  .mode-hint {
+    position: absolute;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%);
+    font-size: 10px; font-weight: 300; letter-spacing: 0.08em;
+    color: var(--color-note); opacity: 0.5; z-index: 2;
+    transition: opacity 0.35s ease; white-space: nowrap;
+  }
+
+  /* ── TEXT ICON ── */
+  .text-btn {
+    position: absolute;
+    bottom: calc(40px + env(safe-area-inset-bottom, 0px));
+    left: calc(24px + env(safe-area-inset-left, 0px));
+    z-index: 5; background: none; border: none;
+    color: var(--color-note); font-size: 18px;
+    cursor: pointer; padding: 10px;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.5; transition: opacity 0.35s ease;
+  }
+  .text-btn:active { opacity: 0.9; }
+
+  /* ── EXPANDED ── */
+  .page.expanded .page-label,
+  .page.expanded .page-credit,
+  .page.expanded .text-btn,
+  .page.expanded .mode-hint { opacity: 0; pointer-events: none; }
+  .page.expanded::after {
+    content: ''; position: absolute; inset: 0;
+    border: 2px solid rgba(240,237,232,0.12);
+    pointer-events: none; z-index: 14;
+  }
+  .expanded-close {
+    position: absolute;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    z-index: 15;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(240,237,232,0.2);
+    border-radius: 4px;
+    color: var(--color-title);
+    font-size: 11px; font-weight: 300; letter-spacing: 0.06em;
+    padding: 6px 12px; cursor: pointer;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .page.expanded .expanded-close { opacity: 0.7; pointer-events: auto; }
+
+  /* ── VEIL ── */
+  .veil {
+    position: absolute; inset: 0;
+    background: rgba(28,27,24,0.90); z-index: 10;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .veil.open { opacity: 1; pointer-events: auto; }
+  .veil-content {
+    padding: 80px 32px 80px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .veil-text {
+    max-width: 480px; text-align: center;
+    transform: translateY(16px); opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1) 0.06s,
+                opacity 0.5s cubic-bezier(0.4,0,0.2,1) 0.06s;
+  }
+  .veil.open .veil-text { transform: translateY(0); opacity: 1; }
+  .veil-text p {
+    font-size: 14px; font-weight: 300;
+    line-height: 2.2; margin-bottom: 1.4em; color: var(--color-title);
+  }
+  .veil-close {
+    position: absolute;
+    top: calc(24px + env(safe-area-inset-top, 0px));
+    right: calc(24px + env(safe-area-inset-right, 0px));
+    z-index: 12; background: none; border: none;
+    color: var(--color-note); font-size: 20px;
+    cursor: pointer; padding: 10px;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.4s ease 0.15s;
+  }
+  .page.veil-active .veil-close { opacity: 0.6; pointer-events: auto; }
+  .page.veil-active .page-label,
+  .page.veil-active .page-credit,
+  .page.veil-active .text-btn,
+  .page.veil-active .mode-hint { opacity: 0; pointer-events: none; }
+
+  /* ── COVER ── */
+  .page-cover {
+    background: var(--color-bg);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .page-cover h1 { font-size: clamp(28px, 6vw, 48px); font-weight: 300; }
+  .page-cover .sub {
+    margin-top: 12px; font-size: 12px; font-weight: 300;
+    letter-spacing: 0.06em; color: var(--color-note); opacity: 0.6;
+    text-align: center; line-height: 2; padding: 0 20px;
+  }
+  .page-cover .proto-label {
+    position: absolute;
+    top: calc(20px + env(safe-area-inset-top, 0px)); left: 20px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    color: #4ca0e8; opacity: 0.8;
+  }
+
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 100;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--color-title); opacity: 0.2; transition: opacity 0.3s;
+  }
+  .dot.active { opacity: 0.8; }
+
+  .debug {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 300;
+    background: rgba(0,0,0,0.85);
+    color: #8af; font-family: "SF Mono", monospace;
+    font-size: 10px; line-height: 1.5;
+    padding: 8px 12px; max-height: 25vh; overflow-y: auto; display: none;
+  }
+  .debug.visible { display: block; }
+  .debug-toggle {
+    position: fixed;
+    top: calc(8px + env(safe-area-inset-top, 0px)); right: 8px; z-index: 301;
+    background: rgba(0,0,0,0.5); color: #8af; border: none;
+    font-size: 10px; padding: 4px 8px; border-radius: 4px; cursor: pointer;
+    font-family: "SF Mono", monospace;
+  }
+</style>
+</head>
+<body>
+<main class="booklet" id="booklet">
+  <section class="page page-cover">
+    <div class="proto-label">PROTO B</div>
+    <h1>Tap → Zoom</h1>
+    <div class="sub">
+      TAP / CLICK → Expand (drag to pan)<br>
+      📖 ICON → Veil (text)<br>
+      2-finger PINCH → Temp zoom<br>
+      Esc = exit ・ ←→ = pages ・ Space = veil
+    </div>
+  </section>
+
+  <section class="page photo-page" data-has-veil="true">
+    <img class="bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Crect fill='%23282520'/%3E%3Crect x='80' y='60' width='200' height='880' fill='%23c4956a' rx='4'/%3E%3Crect x='340' y='60' width='200' height='880' fill='%23b08858' rx='4'/%3E%3Crect x='600' y='60' width='200' height='880' fill='%23c4956a' rx='4'/%3E%3Crect x='860' y='60' width='200' height='880' fill='%23b08858' rx='4'/%3E%3Crect x='1120' y='60' width='200' height='880' fill='%23c4956a' rx='4'/%3E%3Crect x='1380' y='60' width='200' height='880' fill='%23b08858' rx='4'/%3E%3Ctext x='800' y='30' text-anchor='middle' fill='%23706050' font-size='18'%3ETOP EDGE cropped%3C/text%3E%3Ctext x='800' y='990' text-anchor='middle' fill='%23706050' font-size='18'%3EBOTTOM EDGE cropped%3C/text%3E%3C/svg%3E" alt="Test">
+    <div class="page-label"><div class="label-title">Material</div></div>
+    <div class="page-credit">Untitled, 1991, Anodized aluminum</div>
+    <button class="text-btn">📖</button>
+    <div class="mode-hint">tap = expand ・ 📖 = read</div>
+    <div class="expanded-close">✕ exit</div>
+    <div class="veil"><div class="veil-content"><div class="veil-text">
+      <p>雨の午後<br>静かなワタリウム</p>
+      <p>マーファにも、雨は降るのだろうか</p>
+      <p>そう思いながら<br>ジャッドの世界に入る</p>
+      <p>Untitled,<br>日用のトタンから<br>硬い影が落ちていた<br>雨粒のリズムが聞こえた気がした</p>
+      <p>けれどその表面は柔らかく温かく<br>流れる光をまとっていた</p>
+    </div></div></div>
+    <button class="veil-close">✕</button>
+  </section>
+
+  <section class="page photo-page" data-has-veil="true">
+    <img class="bg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Crect fill='%231e2228'/%3E%3Ccircle cx='400' cy='500' r='300' fill='none' stroke='%23506080' stroke-width='3'/%3E%3Ccircle cx='800' cy='500' r='300' fill='none' stroke='%23506080' stroke-width='3'/%3E%3Ccircle cx='1200' cy='500' r='300' fill='none' stroke='%23506080' stroke-width='3'/%3E%3Crect x='0' y='0' width='1600' height='40' fill='%23304060' opacity='0.3'/%3E%3Crect x='0' y='960' width='1600' height='40' fill='%23304060' opacity='0.3'/%3E%3Ctext x='800' y='25' text-anchor='middle' fill='%23506080' font-size='16'%3ETOP EDGE visible in contain%3C/text%3E%3Ctext x='800' y='985' text-anchor='middle' fill='%23506080' font-size='16'%3EBOTTOM EDGE visible in contain%3C/text%3E%3C/svg%3E" alt="Test">
+    <div class="page-label"><div class="label-title">Light</div></div>
+    <div class="page-credit">WATARI-UM, Mario Botta, 1990</div>
+    <button class="text-btn">📖</button>
+    <div class="mode-hint">tap = expand ・ 📖 = read</div>
+    <div class="expanded-close">✕ exit</div>
+    <div class="veil"><div class="veil-content"><div class="veil-text">
+      <p>コンクリートに落ちる光</p>
+      <p>ボッタの建築が<br>ジャッドの作品と共鳴する</p>
+      <p>光は時間を可視化する<br>——午前と午後で<br>同じ作品が違って見える</p>
+    </div></div></div>
+    <button class="veil-close">✕</button>
+  </section>
+</main>
+
+<nav class="page-indicator" id="indicator"></nav>
+<button class="debug-toggle" id="debugToggle">LOG</button>
+<div class="debug" id="debugLog"></div>
+
+<script>
+const booklet = document.getElementById('booklet');
+const pages = [...booklet.querySelectorAll('.page')];
+const totalPages = pages.length;
+const indicator = document.getElementById('indicator');
+const debugLog = document.getElementById('debugLog');
+
+let currentPage=0, currentX=0, isAnimating=false, animationId=0;
+
+function log(m){const l=document.createElement('div');l.textContent=`${(performance.now()/1000).toFixed(2)}  ${m}`;debugLog.prepend(l);if(debugLog.children.length>80)debugLog.lastChild.remove();}
+document.getElementById('debugToggle').onclick=()=>debugLog.classList.toggle('visible');
+
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');indicator.appendChild(d);});
+const dots=indicator.querySelectorAll('.dot');
+function updateDots(){dots.forEach((d,i)=>d.classList.toggle('active',i===currentPage));}
+
+// ═══ VEIL ═══
+function getVeil(i){const p=pages[i];return(p&&p.getAttribute('data-has-veil')==='true')?{veil:p.querySelector('.veil'),close:p.querySelector('.veil-close')}:null;}
+function isVeilOpen(i){const v=getVeil(i);return v&&v.veil.classList.contains('open');}
+function openVeil(i){const v=getVeil(i);if(!v)return;v.veil.classList.add('open');pages[i].classList.add('veil-active');log(`VEIL OPEN ${i}`);}
+function closeVeil(i){const v=getVeil(i);if(!v)return;v.veil.classList.remove('open');pages[i].classList.remove('veil-active');log(`VEIL CLOSE ${i}`);}
+
+pages.forEach((p,i)=>{
+  const c=p.querySelector('.veil-close');
+  if(c)c.addEventListener('click',e=>{e.stopPropagation();closeVeil(i);});
+  const tb=p.querySelector('.text-btn');
+  if(tb)tb.addEventListener('click',e=>{e.stopPropagation();openVeil(i);log(`📖 → veil ${i}`);});
+});
+
+// ═══ ZOOM/PAN ═══
+const zs=new Map();
+function getZ(i){if(!zs.has(i))zs.set(i,{s:1,px:0,py:0});return zs.get(i);}
+function applyZ(i){const img=pages[i].querySelector('img.bg');if(!img)return;const z=getZ(i);img.style.transform=`translate(${z.px}px,${z.py}px) scale(${z.s})`;}
+function resetZ(i){const z=getZ(i);z.s=1;z.px=0;z.py=0;const img=pages[i].querySelector('img.bg');if(!img)return;img.style.transition='transform 0.3s cubic-bezier(0.2,0,0,1)';img.style.transform='scale(1)';setTimeout(()=>{img.style.transition='';},350);}
+
+// ═══ EXPANDED ═══
+function isExpanded(i){return pages[i].classList.contains('expanded');}
+function enterExpanded(i){pages[i].classList.add('expanded');log(`EXPANDED — drag to pan, "✕ exit" or Esc`);}
+function exitExpanded(i){pages[i].classList.remove('expanded');resetZ(i);log(`EXIT EXPANDED`);}
+
+pages.forEach((p,i)=>{
+  const ec=p.querySelector('.expanded-close');
+  if(ec){
+    ec.addEventListener('click',e=>{e.stopPropagation();exitExpanded(i);});
+    ec.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();exitExpanded(i);});
+  }
+});
+
+// ═══ NAV ═══
+function setOff(x){currentX=x;booklet.style.transform=`translate3d(${x}px,0,0)`;}
+function rb(d){return d>0?Math.pow(d,.38)*5:-Math.pow(-d,.38)*5;}
+function animTo(t,dur){
+  t=Math.max(0,Math.min(totalPages-1,t));dur=dur||350;
+  const f=currentX,to=-t*innerWidth,st=performance.now();
+  isAnimating=true;const id=++animationId;
+  (function tick(now){if(id!==animationId)return;let p=Math.min(1,(now-st)/dur);p=1-Math.pow(1-p,3);setOff(f+(to-f)*p);if(p<1)requestAnimationFrame(tick);else{setOff(to);currentPage=t;updateDots();isAnimating=false;}})(performance.now());
+}
+function snapBack(){
+  const tx=-currentPage*innerWidth;let v=0;isAnimating=true;const id=++animationId;
+  (function tick(){if(id!==animationId)return;const d=currentX-tx;v+=(-40*d-13*v)*0.016;currentX+=v*0.016;setOff(currentX);if(Math.abs(d)<.5&&Math.abs(v)<.5){setOff(tx);isAnimating=false;return;}requestAnimationFrame(tick);})();
+}
+
+// ═══ TOUCH ═══
+let tsx=0,tsy=0,tcx=0,tcy=0,tpx=0,tpy=0;
+let touching=false,tdir=null,tHist=[];
+const DT=10,ST=50,VT=0.3;
+let pinching=false,pDist0=0,pPage=null;
+
+function dist2(e){const a=e.touches;const dx=a[1].clientX-a[0].clientX,dy=a[1].clientY-a[0].clientY;return Math.sqrt(dx*dx+dy*dy);}
+
+document.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){e.preventDefault();pinching=true;pDist0=dist2(e);pPage=currentPage;getZ(pPage)._ps=getZ(pPage).s;return;}
+  if(e.touches.length!==1)return;
+  e.preventDefault();
+  if(isAnimating){animationId++;isAnimating=false;setOff(-currentPage*innerWidth);}
+  const t=e.touches[0];
+  tsx=t.clientX;tsy=t.clientY;tcx=t.clientX;tcy=t.clientY;tpx=t.clientX;tpy=t.clientY;
+  touching=true;tdir=null;tHist=[{x:t.clientX,t:performance.now()}];
+},{passive:false});
+
+document.addEventListener('touchmove',e=>{
+  if(pinching&&e.touches.length===2){e.preventDefault();const z=getZ(pPage);z.s=Math.max(1,Math.min(4,(z._ps||1)*(dist2(e)/pDist0)));applyZ(pPage);return;}
+  if(!touching||e.touches.length!==1)return;
+  const t=e.touches[0];
+  const dx=t.clientX-tsx,dy=t.clientY-tsy;
+
+  if(isExpanded(currentPage)){e.preventDefault();const z=getZ(currentPage);z.px+=t.clientX-tpx;z.py+=t.clientY-tpy;tpx=t.clientX;tpy=t.clientY;applyZ(currentPage);return;}
+
+  tcx=t.clientX;tcy=t.clientY;tpx=t.clientX;tpy=t.clientY;
+  if(tdir===null){if(Math.abs(dx)>DT||Math.abs(dy)>DT)tdir=Math.abs(dx)>Math.abs(dy)?'h':'v';else{e.preventDefault();return;}}
+  if(tdir==='v'){e.preventDefault();return;}
+  e.preventDefault();
+  const base=-currentPage*innerWidth;
+  let drag=dx;
+  if((currentPage===0&&dx>0)||(currentPage===totalPages-1&&dx<0))drag=rb(dx);
+  setOff(base+drag);
+  const now=performance.now();tHist.push({x:t.clientX,t:now});tHist=tHist.filter(h=>now-h.t<100);
+},{passive:false});
+
+let lastTE=0;
+document.addEventListener('touchend',e=>{
+  lastTE=performance.now();
+  if(pinching){pinching=false;if(pPage!==null){const z=getZ(pPage);if(z.s<1.15)resetZ(pPage);pPage=null;}return;}
+  if(!touching)return;touching=false;
+  const dx=tcx-tsx,dy=tcy-tsy;
+
+  if(tdir===null){
+    if(Math.abs(dx)<8&&Math.abs(dy)<8){
+      // Check button taps
+      const target=e.target||document.elementFromPoint(tsx,tsy);
+      if(target&&(target.closest('.text-btn')||target.closest('.veil-close'))){return;}
+
+      const pg=pages[currentPage];
+      if(pg.classList.contains('photo-page')){
+        if(isExpanded(currentPage))exitExpanded(currentPage);
+        else if(isVeilOpen(currentPage))closeVeil(currentPage);
+        else{enterExpanded(currentPage);log(`TAP → expand (B)`);}
+      }
+    }
+    return;
+  }
+  if(isExpanded(currentPage))return;
+  if(tdir==='v')return;
+
+  let v=0;
+  if(tHist.length>=2){const o=tHist[0],n=tHist[tHist.length-1],dt=n.t-o.t;if(dt>0)v=(n.x-o.x)/dt;}
+  let tg=currentPage;
+  if(Math.abs(v)>VT)tg=v<0?currentPage+1:currentPage-1;
+  else if(Math.abs(dx)>ST)tg=dx<0?currentPage+1:currentPage-1;
+  tg=Math.max(0,Math.min(totalPages-1,tg));
+  if(tg===currentPage)snapBack();else animTo(tg);
+},{passive:true});
+
+// ═══ MOUSE ═══
+let msx=0,msy=0,mDrag=false,mPan=false,mpx=0,mpy=0;
+
+booklet.addEventListener('mousedown',e=>{
+  if(e.button!==0)return;
+  msx=e.clientX;msy=e.clientY;mpx=e.clientX;mpy=e.clientY;
+  mDrag=false;mPan=false;
+
+  const pg=pages[currentPage];
+  if(!pg.classList.contains('photo-page'))return;
+  if(e.target.closest('.veil-close,.expanded-close,.text-btn'))return;
+
+  if(isExpanded(currentPage)){mPan=true;document.body.style.cursor='grabbing';return;}
+});
+
+document.addEventListener('mousemove',e=>{
+  if(mPan){const z=getZ(currentPage);z.px+=e.clientX-mpx;z.py+=e.clientY-mpy;mpx=e.clientX;mpy=e.clientY;applyZ(currentPage);return;}
+  if(Math.abs(e.clientX-msx)>8||Math.abs(e.clientY-msy)>8)mDrag=true;
+});
+
+document.addEventListener('mouseup',e=>{
+  if(mPan){mPan=false;document.body.style.cursor='';return;}
+});
+
+booklet.addEventListener('click',e=>{
+  if(performance.now()-lastTE<500)return;
+  if(mDrag){mDrag=false;return;}
+
+  const pg=pages[currentPage];
+  if(!pg.classList.contains('photo-page'))return;
+  if(e.target.closest('.veil-close,.expanded-close,.text-btn'))return;
+
+  if(isExpanded(currentPage))return;
+  if(isVeilOpen(currentPage)){closeVeil(currentPage);return;}
+  // Proto B: click → expand
+  enterExpanded(currentPage);
+  log(`CLICK → expand (B)`);
+});
+
+// ═══ WHEEL + TRACKPAD PINCH ═══
+let wAccX=0,wT=null,tpT=null;
+
+booklet.addEventListener('wheel',e=>{
+  if(isExpanded(currentPage)&&!e.ctrlKey){e.preventDefault();const z=getZ(currentPage);z.px-=e.deltaX;z.py-=e.deltaY;applyZ(currentPage);return;}
+  if(e.ctrlKey){
+    e.preventDefault();
+    const pg=pages[currentPage];if(!pg.classList.contains('photo-page'))return;
+    const z=getZ(currentPage);z.s=Math.max(1,Math.min(4,z.s-e.deltaY*0.01));applyZ(currentPage);
+    clearTimeout(tpT);tpT=setTimeout(()=>{if(z.s<1.15)resetZ(currentPage);},400);
+    return;
+  }
+  e.preventDefault();if(isAnimating)return;
+  const ax=Math.abs(e.deltaX),ay=Math.abs(e.deltaY);
+  if(ax>ay*1.2){wAccX+=e.deltaX;if(wAccX>200&&currentPage<totalPages-1){animTo(currentPage+1);wAccX=0;}else if(wAccX<-200&&currentPage>0){animTo(currentPage-1);wAccX=0;}}
+  clearTimeout(wT);wT=setTimeout(()=>{wAccX=0;},200);
+},{passive:false});
+
+document.addEventListener('gesturestart',e=>{e.preventDefault();getZ(currentPage)._gs=getZ(currentPage).s;});
+document.addEventListener('gesturechange',e=>{e.preventDefault();const pg=pages[currentPage];if(!pg.classList.contains('photo-page'))return;const z=getZ(currentPage);z.s=Math.max(1,Math.min(4,(z._gs||1)*e.scale));applyZ(currentPage);});
+document.addEventListener('gestureend',e=>{e.preventDefault();const z=getZ(currentPage);if(z.s<1.15)resetZ(currentPage);});
+
+// ═══ KEYBOARD ═══
+document.addEventListener('keydown',e=>{
+  if(isAnimating)return;
+  if(e.key==='Escape'){if(isVeilOpen(currentPage))closeVeil(currentPage);else if(isExpanded(currentPage))exitExpanded(currentPage);return;}
+  if(isExpanded(currentPage))return;
+  if(e.key==='ArrowRight')animTo(currentPage+1);
+  else if(e.key==='ArrowLeft')animTo(currentPage-1);
+  else if(e.key===' '){e.preventDefault();if(pages[currentPage].classList.contains('photo-page')){if(isVeilOpen(currentPage))closeVeil(currentPage);else openVeil(currentPage);}}
+});
+
+window.addEventListener('resize',()=>setOff(-currentPage*innerWidth));
+log('Proto B — Tap→Expand+Pan / 📖→Veil / Pinch→Zoom');
+</script>
+</body>
+</html>
