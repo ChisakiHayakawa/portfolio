@@ -679,10 +679,10 @@ document.addEventListener('wheel', e => {
       // Zoom: deltaY > 0 = pinch in (zoom out), deltaY < 0 = pinch out (zoom in)
       const prevS = ovS;
       const minS = overlayMode === 'cover' ? getContainRatio() : 1;
-      ovS = Math.max(minS, Math.min(6, ovS - e.deltaY * 0.01));
+      ovS = Math.max(minS, Math.min(6, ovS - e.deltaY * 0.004));
       applyOv();
       // Mac auto-close: deltaY > 0 means user is trying to zoom out
-      macPushFloor(e.deltaY);
+      macPushFloor(e.deltaY * 0.4);
     } else {
       ovPX -= e.deltaX; ovPY -= e.deltaY;
       applyOv();
@@ -747,10 +747,12 @@ document.addEventListener('gesturechange', e => {
   if (overlayOpen) {
     if (ovPS0 === 0) ovPS0 = ovS;
     const minS = overlayMode === 'cover' ? getContainRatio() : 1;
-    ovS = Math.max(minS, Math.min(6, ovPS0 * e.scale));
+    // Dampen: only 40% of gesture scale change applied
+    const dampedScale = 1 + (e.scale - 1) * 0.4;
+    ovS = Math.max(minS, Math.min(6, ovPS0 * dampedScale));
     applyOv();
     // Safari: e.scale < 1 means user is zooming out
-    const zoomOutDelta = (1.0 - e.scale) * 20;
+    const zoomOutDelta = (1.0 - e.scale) * 8;
     macPushFloor(zoomOutDelta);
     return;
   }
