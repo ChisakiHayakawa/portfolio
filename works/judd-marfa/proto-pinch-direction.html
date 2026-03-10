@@ -733,11 +733,17 @@ const SAFARI_PINCH_THRESHOLD = 0.15; // scale deviation from 1.0
 
 document.addEventListener('gesturestart', e => {
   e.preventDefault();
+  // iOS Safari fires gesture events for touch pinches too.
+  // When touch handler owns the pinch, skip gesture logic (Mac only).
+  if (normalPinching || ovPinching) return;
   if (overlayOpen) { ovPS0 = ovS; }
   else { safariPinchDecided = false; }
 });
 document.addEventListener('gesturechange', e => {
   e.preventDefault();
+  // iOS Safari: touch handler owns the pinch — skip gesture logic
+  if (normalPinching || ovPinching) return;
+
   if (overlayOpen) {
     if (ovPS0 === 0) ovPS0 = ovS;
     const minS = overlayMode === 'cover' ? getContainRatio() : 1;
@@ -768,6 +774,7 @@ document.addEventListener('gesturechange', e => {
 });
 document.addEventListener('gestureend', e => {
   e.preventDefault();
+  if (normalPinching || ovPinching) return;
 });
 
 // ═══ KEYBOARD ═══
