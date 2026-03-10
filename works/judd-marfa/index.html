@@ -241,6 +241,7 @@
     opacity: 1;
     pointer-events: auto;
   }
+  .veil:focus { outline: none; }  /* v123: フォーカスリング非表示 */
   .veil-content {
     padding: 60px 40px 80px;
     display: flex;
@@ -576,7 +577,7 @@
       <span class="label-readmore">…read more</span>
     </div>
     <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1967, Galvanized iron<br><span class="lang-ja">所蔵：公益財団法人大原芸術財団 大原美術館</span><span class="lang-en" lang="en">Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</span></div>
-    <div class="veil">
+    <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
           <div class="lang-ja">
@@ -617,7 +618,7 @@
       <span class="label-readmore">…read more</span>
     </div>
     <div class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</div>
-    <div class="veil">
+    <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
           <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
@@ -641,7 +642,7 @@
       <span class="label-readmore">…read more</span>
     </div>
     <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass<br><span class="lang-ja">所蔵：Judd Foundation</span><span class="lang-en" lang="en">Collection: Judd Foundation</span></div>
-    <div class="veil">
+    <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
           <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
@@ -665,7 +666,7 @@
       <span class="label-readmore">…read more</span>
     </div>
     <div class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</div>
-    <div class="veil">
+    <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
           <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
@@ -689,7 +690,7 @@
       <span class="label-readmore">…read more</span>
     </div>
     <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)<br><span class="lang-ja">所蔵：静岡県立美術館</span><span class="lang-en" lang="en">Collection: Shizuoka Prefectural Museum of Art</span></div>
-    <div class="veil">
+    <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
           <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
@@ -713,7 +714,7 @@
       <span class="label-readmore">…read more</span>
     </div>
     <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1989, Painted aluminum<br><span class="lang-ja">所蔵：鹿児島県霧島アートの森</span><span class="lang-en" lang="en">Collection: Kirishima Open-Air Museum</span></div>
-    <div class="veil">
+    <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
           <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
@@ -833,6 +834,7 @@ function openVeil(pageIndex) {
   v.veil.scrollTop = 0;
   v.veil.classList.add('open');
   pages[pageIndex].classList.add('veil-active');
+  v.veil.focus({ preventScroll: true });  // v123: ArrowUp/Downスクロール対応
 }
 
 function closeVeil(pageIndex) {
@@ -840,6 +842,7 @@ function closeVeil(pageIndex) {
   if (!v || !v.veil.classList.contains('open')) return;
   v.veil.classList.remove('open');
   pages[pageIndex].classList.remove('veil-active');
+  if (document.activeElement === v.veil) document.activeElement.blur();  // v123
   setTimeout(function() { v.veil.scrollTop = 0; }, 500);
 }
 
@@ -1063,7 +1066,6 @@ let isTouching = false;
 let touchDirection = null;  // null | 'horizontal' | 'vertical'
 let touchHistory = [];
 let touchTarget = null;
-let veilTouchActive = false;  // Veil 内タッチでネイティブスクロール中
 
 const DIRECTION_THRESHOLD = 10;
 
@@ -1073,7 +1075,6 @@ document.addEventListener('touchstart', function(e) {
   const touchedVeil = veilOpen && veils.get(currentPage) &&
     veils.get(currentPage).veil.contains(e.target);
 
-  veilTouchActive = false;
   if (!touchedVeil) {
     e.preventDefault();
   }
@@ -1117,7 +1118,6 @@ document.addEventListener('touchmove', function(e) {
   if (touchDirection === 'vertical') {
     if (isVeilOpen(currentPage)) {
       // Veil 開中 → ネイティブスクロールに任せる
-      veilTouchActive = true;
       return;
     } else {
       // Veil 閉中 → 何もしない
@@ -1129,9 +1129,9 @@ document.addEventListener('touchmove', function(e) {
   // 横方向 → ページドラッグ
   e.preventDefault();
 
-  // Veil 開中の横スワイプ → Veil を先に閉じてからドラッグ
+  // Veil 開中の横スワイプ → ブロック（v123: ページ送り禁止）
   if (isVeilOpen(currentPage)) {
-    closeVeil(currentPage);
+    return;
   }
 
   const baseX = -currentPage * window.innerWidth;
@@ -1204,6 +1204,7 @@ let mouseIsDragging = false;
 let mouseHistory = [];
 
 booklet.addEventListener('mousedown', function(e) {
+  if (isVeilOpen(currentPage)) return;  // v123: Veil開中はドラッグ禁止
   if (isAnimating) {
     cancelAnimation();
     snapToCurrentPage();
@@ -1273,6 +1274,7 @@ document.addEventListener('keydown', function(e) {
     return;
   }
   if (isAnimating) return;
+  if (isVeilOpen(currentPage)) return;  // v123: Veil開中はページ送りブロック
 
   if (e.key === 'ArrowRight') animateToPage(currentPage + 1);
   if (e.key === 'ArrowLeft') animateToPage(currentPage - 1);
@@ -1295,14 +1297,16 @@ booklet.addEventListener('wheel', function(e) {
   const absY = Math.abs(e.deltaY);
 
   if (absX > absY * 1.2) {
-    // 横 → ページ送り
-    wheelAccumX += e.deltaX;
-    if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
-      animateToPage(currentPage + 1);
-      wheelAccumX = 0;
-    } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
-      animateToPage(currentPage - 1);
-      wheelAccumX = 0;
+    // 横 → ページ送り（v123: Veil開中はブロック）
+    if (!isVeilOpen(currentPage)) {
+      wheelAccumX += e.deltaX;
+      if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+        animateToPage(currentPage + 1);
+        wheelAccumX = 0;
+      } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
+        animateToPage(currentPage - 1);
+        wheelAccumX = 0;
+      }
     }
   } else if (absY > absX * 1.2) {
     // 縦 → Veil 開中ならスクロール
@@ -1340,11 +1344,11 @@ function updateArrows() {
 }
 
 prevBtn.addEventListener('click', function() {
-  if (!isAnimating) animateToPage(currentPage - 1);
+  if (!isAnimating && !isVeilOpen(currentPage)) animateToPage(currentPage - 1);
   prevBtn.blur();
 });
 nextBtn.addEventListener('click', function() {
-  if (!isAnimating) animateToPage(currentPage + 1);
+  if (!isAnimating && !isVeilOpen(currentPage)) animateToPage(currentPage + 1);
   nextBtn.blur();
 });
 
