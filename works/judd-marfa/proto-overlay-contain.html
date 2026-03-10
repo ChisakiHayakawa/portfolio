@@ -370,7 +370,7 @@ overlay.addEventListener('touchmove', e => {
   if (!overlayOpen) return;
   e.preventDefault();
   if (ovPinching && e.touches.length === 2) {
-    ovS = Math.max(0.5, Math.min(6, ovPS0 * (dist2(e) / ovPDist0)));
+    ovS = Math.max(1, Math.min(6, ovPS0 * (dist2(e) / ovPDist0)));
     applyOv(); return;
   }
   if (ovTouching && e.touches.length === 1) {
@@ -387,8 +387,8 @@ overlay.addEventListener('touchend', e => {
   if (!overlayOpen) return;
   if (ovPinching && e.touches.length < 2) {
     ovPinching = false;
-    if (ovS < 0.8) { closeOverlay(); return; }
-    if (ovS < 1) { ovS = 1; ovPX = 0; ovPY = 0; applyOv(); }
+    
+    
   }
   if (e.touches.length === 0) {
     if (ovTapCandidate && ovTouching) {
@@ -446,8 +446,8 @@ document.addEventListener('wheel', e => {
   if (overlayOpen) {
     e.preventDefault();
     if (e.ctrlKey) {
-      ovS = Math.max(0.5, Math.min(6, ovS - e.deltaY * 0.01));
-      if (ovS < 0.8) { closeOverlay(); return; }
+      ovS = Math.max(1, Math.min(6, ovS - e.deltaY * 0.01));
+      
     } else {
       ovPX -= e.deltaX; ovPY -= e.deltaY;
     }
@@ -467,8 +467,8 @@ document.addEventListener('wheel', e => {
 
 // Safari gesture on overlay
 document.addEventListener('gesturestart', e => { if (overlayOpen) { e.preventDefault(); ovPS0 = ovS; } });
-document.addEventListener('gesturechange', e => { if (!overlayOpen) return; e.preventDefault(); ovS = Math.max(0.5, Math.min(6, ovPS0 * e.scale)); applyOv(); });
-document.addEventListener('gestureend', e => { if (!overlayOpen) return; e.preventDefault(); if (ovS < 0.8) closeOverlay(); else if (ovS < 1) { ovS = 1; ovPX = 0; ovPY = 0; applyOv(); } });
+document.addEventListener('gesturechange', e => { if (!overlayOpen) return; e.preventDefault(); ovS = Math.max(1, Math.min(6, ovPS0 * e.scale)); applyOv(); });
+document.addEventListener('gestureend', e => { if (!overlayOpen) return; e.preventDefault();  });
 
 // ═══ KEYBOARD ═══
 document.addEventListener('keydown', e => {

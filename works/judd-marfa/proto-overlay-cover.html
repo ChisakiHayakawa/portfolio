@@ -274,17 +274,17 @@ function closeOverlay() {
   log(`OVERLAY CLOSE`);
 }
 
+// Floor = contain ratio (full image visible). Can't go smaller.
+function minScale() { return getContainRatio(); }
+
 function applyOv() {
-  // When scale < 1: we need to switch from cover to contain to reveal edges
-  // When scale >= 1: keep cover (zooming in)
+  // Clamp to floor
+  ovS = Math.max(minScale(), ovS);
+
   if (ovS < 0.98) {
-    // Transitioning toward contain: use transform scale on a contain image
     overlayImg.style.objectFit = 'contain';
-    // Scale relative to contain view — scale 1 in this mode = full image visible
-    // We map: ovS=1 → coverScale, ovS=containThreshold → 1
-    // Simpler: just use the scale directly on contain
     const displayScale = ovS / getContainRatio();
-    overlayImg.style.transform = `translate(${ovPX}px, ${ovPY}px) scale(${Math.max(0.3, displayScale)})`;
+    overlayImg.style.transform = `translate(${ovPX}px, ${ovPY}px) scale(${displayScale})`;
   } else {
     overlayImg.style.objectFit = 'cover';
     overlayImg.style.transform = `translate(${ovPX}px, ${ovPY}px) scale(${ovS})`;
@@ -293,7 +293,6 @@ function applyOv() {
 
 // Calculate the ratio between cover and contain for current viewport
 function getContainRatio() {
-  // For a 1600x1000 image in the current viewport:
   const imgW = 1600, imgH = 1000;
   const vw = innerWidth, vh = innerHeight;
   const coverScale = Math.max(vw / imgW, vh / imgH);
@@ -439,9 +438,7 @@ overlay.addEventListener('touchend', e => {
   if (!overlayOpen) return;
   if (ovPinching && e.touches.length < 2) {
     ovPinching = false;
-    // Pinch very small → close
-    if (ovS < 0.4) { closeOverlay(); return; }
-    // Snap to 1 if close to cover
+    // Snap to cover if close
     if (ovS > 0.9 && ovS < 1.1) {
       ovS = 1; ovPX = 0; ovPY = 0; applyOv();
     }
@@ -500,7 +497,6 @@ document.addEventListener('wheel', e => {
     e.preventDefault();
     if (e.ctrlKey) {
       ovS = Math.max(0.3, Math.min(6, ovS - e.deltaY * 0.01));
-      if (ovS < 0.4) { closeOverlay(); return; }
       applyOv();
       log(`WHEEL ZOOM s=${ovS.toFixed(2)}`);
     } else {
@@ -528,8 +524,8 @@ document.addEventListener('gesturechange', e => {
 });
 document.addEventListener('gestureend', e => {
   if (!overlayOpen) return; e.preventDefault();
-  if (ovS < 0.4) closeOverlay();
-  else if (ovS > 0.9 && ovS < 1.1) { ovS = 1; ovPX = 0; ovPY = 0; applyOv(); }
+  // Snap to cover if close
+  if (ovS > 0.9 && ovS < 1.1) { ovS = 1; ovPX = 0; ovPY = 0; applyOv(); }
 });
 
 // ═══ KEYBOARD ═══
