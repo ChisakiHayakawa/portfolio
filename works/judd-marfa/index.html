@@ -1054,7 +1054,8 @@ function onPageArrive(pageIndex, fromIndex) {
 }
 
 // ══════════════════════════════════════════════
-// Touch handling — document レベル（Veil 対応）
+// Touch handling — document レベル
+// v129: 最上位で状態分岐。Veil Open → Normal のページ送りロジックに構造的に到達不可能
 // ══════════════════════════════════════════════
 
 let touchStartX = 0;
@@ -1066,24 +1067,12 @@ let isTouching = false;
 let touchDirection = null;  // null | 'horizontal' | 'vertical'
 let touchHistory = [];
 let touchTarget = null;
+let touchVeilState = false;  // ジェスチャー開始時のVeil状態（途中で変わらない）
 
 const DIRECTION_THRESHOLD = 10;
 
+// ── touchstart ──
 document.addEventListener('touchstart', function(e) {
-  // Veil 開中かつ Veil 内タッチ → ネイティブスクロール許可
-  const veilOpen = isVeilOpen(currentPage);
-  const touchedVeil = veilOpen && veils.get(currentPage) &&
-    veils.get(currentPage).veil.contains(e.target);
-
-  if (!touchedVeil) {
-    e.preventDefault();
-  }
-
-  if (isAnimating) {
-    cancelAnimation();
-    snapToCurrentPage();
-  }
-
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -1094,15 +1083,45 @@ document.addEventListener('touchstart', function(e) {
   touchDirection = null;
   touchTarget = e.target;
   touchHistory = [{ x: touch.clientX, y: touch.clientY, t: touchStartTime }];
+
+  // ジェスチャー開始時のVeil状態をキャプチャ — 以後このジェスチャー中は変えない
+  touchVeilState = isVeilOpen(currentPage);
+
+  if (touchVeilState) {
+    // ── Veil Open: ネイティブスクロール許可（Veil内タッチのみ）──
+    const v = veils.get(currentPage);
+    const touchedVeil = v && v.veil.contains(e.target);
+    if (!touchedVeil) {
+      e.preventDefault();
+    }
+    // ページ送りの初期化は一切しない
+    return;
+  }
+
+  // ── Normal: ページ送りの準備 ──
+  e.preventDefault();
+  if (isAnimating) {
+    cancelAnimation();
+    snapToCurrentPage();
+  }
 }, { passive: false });
 
+// ── touchmove ──
 document.addEventListener('touchmove', function(e) {
   if (!isTouching) return;
-  const touch = e.touches[0];
-  const dx = touch.clientX - touchStartX;
-  const dy = touch.clientY - touchStartY;
-  touchCurrentX = touch.clientX;
-  touchCurrentY = touch.clientY;
+
+  touchCurrentX = e.touches[0].clientX;
+  touchCurrentY = e.touches[0].clientY;
+
+  if (touchVeilState) {
+    // ── Veil Open: ページドラッグに一切触れない ──
+    // preventDefaultを呼ばない → Veil内の縦スクロールはネイティブが処理
+    return;
+  }
+
+  // ── Normal: 方向判定 → ページドラッグ ──
+  const dx = touchCurrentX - touchStartX;
+  const dy = touchCurrentY - touchStartY;
 
   // 方向未確定 → 確定
   if (touchDirection === null) {
@@ -1114,25 +1133,14 @@ document.addEventListener('touchmove', function(e) {
     }
   }
 
-  // 縦方向
+  // 縦方向 → 何もしない
   if (touchDirection === 'vertical') {
-    if (isVeilOpen(currentPage)) {
-      // Veil 開中 → ネイティブスクロールに任せる
-      return;
-    } else {
-      // Veil 閉中 → 何もしない
-      e.preventDefault();
-      return;
-    }
+    e.preventDefault();
+    return;
   }
 
   // 横方向 → ページドラッグ
   e.preventDefault();
-
-  // Veil 開中の横スワイプ → ブロック（v123: ページ送り禁止）
-  if (isVeilOpen(currentPage)) {
-    return;
-  }
 
   const baseX = -currentPage * window.innerWidth;
   let dragDelta = dx;
@@ -1142,16 +1150,28 @@ document.addEventListener('touchmove', function(e) {
   setPageOffset(baseX + dragDelta);
 
   const now = performance.now();
-  touchHistory.push({ x: touch.clientX, y: touch.clientY, t: now });
+  touchHistory.push({ x: touchCurrentX, y: touchCurrentY, t: now });
   touchHistory = touchHistory.filter(function(h) { return now - h.t < 100; });
 }, { passive: false });
 
+// ── touchend ──
 document.addEventListener('touchend', function(e) {
   if (!isTouching) return;
   isTouching = false;
 
   const dx = touchCurrentX - touchStartX;
   const dy = touchCurrentY - touchStartY;
+
+  if (touchVeilState) {
+    // ── Veil Open: タップのみ許可（×ボタン等）、ページ送りは構造的に不可能 ──
+    if (touchTarget && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+      touchTarget.click();
+    }
+    touchTarget = null;
+    return;
+  }
+
+  // ── Normal: タップ判定 or ページ送りcommit ──
 
   // 方向未確定のまま終了 → タップ
   if (touchDirection === null) {
@@ -1170,9 +1190,6 @@ document.addEventListener('touchend', function(e) {
 
   // 横方向の終了 → ページ遷移判定
   touchTarget = null;
-
-  // v129: Veil開中は横スワイプのページ送りをブロック（touchmoveだけでなくtouchendも）
-  if (isVeilOpen(currentPage)) return;
 
   let velocity = 0;
   if (touchHistory.length >= 2) {
