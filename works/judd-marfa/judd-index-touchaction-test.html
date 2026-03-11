@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- touch-action動的切替テスト / base: v131 — Veil開閉でtouch-action: none ↔ auto を切替。user-selectも連動 -->
+<!-- touch-action動的切替テスト / base: v131 — Veil開閉でtouch-action: none ↔ auto を切替。user-selectも連動。v133: Veil CSS整備（justify-content/overflow/overflow-wrap） -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -233,7 +233,7 @@
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-y: auto;
+    overflow: auto;
     -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
   }
@@ -247,12 +247,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     min-height: 100%;
   }
   .veil-text {
     max-width: 480px;
+    margin: auto 0;
     text-align: center;
+    overflow-wrap: break-word;
     transform: translateY(20px);
     opacity: 0;
     transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s,
@@ -849,8 +851,9 @@ pages.forEach(function(pg, i) {
 
 const diagEl = document.getElementById('diag');
 function updateDiag() {
-  const ta = getComputedStyle(document.documentElement).touchAction;
-  const us = getComputedStyle(document.documentElement).userSelect;
+  const cs = getComputedStyle(document.documentElement);
+  const ta = cs.touchAction;
+  const us = cs.userSelect || cs.webkitUserSelect;
   const veilState = isVeilOpen(currentPage) ? 'OPEN' : 'closed';
   diagEl.textContent = 'touch-action: ' + ta + '\nuser-select: ' + us + '\nveil: ' + veilState;
 }
