@@ -1170,6 +1170,10 @@ document.addEventListener('touchend', function(e) {
 
   // 横方向の終了 → ページ遷移判定
   touchTarget = null;
+
+  // v129: Veil開中は横スワイプのページ送りをブロック（touchmoveだけでなくtouchendも）
+  if (isVeilOpen(currentPage)) return;
+
   let velocity = 0;
   if (touchHistory.length >= 2) {
     const oldest = touchHistory[0];
