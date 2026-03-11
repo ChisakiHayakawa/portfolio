@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
+<!-- v11.0 / 2026.03.09 — Veil統合: 写真+テキスト一体化, Endmatter削除, タップ開閉, 暫定wheel -->
+<meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
+<meta name="author" content="Chisaki">
+<meta property="og:type" content="article">
+<meta property="og:title" content="B-Side No.001 — ジャッド｜マーファ展">
+<meta property="og:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。ワタリウム美術館 2026.02–06。">
+<meta property="og:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
+<meta property="og:url" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:site_name" content="B-Side by Chisaki">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="B-Side No.001 — ジャッド｜マーファ展">
+<meta name="twitter:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。">
+<meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
+<link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
+<script>
+(function(d) {
+  var config = {
+    kitId: 'pxi5mdv',
+    scriptTimeout: 3000,
+    async: true
+  },
+  h=d.documentElement,t=setTimeout(function(){h.className=h.className.replace(/\bwf-loading\b/g,"")+" wf-inactive";},config.scriptTimeout),tk=d.createElement("script"),f=false,s=d.getElementsByTagName("script")[0],a;h.className+=" wf-loading";tk.src='https://use.typekit.net/'+config.kitId+'.js';tk.async=true;tk.onload=tk.onreadystatechange=function(){a=this.readyState;if(f||a&&a!="complete"&&a!="loaded")return;f=true;clearTimeout(t);try{Typekit.load(config)}catch(e){}};s.parentNode.insertBefore(tk,s)
+})(document);
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style id="arrival-hide">
+  body { visibility: hidden; }
+</style>
+<script>
+// T17: 直接アクセス時は即表示。順方向遷移時はオーバーレイ設置まで隠し続ける
+(function() {
+  var flag = sessionStorage.getItem('bside-forward');
+  var isForward = false;
+  if (flag) {
+    try {
+      var data = JSON.parse(flag);
+      isForward = data && (Date.now() - data.time < 10000);
+    } catch(e) {}
+  }
+  if (!isForward) {
+    document.getElementById('arrival-hide').remove();
+  }
+})();
+</script>
+<style>
+  :root {
+    --color-title: #f0ede8;
+    --color-credit: #b5b2ab;
+    --color-note: #7d7a73;
+    --color-rule: #35332e;
+    --color-bg: #1c1b18;
+    --exit-duration: 0.45s;
+    --font: "mr-eaves-xl-modern", "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
+    --font-serif: "mrs-eaves-roman-lining", serif;
+    --font-jp: "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
+    --ts: clamp(36px, 7vw, 60px);
+  }
+
+  .serif { font-family: var(--font-serif); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--color-title);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    touch-action: none;
+    user-select: none;
+  }
+
+  /* ════════════════════════════════════════
+     BOOKLET CONTAINER
+     ════════════════════════════════════════ */
+  .booklet {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    will-change: transform;
+    transform: translate3d(0,0,0);
+    touch-action: none;
+  }
+
+  .page {
+    flex: 0 0 100vw;
+    width: 100vw;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    contain: paint;
+    touch-action: none;
+  }
+
+  .page img.bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* ════════════════════════════════════════
+     COVER
+     ════════════════════════════════════════ */
+  .page-cover {
+    background: var(--color-bg);
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .page-cover .cover-title {
+    font-family: var(--font-serif);
+    font-size: var(--ts);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .page-cover .cover-hint {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: calc(50% + var(--ts) * 0.83);
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+  }
+
+  /* ════════════════════════════════════════
+     PHOTO PAGE — LABEL (top-left) + CREDIT (bottom-right) + VEIL
+     ════════════════════════════════════════ */
+
+  /* ── LABEL: タイトル + リード + read more（左上） ── */
+  .page-label {
+    position: absolute;
+    top: calc(36px + env(safe-area-inset-top, 0px));
+    left: calc(28px + env(safe-area-inset-left, 0px));
+    z-index: 2;
+    max-width: 70%;
+    text-align: left;
+    transition: opacity 0.4s ease;
+  }
+  .label-title {
+    font-family: var(--font-jp);
+    font-size: clamp(17px, 2.5vw, 24px);
+    font-weight: 400;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .label-title .sub {
+    display: block;
+    font-size: clamp(12px, 1.6vw, 15px);
+    font-weight: 300;
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+  }
+  .label-title .lang-en {
+    font-family: var(--font);
+    font-size: clamp(19px, 2.8vw, 27px);
+    letter-spacing: 0.01em;
+  }
+  .label-title .lang-en .sub {
+    font-size: clamp(13px, 1.8vw, 16px);
+  }
+  .label-readmore {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    color: var(--color-title);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s;
+  }
+  .label-readmore:hover { opacity: 0.7; }
+
+  /* ── CREDIT: 作品名・建築家等（右下） ── */
+  .page-credit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 36px;
+    padding-bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+    padding-right: calc(36px + env(safe-area-inset-right, 0px));
+    max-width: 50%;
+    text-align: right;
+    z-index: 2;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.02em;
+    color: var(--color-title);
+    opacity: 0.7;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    transition: opacity 0.4s ease;
+  }
+
+  /* ── TONE: 明るい写真用（黒系テキスト） ── */
+  [data-tone="dark"] .page-label,
+  [data-tone="dark"] .label-title,
+  [data-tone="dark"] .label-readmore {
+    color: var(--color-bg);
+    text-shadow: 0 1px 4px rgba(255,255,255,0.15);
+  }
+  [data-tone="dark"] .label-readmore:hover { opacity: 0.7; }
+  [data-tone="dark"] .page-credit {
+    color: var(--color-bg);
+    text-shadow: 0 1px 4px rgba(255,255,255,0.15);
+  }
+
+  /* ── VEIL: 全画面テキストオーバーレイ ── */
+  .veil {
+    position: absolute;
+    inset: 0;
+    background: rgba(28,27,24,0.92);
+    z-index: 10;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  .veil.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .veil:focus { outline: none; }  /* v123: フォーカスリング非表示 */
+  .veil-content {
+    padding: 60px 40px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100%;
+  }
+  .veil-text {
+    max-width: 480px;
+    text-align: center;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s,
+                opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s;
+  }
+  .veil.open .veil-text {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  .veil-text .stanza {
+    font-family: var(--font-jp);
+    font-size: clamp(13px, 1.5vw, 15px);
+    font-weight: 300;
+    line-height: 2.2;
+    margin-bottom: 1.6em;
+    color: var(--color-title);
+  }
+  .veil-text .stanza:last-child { margin-bottom: 0; }
+  .veil-text .stanza-end {
+    font-family: var(--font-jp);
+    font-size: clamp(13px, 1.5vw, 15px);
+    font-weight: 300;
+    line-height: 2.2;
+    margin-top: 2em;
+    color: var(--color-title);
+  }
+  .veil-text .stanza.en,
+  .veil-text .stanza-end.en {
+    font-family: var(--font);
+    font-size: clamp(12px, 1.4vw, 14px);
+    line-height: 2.0;
+    letter-spacing: 0.01em;
+  }
+  .veil-text .placeholder {
+    color: var(--color-note);
+    font-style: italic;
+    font-size: 13px;
+  }
+  /* ── VEIL CLOSE ×（右上） ── */
+  .veil-close {
+    position: absolute;
+    top: calc(24px + env(safe-area-inset-top, 0px));
+    right: calc(28px + env(safe-area-inset-right, 0px));
+    z-index: 12;
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 10px;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease 0.15s, color 0.2s;
+  }
+  .page.veil-active .veil-close {
+    opacity: 0.6;
+    pointer-events: auto;
+  }
+  .veil-close:hover { color: var(--color-title); opacity: 0.9; }
+
+  /* ── Veil 開中: ラベル・クレジット・lang-btn を非表示 ── */
+  .page.veil-active .page-label { opacity: 0; pointer-events: none; }
+  .page.veil-active .page-credit { opacity: 0; pointer-events: none; }
+  .page.veil-active .lang-btn { opacity: 0 !important; pointer-events: none; }
+
+  /* ════════════════════════════════════════
+     CLOSING
+     ════════════════════════════════════════ */
+  .page-closing {
+    background: var(--color-bg);
+    text-align: center;
+  }
+  .page-closing .closing-title {
+    font-family: var(--font-serif);
+    font-size: var(--ts);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    position: absolute;
+    left: 50%;
+    bottom: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .page-closing .closing-home {
+    color: var(--color-note);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    position: absolute;
+    left: 50%;
+    top: calc(50% + var(--ts) * 0.83);
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .page-closing .closing-home:hover {
+    opacity: 0.8;
+  }
+
+
+  /* ════════════════════════════════════════
+     日英切替（グローバル）
+     ════════════════════════════════════════ */
+  .lang-ja, .lang-en { transition: opacity 0.4s ease; }
+  .lang-en { display: none; }
+  body.show-en .lang-ja { display: none; }
+  body.show-en .lang-en { display: block; }
+  body.show-en span.lang-en { display: inline; }
+  span.lang-ja { display: inline; }
+
+  /* ════════════════════════════════════════
+     LANG BUTTON（全ページ共通）
+     ════════════════════════════════════════ */
+  .lang-btn {
+    position: absolute;
+    top: calc(28px + env(safe-area-inset-top, 0px));
+    right: calc(32px + env(safe-area-inset-right, 0px));
+    font-size: 11px;
+    font-weight: 300;
+    font-family: var(--font);
+    letter-spacing: 0.1em;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    cursor: pointer;
+    background: none;
+    color: var(--color-note);
+    z-index: 10;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .lang-btn:hover { opacity: 0.5; }
+  .lang-btn:active { opacity: 0.6; }
+
+  /* ════════════════════════════════════════
+     FADE-IN
+     ════════════════════════════════════════ */
+  /* ── FOUT防止: フォントロード完了まで停止 ── */
+  .cover-title {
+    opacity: 0;
+    animation: title-fadein 1.0s ease-out forwards;
+  }
+  .wf-loading .cover-title,
+  .wf-loading .cover-hint {
+    animation: none;
+    opacity: 0;
+  }
+  .wf-loading .fade-target,
+  .wf-loading .ent-fade {
+    transition: none !important;
+    opacity: 0 !important;
+  }
+  .wf-loading .closing-title {
+    visibility: hidden;
+  }
+  @keyframes title-fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ════════════════════════════════════════
+     STAGGERED ENTRANCE / EXIT
+     ════════════════════════════════════════ */
+  .fade-target {
+    opacity: 0;
+    transform: translateX(var(--ent-slide, 0px));
+    transition: opacity var(--ent-dur, 0.8s) ease, transform var(--ent-dur, 0.8s) ease;
+    transition-delay: var(--ent-delay, 0ms);
+  }
+  .page.active .fade-target {
+    opacity: var(--ent-opacity, 1);
+    transform: translateX(0);
+  }
+
+  /* Exit: mode C — 方向スライド + フェード */
+  .page.leaving-slide .fade-target {
+    opacity: 0 !important;
+    transition: opacity var(--exit-duration) ease, transform var(--exit-duration) ease !important;
+    transition-delay: 0s !important;
+  }
+  .page.leaving-slide.slide-fwd .fade-target {
+    transform: translateX(calc(-1 * var(--ent-slide, 18px))) !important;
+  }
+  .page.leaving-slide.slide-back .fade-target {
+    transform: translateX(var(--ent-slide, 18px)) !important;
+  }
+
+  /* Entrance: opacity-only（transform で配置されている要素用） */
+  .ent-fade {
+    opacity: 0;
+    transition: opacity var(--ent-dur, 0.8s) ease;
+    transition-delay: var(--ent-delay, 0ms);
+  }
+  .page.active .ent-fade {
+    opacity: var(--ent-opacity, 1);
+  }
+  .page.leaving-slide .ent-fade {
+    opacity: 0 !important;
+    transition: opacity var(--exit-duration) ease !important;
+    transition-delay: 0s !important;
+  }
+
+  /* ════════════════════════════════════════
+     PAGE INDICATOR
+     ════════════════════════════════════════ */
+  .page-indicator {
+    position: fixed;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 100;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-title);
+    opacity: 0.2;
+    transition: opacity 0.3s;
+  }
+  .dot.active { opacity: 0.8; }
+
+  /* ════════════════════════════════════════
+     NAV ARROWS (PC only)
+     ════════════════════════════════════════ */
+  .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--color-title);
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.2;
+    transition: opacity 0.2s;
+    z-index: 100;
+    padding: 16px;
+    font-family: var(--font);
+    font-weight: 300;
+  }
+  .nav-arrow:hover { opacity: 0.6; }
+  .nav-prev { left: calc(8px + env(safe-area-inset-left, 0px)); }
+  .nav-next { right: calc(8px + env(safe-area-inset-right, 0px)); }
+
+  @media (max-width: 640px) {
+    .page-label {
+      top: calc(28px + env(safe-area-inset-top, 0px));
+      left: calc(20px + env(safe-area-inset-left, 0px));
+      max-width: 75%;
+    }
+    .label-title .lang-en {
+      font-size: 22px;
+    }
+    .label-title .lang-en .sub {
+      font-size: 14px;
+    }
+    .page-credit {
+      max-width: 65%;
+      padding: 28px;
+      padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      padding-right: calc(28px + env(safe-area-inset-right, 0px));
+    }
+    .veil-content { padding: 48px 28px 60px; }
+    .veil-close {
+      top: calc(20px + env(safe-area-inset-top, 0px));
+      right: calc(20px + env(safe-area-inset-right, 0px));
+    }
+    .nav-arrow { display: none; }
+    .lang-btn {
+      top: calc(24px + env(safe-area-inset-top, 0px));
+      right: calc(24px + env(safe-area-inset-right, 0px));
+    }
+  }
+
+  /* ════════════════════════════════════════
+     REDUCED MOTION (T18)
+     ════════════════════════════════════════ */
+  @media (prefers-reduced-motion: reduce) {
+    .fade-target {
+      transition-duration: 0.01s !important;
+      transition-delay: 0s !important;
+    }
+    .page.leaving-slide .fade-target {
+      transition-duration: 0.01s !important;
+    }
+    .cover-title {
+      animation-duration: 0.01s !important;
+    }
+  }
+</style>
+</head>
+<body style="background:#1c1b18">
+
+<main class="booklet" id="booklet">
+
+  <!-- ══════════════════════════════════════════════
+       COVER
+       ══════════════════════════════════════════════ -->
+  <section class="page page-cover">
+    <h1 class="cover-title">JUDD | Marfa</h1>
+    <p class="cover-hint ent-fade" style="--ent-opacity:0.4;">Swipe to read →</p>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       2A: Material — 写真 + Veil
+       ══════════════════════════════════════════════ -->
+  <section class="page photo-d" aria-label="Material — 「見えないもの」を知覚する" data-has-veil="true" data-tone="dark">
+    <img class="bg" src="images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
+    <div class="page-label fade-target" style="--ent-slide:18px;">
+      <div class="label-title">
+        <span class="lang-ja">「見えないもの」を知覚する<span class="sub">グレーに浮かぶ、桜のピンク</span></span>
+        <span class="lang-en" lang="en">Perceiving the invisible<span class="sub">Cherry blossom pink, floating in grey</span></span>
+      </div>
+      <span class="label-readmore">…read more</span>
+    </div>
+    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1967, Galvanized iron<br><span class="lang-ja">所蔵：公益財団法人大原芸術財団 大原美術館</span><span class="lang-en" lang="en">Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</span></div>
+    <div class="veil" tabindex="-1">
+      <div class="veil-content">
+        <div class="veil-text">
+          <div class="lang-ja">
+            <div class="stanza">雨の日の昼下がり<br>静かなワタリウム</div>
+            <div class="stanza">マーファは雨が降るのだろうか。</div>
+            <div class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</div>
+            <div class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</div>
+            <div class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</div>
+            <div class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</div>
+            <div class="stanza-end">春の気配がした</div>
+            <div class="stanza" style="margin-top:3em;padding-top:2em;border-top:1px solid rgba(240,237,232,0.15);color:rgba(240,237,232,0.4);font-size:11px;">── ここからスクロールテスト用 ──</div>
+            <div class="stanza">展示室に入ると、まず目に飛び込んでくるのは壁面に沿って並ぶアルミニウムの箱だった。同じ形、同じ素材、同じ寸法。しかしそれぞれが異なる光を受け、異なる影を落としている。</div>
+            <div class="stanza">ジャッドは「特定のオブジェクト」という言葉を使った。絵画でも彫刻でもない、新しいカテゴリーの作品。それは壁から突き出し、床から浮き、空間そのものを作品の一部にしている。</div>
+            <div class="stanza">マーファのチナティ・ファウンデーションでは、100点のアルミニウム作品が2棟の砲兵隊格納庫に永久展示されている。テキサスの乾いた光が、朝と夕で全く異なる表情を作品に与える。</div>
+            <div class="stanza">ワタリウム美術館は、マリオ・ボッタが1990年に設計した三角形の建物だ。渋谷の喧騒から少し離れた神宮前の路地に、ひっそりと佇んでいる。</div>
+            <div class="stanza">ボッタの建築は、コンクリートと石の重厚な壁面が特徴だ。自然光を慎重に制御し、展示室には柔らかい光が差し込む。ジャッドの作品が求める「光と空間の対話」に、この建築は応えているように見えた。</div>
+            <div class="stanza">ジャッドは1928年、ミズーリ州エクセルシオール・スプリングスに生まれた。最初は画家として出発し、その後批評家として活動し、やがて三次元の作品を作り始めた。</div>
+            <div class="stanza">彼の批評は辛辣で正確だった。「ヨーロッパの芸術の大部分は、何世紀にもわたって、虚偽であった」と書いた。既存の芸術の枠組みに対する不信が、彼を新しい表現へと駆り立てた。</div>
+            <div class="stanza">素材への執着は徹底していた。アルミニウム、ステンレス、銅、真鍮、コールテン鋼、アクリル。それぞれの素材が持つ固有の質感、反射率、重量感。ジャッドはそれらを「見る」のではなく「知覚する」ことを求めた。</div>
+            <div class="stanza">この展覧会で最も長く足を止めたのは、ガルバナイズド・アイアンの作品だった。トタン板という日常的な素材が、予期せぬ美しさを見せていた。</div>
+            <div class="stanza">表面に生じたスパングル結晶——亜鉛メッキの冷却過程で偶然生まれる結晶構造——が、桜の花びらのような模様を描いていた。工業製品の中に、自然の痕跡が宿っている。</div>
+            <div class="stanza">ジャッドがこの素材を選んだとき、このスパングル結晶を意図していたのだろうか。おそらく違う。しかし、素材の真実に向き合う姿勢が、こうした偶然の美を引き寄せたのだと思う。</div>
+            <div class="stanza-end">予測を超えたものに出会うこと。それが展覧会を訪れる理由のひとつだ。</div>
+          </div>
+          <div class="lang-en" lang="en">
+            <div class="stanza en">A rainy afternoon<br>Quiet Watari-Um</div>
+            <div class="stanza en">Does it rain in Marfa?</div>
+            <div class="stanza en">Thinking about that<br>as I enter Judd's world</div>
+            <div class="stanza en">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</div>
+            <div class="stanza en">Yet its surface was soft and warm<br>draped in drifting light</div>
+            <div class="stanza en">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</div>
+            <div class="stanza-end en">A hint of spring</div>
+            <div class="stanza en" style="margin-top:3em;padding-top:2em;border-top:1px solid rgba(240,237,232,0.15);color:rgba(240,237,232,0.4);font-size:11px;">── scroll test content below ──</div>
+            <div class="stanza en">Entering the gallery, the first thing that strikes you is a row of aluminum boxes aligned along the wall. Same form, same material, same dimensions. Yet each receives different light and casts different shadows.</div>
+            <div class="stanza en">Judd used the term "specific objects." Neither painting nor sculpture, but a new category of work. They project from the wall, hover above the floor, and make the space itself part of the piece.</div>
+            <div class="stanza en">At the Chinati Foundation in Marfa, 100 aluminum works are permanently installed in two former artillery sheds. The dry Texas light gives the works entirely different expressions at morning and evening.</div>
+            <div class="stanza en">The Watari-Um Museum of Contemporary Art is a triangular building designed by Mario Botta in 1990. It sits quietly on a side street in Jingumae, a short distance from the noise of Shibuya.</div>
+            <div class="stanza en">Botta's architecture is characterized by heavy concrete and stone walls. Natural light is carefully controlled, and soft illumination filters into the exhibition rooms. The building seemed to answer the "dialogue between light and space" that Judd's work demands.</div>
+            <div class="stanza en">Judd was born in 1928 in Excelsior Springs, Missouri. He began as a painter, then worked as a critic, and eventually started making three-dimensional works.</div>
+            <div class="stanza en">His criticism was sharp and precise. "Most of the art of the past centuries in Europe has been false for several centuries," he wrote. A deep distrust of existing artistic frameworks drove him toward new forms of expression.</div>
+            <div class="stanza en">His obsession with materials was thorough. Aluminum, stainless steel, copper, brass, Cor-Ten steel, acrylic. The unique texture, reflectivity, and weight of each material. Judd asked not to "see" them but to "perceive" them.</div>
+            <div class="stanza en">The work I spent the most time with in this exhibition was the galvanized iron piece. An everyday material — corrugated steel — revealed unexpected beauty.</div>
+            <div class="stanza en">Spangle crystals on the surface — crystalline structures that form by chance during the cooling of zinc plating — traced patterns like cherry blossom petals. Within an industrial product, traces of nature reside.</div>
+            <div class="stanza en">Did Judd intend these spangle crystals when he chose this material? Probably not. But I believe his commitment to facing the truth of materials attracted this kind of accidental beauty.</div>
+            <div class="stanza-end en">To encounter something beyond expectation. That is one reason to visit an exhibition.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       W1: Light — 写真 + Veil
+       ══════════════════════════════════════════════ -->
+  <section class="page photo-d" aria-label="Light — WATARI-UM" data-has-veil="true">
+    <img class="bg" src="images/judd-w1.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
+    <div class="page-label fade-target" style="--ent-slide:18px;">
+      <div class="label-title">
+        <span class="lang-ja">Light</span>
+        <span class="lang-en" lang="en">Light</span>
+      </div>
+      <span class="label-readmore">…read more</span>
+    </div>
+    <div class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</div>
+    <div class="veil" tabindex="-1">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       6D: Color — 写真 + Veil
+       ══════════════════════════════════════════════ -->
+  <section class="page photo-d" aria-label="Color — Untitled, 1991" data-has-veil="true" data-tone="dark">
+    <img class="bg" src="images/judd-6d.jpg" loading="lazy" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
+    <div class="page-label fade-target" style="--ent-slide:18px;">
+      <div class="label-title">
+        <span class="lang-ja">Color</span>
+        <span class="lang-en" lang="en">Color</span>
+      </div>
+      <span class="label-readmore">…read more</span>
+    </div>
+    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass<br><span class="lang-ja">所蔵：Judd Foundation</span><span class="lang-en" lang="en">Collection: Judd Foundation</span></div>
+    <div class="veil" tabindex="-1">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       W2: Space — 写真 + Veil
+       ══════════════════════════════════════════════ -->
+  <section class="page photo-d" aria-label="Space — WATARI-UM" data-has-veil="true">
+    <img class="bg" src="images/judd-w2.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
+    <div class="page-label fade-target" style="--ent-slide:18px;">
+      <div class="label-title">
+        <span class="lang-ja">Space</span>
+        <span class="lang-en" lang="en">Space</span>
+      </div>
+      <span class="label-readmore">…read more</span>
+    </div>
+    <div class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</div>
+    <div class="veil" tabindex="-1">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       2B: Repetition — 写真 + Veil
+       ══════════════════════════════════════════════ -->
+  <section class="page photo-d" aria-label="Repetition — Untitled, 1990" data-has-veil="true">
+    <img class="bg" src="images/judd-2b.jpg" loading="lazy" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)">
+    <div class="page-label fade-target" style="--ent-slide:18px;">
+      <div class="label-title">
+        <span class="lang-ja">Repetition</span>
+        <span class="lang-en" lang="en">Repetition</span>
+      </div>
+      <span class="label-readmore">…read more</span>
+    </div>
+    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)<br><span class="lang-ja">所蔵：静岡県立美術館</span><span class="lang-en" lang="en">Collection: Shizuoka Prefectural Museum of Art</span></div>
+    <div class="veil" tabindex="-1">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       5B: Time — 写真 + Veil
+       ══════════════════════════════════════════════ -->
+  <section class="page photo-d" aria-label="Time — Untitled, 1989" data-has-veil="true">
+    <img class="bg" src="images/judd-5b.jpg" loading="lazy" alt="Untitled, 1989, Painted aluminum">
+    <div class="page-label fade-target" style="--ent-slide:18px;">
+      <div class="label-title">
+        <span class="lang-ja">Time</span>
+        <span class="lang-en" lang="en">Time</span>
+      </div>
+      <span class="label-readmore">…read more</span>
+    </div>
+    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1989, Painted aluminum<br><span class="lang-ja">所蔵：鹿児島県霧島アートの森</span><span class="lang-en" lang="en">Collection: Kirishima Open-Air Museum</span></div>
+    <div class="veil" tabindex="-1">
+      <div class="veil-content">
+        <div class="veil-text">
+          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+        </div>
+      </div>
+    </div>
+    <button class="veil-close">✕</button>
+    <button class="lang-btn">EN</button>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       CLOSING（最終ページ — 裏表紙）
+       ══════════════════════════════════════════════ -->
+  <section class="page page-closing">
+    <p class="closing-title ent-fade">JUDD | Marfa</p>
+    <a class="closing-home ent-fade" href="../../" style="--ent-opacity:0.5;">Home →</a>
+    <button class="lang-btn">EN</button>
+  </section>
+
+</main>
+
+<!-- Page indicator dots -->
+<nav class="page-indicator" id="indicator" aria-label="ページ"></nav>
+
+<!-- Nav arrows (PC) -->
+<button class="nav-arrow nav-prev" id="prevBtn" aria-label="前のページ">‹</button>
+<button class="nav-arrow nav-next" id="nextBtn" aria-label="次のページ">›</button>
+
+<script>
+// ══════════════════════════════════════════════
+// B-Side Booklet Engine v11.0
+// Veil統合: 写真+テキスト一体化, タップ開閉
+// Wheel は暫定処理（v4.15d 統合前）
+// ══════════════════════════════════════════════
+
+// ── 順方向到着: 暗転→フェードイン (T22: timestamp) ──
+(function() {
+  var flag = sessionStorage.getItem('bside-forward');
+  if (!flag) {
+    // 直接アクセス: arrival-hide を即除去
+    var h = document.getElementById('arrival-hide');
+    if (h) h.remove();
+    return;
+  }
+
+  var isForward = false;
+  try {
+    var data = JSON.parse(flag);
+    isForward = data && (Date.now() - data.time < 10000);
+  } catch(e) {}
+  sessionStorage.removeItem('bside-forward');
+
+  if (!isForward) {
+    var h = document.getElementById('arrival-hide');
+    if (h) h.remove();
+    return;
+  }
+
+  var overlay = document.createElement('div');
+  overlay.id = 'bside-arrival-overlay';
+  overlay.style.cssText =
+    'position:fixed;inset:0;background:#1c1b18;z-index:9999;opacity:1;pointer-events:none;';
+  document.body.appendChild(overlay);
+
+  // オーバーレイ設置完了 → body 表示
+  var hideStyle = document.getElementById('arrival-hide');
+  if (hideStyle) hideStyle.remove();
+
+  setTimeout(function() {
+    overlay.style.transition = 'opacity 1.4s cubic-bezier(0.42, 0, 0.58, 1)';
+    overlay.style.opacity = '0';
+    var done = false;
+    function complete() {
+      if (done) return;
+      done = true;
+      overlay.remove();
+    }
+    overlay.addEventListener('transitionend', complete);
+    setTimeout(complete, 1600);
+  }, 700);
+})();
+
+// ══════════════════════════════════════════════
+// Core elements & state
+// ══════════════════════════════════════════════
+
+const booklet = document.getElementById('booklet');
+const pages = [...booklet.querySelectorAll('.page')];
+const indicator = document.getElementById('indicator');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const totalPages = pages.length;
+
+let currentPage = 0;
+let isAnimating = false;
+
+// ══════════════════════════════════════════════
+// Veil state management
+// ══════════════════════════════════════════════
+
+const veils = new Map();
+pages.forEach(function(pg, i) {
+  const veil = pg.querySelector('.veil');
+  if (veil) {
+    veils.set(i, { veil: veil });
+  }
+});
+
+function isVeilOpen(pageIndex) {
+  const v = veils.get(pageIndex);
+  return v && v.veil.classList.contains('open');
+}
+
+function openVeil(pageIndex) {
+  const v = veils.get(pageIndex);
+  if (!v || v.veil.classList.contains('open')) return;
+  v.veil.scrollTop = 0;
+  v.veil.classList.add('open');
+  pages[pageIndex].classList.add('veil-active');
+  v.veil.focus({ preventScroll: true });  // v123: ArrowUp/Downスクロール対応
+}
+
+function closeVeil(pageIndex) {
+  const v = veils.get(pageIndex);
+  if (!v || !v.veil.classList.contains('open')) return;
+  v.veil.classList.remove('open');
+  pages[pageIndex].classList.remove('veil-active');
+  if (document.activeElement === v.veil) document.activeElement.blur();  // v123
+  setTimeout(function() { v.veil.scrollTop = 0; }, 500);
+}
+
+function closeAllVeils() {
+  veils.forEach(function(v, i) {
+    v.veil.classList.remove('open');
+    pages[i].classList.remove('veil-active');
+  });
+}
+
+// ══════════════════════════════════════════════
+// Config (確定パラメータ — 仮確定、実テキスト後に本調整)
+// ══════════════════════════════════════════════
+
+// ── Touch / Mouse ──
+const TRANSITION_DURATION = 450;
+const SWIPE_THRESHOLD = 50;
+const VELOCITY_THRESHOLD = 0.3;
+
+// ── Rubber-band ──
+const RB = {
+  rubberC: 0.38,
+  kick: 5,
+  stiffness: 40,
+  damping: 13,
+};
+
+function rubberBand(distance) {
+  const dim = window.innerWidth;
+  const c = RB.rubberC;
+  return (distance * dim * c) / (dim + c * Math.abs(distance));
+}
+
+// ── Text entrance delay (ms) ──
+const TEXT_DELAY = { a: 160, b: 260, c: 400 };
+
+// ── Entrance trigger: 1.0 = 着地後 ──
+const ENTRANCE_TRIGGER = 1.0;
+
+// ── Reduced motion preference (T18) ──
+const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ── Easing ──
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+// ══════════════════════════════════════════════
+// Core: ページ位置の制御
+// ══════════════════════════════════════════════
+
+function setPageOffset(px) {
+  booklet.style.transition = 'none';
+  booklet.style.transform = `translate3d(${px}px,0,0)`;
+}
+
+function getPageOffset() {
+  return -currentPage * window.innerWidth;
+}
+
+function parseCurrentX() {
+  const transform = booklet.style.transform;
+  const match3d = transform.match(/translate3d\((.+?)px/);
+  if (match3d) return parseFloat(match3d[1]);
+  const match = transform.match(/translateX\((.+?)px\)/);
+  return match ? parseFloat(match[1]) : getPageOffset();
+}
+
+let animationId = 0;
+
+function cancelAnimation() {
+  animationId++;
+  isAnimating = false;
+  booklet.style.transition = 'none';
+}
+
+function snapToCurrentPage() {
+  setPageOffset(-currentPage * window.innerWidth);
+}
+
+function animateToPage(targetPage, duration, easingFn) {
+  if (targetPage < 0 || targetPage >= totalPages) return;
+  if (targetPage === currentPage) {
+    const currentX = parseCurrentX();
+    const correctX = -currentPage * window.innerWidth;
+    if (Math.abs(currentX - correctX) < 1) return;
+  }
+
+  isAnimating = true;
+  animationId++;
+  const myId = animationId;
+  const fromX = parseCurrentX();
+  const toX = -targetPage * window.innerWidth;
+  const startTime = performance.now();
+  const prevPage = currentPage;
+  duration = duration || TRANSITION_DURATION;
+  if (REDUCED_MOTION) duration = 10;
+  easingFn = easingFn || easeOutCubic;
+
+  if (targetPage !== currentPage) {
+    onPageLeave(currentPage, targetPage);
+  }
+
+  currentPage = targetPage;
+  updateDots();
+
+  let textActivated = false;
+
+  function tick(now) {
+    if (myId !== animationId) return;
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easingFn(progress);
+    const x = fromX + (toX - fromX) * eased;
+    setPageOffset(x);
+
+    if (!textActivated && progress >= ENTRANCE_TRIGGER) {
+      textActivated = true;
+      setActivePage(currentPage);
+    }
+
+    if (progress < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      setPageOffset(toX);
+      isAnimating = false;
+      updateArrows();
+      if (!textActivated) {
+        textActivated = true;
+        setActivePage(currentPage);
+      }
+      onPageArrive(currentPage, prevPage);
+    }
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// ── Spring snap-back（端の跳ね返り） ──
+function springSnapBack() {
+  cancelAnimation();
+  isAnimating = true;
+  animationId++;
+  const myId = animationId;
+
+  const targetX = -currentPage * window.innerWidth;
+  let currentX = parseCurrentX();
+  const displacement = currentX - targetX;
+  let velocity = -displacement * RB.kick;
+
+  function tick() {
+    if (myId !== animationId) return;
+    const disp = currentX - targetX;
+    const springForce = -RB.stiffness * disp;
+    const dampingForce = -RB.damping * velocity;
+    const acceleration = springForce + dampingForce;
+    const dt = 0.016;
+    velocity += acceleration * dt;
+    currentX += velocity * dt;
+    setPageOffset(currentX);
+
+    if (Math.abs(disp) < 0.5 && Math.abs(velocity) < 0.5) {
+      setPageOffset(targetX);
+      isAnimating = false;
+      updateArrows();
+      onPageArrive(currentPage, currentPage);
+      return;
+    }
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+}
+
+// ══════════════════════════════════════════════
+// Page lifecycle — staggered entrance / exit
+// ══════════════════════════════════════════════
+
+function setActivePage(index) {
+  pages.forEach(function(pg, i) {
+    pg.classList.remove('leaving-slide', 'slide-fwd', 'slide-back');
+    pg.classList.toggle('active', i === index);
+  });
+
+  const pg = pages[index];
+  if (!pg) return;
+
+  // Staggered entrance delays
+  const slots = [TEXT_DELAY.a, TEXT_DELAY.b, TEXT_DELAY.c];
+  const targets = pg.querySelectorAll('.fade-target, .ent-fade');
+  targets.forEach(function(el, i) {
+    var delay = i < slots.length ? slots[i] : slots[slots.length - 1];
+    el.style.setProperty('--ent-delay', delay + 'ms');
+  });
+}
+
+function onPageLeave(pageIndex, targetPage) {
+  const pg = pages[pageIndex];
+  if (!pg) return;
+
+  // Veil が開いていたら閉じる
+  closeVeil(pageIndex);
+
+  // Exit mode C: 方向スライド + フェード
+  pg.classList.add('leaving-slide');
+  pg.classList.add(targetPage > pageIndex ? 'slide-fwd' : 'slide-back');
+}
+
+function onPageArrive(pageIndex, fromIndex) {
+  // 将来の拡張ポイント（効果音、アナリティクス等）
+}
+
+// ══════════════════════════════════════════════
+// Touch handling — document レベル（Veil 対応）
+// ══════════════════════════════════════════════
+
+let touchStartX = 0;
+let touchStartY = 0;
+let touchCurrentX = 0;
+let touchCurrentY = 0;
+let touchStartTime = 0;
+let isTouching = false;
+let touchDirection = null;  // null | 'horizontal' | 'vertical'
+let touchHistory = [];
+let touchTarget = null;
+
+const DIRECTION_THRESHOLD = 10;
+
+document.addEventListener('touchstart', function(e) {
+  // Veil 開中かつ Veil 内タッチ → ネイティブスクロール許可
+  const veilOpen = isVeilOpen(currentPage);
+  const touchedVeil = veilOpen && veils.get(currentPage) &&
+    veils.get(currentPage).veil.contains(e.target);
+
+  if (!touchedVeil) {
+    e.preventDefault();
+  }
+
+  if (isAnimating) {
+    cancelAnimation();
+    snapToCurrentPage();
+  }
+
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+  touchCurrentX = touch.clientX;
+  touchCurrentY = touch.clientY;
+  touchStartTime = performance.now();
+  isTouching = true;
+  touchDirection = null;
+  touchTarget = e.target;
+  touchHistory = [{ x: touch.clientX, y: touch.clientY, t: touchStartTime }];
+}, { passive: false });
+
+document.addEventListener('touchmove', function(e) {
+  if (!isTouching) return;
+  const touch = e.touches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+  touchCurrentX = touch.clientX;
+  touchCurrentY = touch.clientY;
+
+  // 方向未確定 → 確定
+  if (touchDirection === null) {
+    if (Math.abs(dx) > DIRECTION_THRESHOLD || Math.abs(dy) > DIRECTION_THRESHOLD) {
+      touchDirection = Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical';
+    } else {
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // 縦方向
+  if (touchDirection === 'vertical') {
+    if (isVeilOpen(currentPage)) {
+      // Veil 開中 → ネイティブスクロールに任せる
+      return;
+    } else {
+      // Veil 閉中 → 何もしない
+      e.preventDefault();
+      return;
+    }
+  }
+
+  // 横方向 → ページドラッグ
+  e.preventDefault();
+
+  // Veil 開中の横スワイプ → ブロック（v123: ページ送り禁止）
+  if (isVeilOpen(currentPage)) {
+    return;
+  }
+
+  const baseX = -currentPage * window.innerWidth;
+  let dragDelta = dx;
+  if ((currentPage === 0 && dx > 0) || (currentPage === totalPages - 1 && dx < 0)) {
+    dragDelta = rubberBand(dx);
+  }
+  setPageOffset(baseX + dragDelta);
+
+  const now = performance.now();
+  touchHistory.push({ x: touch.clientX, y: touch.clientY, t: now });
+  touchHistory = touchHistory.filter(function(h) { return now - h.t < 100; });
+}, { passive: false });
+
+document.addEventListener('touchend', function(e) {
+  if (!isTouching) return;
+  isTouching = false;
+
+  const dx = touchCurrentX - touchStartX;
+  const dy = touchCurrentY - touchStartY;
+
+  // 方向未確定のまま終了 → タップ
+  if (touchDirection === null) {
+    if (touchTarget && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+      touchTarget.click();
+    }
+    touchTarget = null;
+    return;
+  }
+
+  // 縦方向の終了
+  if (touchDirection === 'vertical') {
+    touchTarget = null;
+    return;
+  }
+
+  // 横方向の終了 → ページ遷移判定
+  touchTarget = null;
+  let velocity = 0;
+  if (touchHistory.length >= 2) {
+    const oldest = touchHistory[0];
+    const newest = touchHistory[touchHistory.length - 1];
+    const dt = newest.t - oldest.t;
+    if (dt > 0) velocity = (newest.x - oldest.x) / dt;
+  }
+
+  let targetPage = currentPage;
+  if (Math.abs(velocity) > VELOCITY_THRESHOLD) {
+    targetPage = velocity < 0 ? currentPage + 1 : currentPage - 1;
+  } else if (Math.abs(dx) > SWIPE_THRESHOLD) {
+    targetPage = dx < 0 ? currentPage + 1 : currentPage - 1;
+  }
+  targetPage = Math.max(0, Math.min(totalPages - 1, targetPage));
+
+  if (targetPage === currentPage) {
+    springSnapBack();
+  } else {
+    const remainingDist = Math.abs(-targetPage * window.innerWidth - parseCurrentX());
+    const ratio = Math.max(0.3, Math.min(1, remainingDist / window.innerWidth));
+    animateToPage(targetPage, Math.round(TRANSITION_DURATION * ratio));
+  }
+}, { passive: true });
+
+// ══════════════════════════════════════════════
+// Mouse drag handling
+// ══════════════════════════════════════════════
+
+let mouseStartX = 0;
+let mouseIsDragging = false;
+let mouseHistory = [];
+
+booklet.addEventListener('mousedown', function(e) {
+  if (isVeilOpen(currentPage)) return;  // v123: Veil開中はドラッグ禁止
+  if (isAnimating) {
+    cancelAnimation();
+    snapToCurrentPage();
+  }
+  if (e.target.closest('button, a')) return;
+  mouseStartX = e.clientX;
+  mouseIsDragging = true;
+  mouseHistory = [{ x: e.clientX, t: performance.now() }];
+  booklet.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (!mouseIsDragging) return;
+  const dx = e.clientX - mouseStartX;
+  const baseX = -currentPage * window.innerWidth;
+
+  let dragDelta = dx;
+  if ((currentPage === 0 && dx > 0) || (currentPage === totalPages - 1 && dx < 0)) {
+    dragDelta = rubberBand(dx);
+  }
+  setPageOffset(baseX + dragDelta);
+
+  const now = performance.now();
+  mouseHistory.push({ x: e.clientX, t: now });
+  mouseHistory = mouseHistory.filter(function(h) { return now - h.t < 100; });
+});
+
+document.addEventListener('mouseup', function(e) {
+  if (!mouseIsDragging) return;
+  mouseIsDragging = false;
+  booklet.style.cursor = '';
+
+  const dx = e.clientX - mouseStartX;
+  let velocity = 0;
+  if (mouseHistory.length >= 2) {
+    const oldest = mouseHistory[0];
+    const newest = mouseHistory[mouseHistory.length - 1];
+    const dt = newest.t - oldest.t;
+    if (dt > 0) velocity = (newest.x - oldest.x) / dt;
+  }
+
+  let targetPage = currentPage;
+  if (Math.abs(velocity) > VELOCITY_THRESHOLD) {
+    targetPage = velocity < 0 ? currentPage + 1 : currentPage - 1;
+  } else if (Math.abs(dx) > SWIPE_THRESHOLD) {
+    targetPage = dx < 0 ? currentPage + 1 : currentPage - 1;
+  }
+  targetPage = Math.max(0, Math.min(totalPages - 1, targetPage));
+
+  if (targetPage === currentPage) {
+    springSnapBack();
+  } else {
+    const remainingDist = Math.abs(-targetPage * window.innerWidth - parseCurrentX());
+    const ratio = Math.max(0.3, Math.min(1, remainingDist / window.innerWidth));
+    animateToPage(targetPage, Math.round(TRANSITION_DURATION * ratio));
+  }
+});
+
+// ══════════════════════════════════════════════
+// Keyboard
+// ══════════════════════════════════════════════
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    if (isVeilOpen(currentPage)) closeVeil(currentPage);
+    return;
+  }
+  if (isAnimating) return;
+  if (isVeilOpen(currentPage)) return;  // v123: Veil開中はページ送りブロック
+
+  if (e.key === 'ArrowRight') animateToPage(currentPage + 1);
+  if (e.key === 'ArrowLeft') animateToPage(currentPage - 1);
+});
+
+// ══════════════════════════════════════════════
+// Wheel — 暫定処理（v4.15d 統合前。Veil スクロール対応）
+// deltaX → ページ送り、deltaY → Veil 内スクロール（開中のみ）
+// ══════════════════════════════════════════════
+
+let wheelAccumX = 0;
+let wheelTimer = null;
+const WHEEL_PAGE_DIST = 300;
+
+booklet.addEventListener('wheel', function(e) {
+  e.preventDefault();
+  if (isAnimating) return;
+
+  const absX = Math.abs(e.deltaX);
+  const absY = Math.abs(e.deltaY);
+
+  if (absX > absY * 1.2) {
+    // 横 → ページ送り（v123: Veil開中はブロック）
+    if (!isVeilOpen(currentPage)) {
+      wheelAccumX += e.deltaX;
+      if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+        animateToPage(currentPage + 1);
+        wheelAccumX = 0;
+      } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
+        animateToPage(currentPage - 1);
+        wheelAccumX = 0;
+      }
+    }
+  } else if (absY > absX * 1.2) {
+    // 縦 → Veil 開中ならスクロール
+    const v = veils.get(currentPage);
+    if (v && isVeilOpen(currentPage)) {
+      v.veil.scrollTop += e.deltaY;
+    }
+  }
+
+  clearTimeout(wheelTimer);
+  wheelTimer = setTimeout(function() { wheelAccumX = 0; }, 200);
+}, { passive: false });
+
+// ══════════════════════════════════════════════
+// Dots & Arrows (T16: dot aria-labels)
+// ══════════════════════════════════════════════
+
+pages.forEach(function(pg, i) {
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.setAttribute('aria-label', 'ページ ' + (i + 1));
+  indicator.appendChild(dot);
+});
+const dots = indicator.querySelectorAll('.dot');
+
+function updateDots() {
+  dots.forEach(function(d, i) { d.classList.toggle('active', i === currentPage); });
+}
+
+function updateArrows() {
+  prevBtn.style.opacity = currentPage === 0 ? '0' : '';
+  prevBtn.style.pointerEvents = currentPage === 0 ? 'none' : '';
+  nextBtn.style.opacity = currentPage === totalPages - 1 ? '0' : '';
+  nextBtn.style.pointerEvents = currentPage === totalPages - 1 ? 'none' : '';
+}
+
+prevBtn.addEventListener('click', function() {
+  if (!isAnimating && !isVeilOpen(currentPage)) animateToPage(currentPage - 1);
+  prevBtn.blur();
+});
+nextBtn.addEventListener('click', function() {
+  if (!isAnimating && !isVeilOpen(currentPage)) animateToPage(currentPage + 1);
+  nextBtn.blur();
+});
+
+updateArrows();
+
+// ══════════════════════════════════════════════
+// Resize handling
+// ══════════════════════════════════════════════
+
+window.addEventListener('resize', function() {
+  setPageOffset(-currentPage * window.innerWidth);
+});
+
+// ══════════════════════════════════════════════
+// bfcache handler（ブラウザバック/進む時のリセット）
+// ══════════════════════════════════════════════
+
+window.addEventListener('pageshow', function(e) {
+  if (e.persisted) {
+    // Veil を閉じる
+    closeAllVeils();
+
+    // ページ位置をリセット
+    setPageOffset(-currentPage * window.innerWidth);
+    setActivePage(currentPage);
+    updateArrows();
+
+    // Closing 遷移状態をリセット（inline style を除去して ent-fade に戻す）
+    var home = document.querySelector('.closing-home');
+    var ctitle = document.querySelector('.closing-title');
+    var clangBtn = document.querySelector('.page-closing .lang-btn');
+    if (home) { home.removeAttribute('style'); home.removeAttribute('data-animating'); }
+    if (ctitle) ctitle.removeAttribute('style');
+    if (clangBtn) clangBtn.removeAttribute('style');
+    // closing-home の --ent-opacity を再設定（removeAttribute('style') で消えるため）
+    if (home) home.style.setProperty('--ent-opacity', '0.5');
+
+    // 残留オーバーレイを除去
+    var leftover = document.getElementById('bside-arrival-overlay');
+    if (leftover) leftover.remove();
+    var hideStyle = document.getElementById('arrival-hide');
+    if (hideStyle) hideStyle.remove();
+  }
+});
+
+// ══════════════════════════════════════════════
+// Lazy → Eager 画像（Chrome アンロード防止）
+// ══════════════════════════════════════════════
+
+document.querySelectorAll('.page img.bg[loading="lazy"]').forEach(function(img) {
+  if (img.complete) {
+    img.loading = 'eager';
+  } else {
+    img.addEventListener('load', function() { img.loading = 'eager'; }, { once: true });
+  }
+});
+
+// ══════════════════════════════════════════════
+// 言語切替 (T19: html lang 属性も変更)
+// ══════════════════════════════════════════════
+
+const langBtns = document.querySelectorAll('.lang-btn');
+
+function toggleLang() {
+  const isEn = document.body.classList.toggle('show-en');
+  document.documentElement.lang = isEn ? 'en' : 'ja';
+  langBtns.forEach(function(btn) {
+    btn.textContent = isEn ? 'JP' : 'EN';
+  });
+}
+
+langBtns.forEach(function(btn) {
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleLang();
+  });
+});
+
+// ══════════════════════════════════════════════
+// CLOSING → Home 逆遷移
+// ══════════════════════════════════════════════
+
+const closingHome = document.querySelector('.closing-home');
+if (closingHome) {
+  const closingDest = closingHome.getAttribute('href');
+  const closingTitle = document.querySelector('.closing-title');
+  const closingLangBtn = document.querySelector('.page-closing .lang-btn');
+
+  closingHome.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (closingHome.dataset.animating) return;
+    closingHome.dataset.animating = '1';
+
+    // フェードアウト
+    closingHome.style.transition = 'opacity 0.4s ease';
+    closingHome.style.opacity = '0';
+    if (closingTitle) {
+      closingTitle.style.transition = 'opacity 0.4s ease';
+      closingTitle.style.opacity = '0';
+    }
+    if (closingLangBtn) {
+      closingLangBtn.style.transition = 'opacity 0.4s ease';
+      closingLangBtn.style.opacity = '0';
+    }
+
+    // 暗闘後に遷移
+    setTimeout(function() {
+      sessionStorage.setItem('bside-reverse', '1');
+      window.location.href = closingDest;
+    }, 700);
+  });
+}
+
+// ══════════════════════════════════════════════
+// Veil interaction — read more / × / bfcache
+// ══════════════════════════════════════════════
+
+pages.forEach(function(pg, i) {
+  var readmore = pg.querySelector('.label-readmore');
+  if (readmore && veils.has(i)) {
+    readmore.addEventListener('click', function(e) {
+      e.stopPropagation();
+      openVeil(i);
+    });
+  }
+  var closeBtn = pg.querySelector('.veil-close');
+  if (closeBtn && veils.has(i)) {
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      closeVeil(i);
+    });
+  }
+});
+
+// ══════════════════════════════════════════════
+// Init
+// ══════════════════════════════════════════════
+
+setActivePage(0);
+onPageArrive(0, 0);
+</script>
+
+</body>
+</html>
