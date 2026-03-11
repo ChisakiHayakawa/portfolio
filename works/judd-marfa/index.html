@@ -1282,10 +1282,11 @@ document.addEventListener('keydown', function(e) {
 
 // ══════════════════════════════════════════════
 // Wheel — 暫定処理（v4.15d 統合前。Veil スクロール対応）
-// deltaX → ページ送り、deltaY → Veil 内スクロール（開中のみ）
+// deltaX → ページ送り、deltaY → Normal: ページ送り / Veil開中: テキストスクロール
 // ══════════════════════════════════════════════
 
 let wheelAccumX = 0;
+let wheelAccumY = 0;
 let wheelTimer = null;
 const WHEEL_PAGE_DIST = 300;
 
@@ -1309,15 +1310,24 @@ booklet.addEventListener('wheel', function(e) {
       }
     }
   } else if (absY > absX * 1.2) {
-    // 縦 → Veil 開中ならスクロール
-    const v = veils.get(currentPage);
-    if (v && isVeilOpen(currentPage)) {
-      v.veil.scrollTop += e.deltaY;
+    // 縦 → Veil 開中ならスクロール、閉じていればページ送り（マウスホイール対応）
+    if (isVeilOpen(currentPage)) {
+      const v = veils.get(currentPage);
+      if (v) v.veil.scrollTop += e.deltaY;
+    } else {
+      wheelAccumY += e.deltaY;
+      if (wheelAccumY > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+        animateToPage(currentPage + 1);
+        wheelAccumY = 0;
+      } else if (wheelAccumY < -WHEEL_PAGE_DIST && currentPage > 0) {
+        animateToPage(currentPage - 1);
+        wheelAccumY = 0;
+      }
     }
   }
 
   clearTimeout(wheelTimer);
-  wheelTimer = setTimeout(function() { wheelAccumX = 0; }, 200);
+  wheelTimer = setTimeout(function() { wheelAccumX = 0; wheelAccumY = 0; }, 200);
 }, { passive: false });
 
 // ══════════════════════════════════════════════
