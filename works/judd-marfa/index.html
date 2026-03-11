@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v11.0 / 2026.03.09 — Veil統合: 写真+テキスト一体化, Endmatter削除, タップ開閉, 暫定wheel -->
+<!-- v11.0 / 2026.03.11 — Veil統合: 写真+テキスト一体化, Endmatter削除, タップ開閉, 暫定wheel / F1修正: trackpad縦スワイプのページ送りブロック -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -1303,8 +1303,15 @@ document.addEventListener('keydown', function(e) {
 
 // ══════════════════════════════════════════════
 // Wheel — 暫定処理（v4.15d 統合前。Veil スクロール対応）
-// deltaX → ページ送り、deltaY → Normal: ページ送り / Veil開中: テキストスクロール
+// deltaX → ページ送り、deltaY → マウスホイール: ページ送り / trackpad: 無視 / Veil開中: テキストスクロール
+// F1修正: trackpad縦スワイプでページ送りしないよう、マウスホイール判定を追加
 // ══════════════════════════════════════════════
+
+function isMouseWheel(e) {
+  if (e.deltaMode === 1) return true;  // DOM_DELTA_LINE = マウス確定
+  // macOS: マウス定常値≈184, trackpad最大≈78。閾値90で分離
+  return Math.abs(e.deltaY) >= 90;
+}
 
 let wheelAccumX = 0;
 let wheelAccumY = 0;
@@ -1331,11 +1338,11 @@ booklet.addEventListener('wheel', function(e) {
       }
     }
   } else if (absY > absX * 1.2) {
-    // 縦 → Veil 開中ならスクロール、閉じていればページ送り（マウスホイール対応）
+    // 縦 → Veil 開中ならスクロール、閉じていればマウスホイールのみページ送り
     if (isVeilOpen(currentPage)) {
       const v = veils.get(currentPage);
       if (v) v.veil.scrollTop += e.deltaY;
-    } else {
+    } else if (isMouseWheel(e)) {
       wheelAccumY += e.deltaY;
       if (wheelAccumY > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
         animateToPage(currentPage + 1);
