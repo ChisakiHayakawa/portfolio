@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>reading-layer prototype — B-Side</title>
+<!-- reading-layer proto v1 / 2026.03.12 — <dialog> ベースの3パターン比較 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --color-title: #f0ede8;
+    --color-credit: #b5b2ab;
+    --color-note: #7d7a73;
+    --color-rule: #35332e;
+    --color-bg: #1c1b18;
+    --font: "mr-eaves-xl-modern", "Noto Sans JP", sans-serif;
+    --font-jp: "fot-tsukuardgothic-std", "Noto Sans JP", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    font-family: var(--font);
+    color: var(--color-title);
+    background: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ════════════════════════════════════════
+     PHOTO PAGE (背景 — 実写真)
+     ════════════════════════════════════════ */
+  .photo-sim {
+    position: fixed;
+    inset: 0;
+    background: var(--color-bg);
+  }
+  .photo-sim img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .photo-sim .sim-label {
+    position: absolute;
+    top: calc(36px + env(safe-area-inset-top, 0px));
+    left: calc(28px + env(safe-area-inset-left, 0px));
+    z-index: 2;
+  }
+  .photo-sim .sim-title {
+    font-family: var(--font-jp);
+    font-size: clamp(17px, 2.5vw, 24px);
+    font-weight: 400;
+    line-height: 1.8;
+    letter-spacing: 0.04em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+  .photo-sim .sim-sub {
+    display: block;
+    font-size: clamp(12px, 1.6vw, 15px);
+    font-weight: 300;
+    margin-top: 4px;
+    letter-spacing: 0.03em;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+  }
+
+  /* ── 📖 open button ── */
+  .open-reading {
+    position: fixed;
+    top: calc(36px + env(safe-area-inset-top, 0px));
+    left: calc(28px + env(safe-area-inset-left, 0px));
+    top: auto;
+    left: auto;
+    bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+    right: calc(28px + env(safe-area-inset-right, 0px));
+    z-index: 5;
+    background: none;
+    border: none;
+    color: var(--color-title);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    padding: 10px;
+    transition: opacity 0.2s;
+  }
+  .open-reading:hover { opacity: 0.7; }
+  body.is-reading .open-reading { opacity: 0; pointer-events: none; }
+  body.is-reading .photo-sim .sim-label { opacity: 0; transition: opacity 0.3s; }
+
+  /* ════════════════════════════════════════
+     MODE SWITCHER (テスト用)
+     ════════════════════════════════════════ */
+  .mode-switcher {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 4px;
+    background: rgba(28,27,24,0.85);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    padding: 4px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .mode-switcher button {
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, color 0.2s;
+  }
+  .mode-switcher button.active {
+    background: var(--color-rule);
+    color: var(--color-title);
+  }
+  .mode-switcher button:hover:not(.active) {
+    color: var(--color-credit);
+  }
+
+  /* ════════════════════════════════════════
+     <dialog> READING-LAYER — 共通
+     ════════════════════════════════════════ */
+  .reading-layer {
+    border: none;
+    outline: none;
+    max-width: none;
+    max-height: none;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: manipulation; /* = pan-x pan-y pinch-zoom */
+    color: var(--color-title);
+    font-family: var(--font);
+  }
+
+  /* ::backdrop — dialog 背面 */
+  .reading-layer::backdrop {
+    background: transparent;
+    transition: background 0.4s ease;
+  }
+
+  /* ── 開閉アニメーション ── */
+  .reading-layer {
+    opacity: 0;
+    transition: opacity 0.4s ease,
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .reading-layer[open] {
+    opacity: 1;
+  }
+
+  /* ── 閉じボタン (共通) ── */
+  .reading-close {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 0;
+  }
+  .reading-close button {
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 10px;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s, opacity 0.2s;
+  }
+  .reading-close button:hover {
+    color: var(--color-title);
+    opacity: 0.9;
+  }
+
+  /* ── 記事本文 (共通) ── */
+  .reading-article {
+    width: min(100% - 32px, 68ch);
+    margin-inline: auto;
+    padding: 0 0 64px;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+    text-align: center;
+    /* テキスト操作を全許可 */
+    user-select: text;
+    -webkit-user-select: text;
+  }
+  .reading-article h1 {
+    font-family: var(--font-jp);
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .reading-article .article-sub {
+    font-size: clamp(13px, 1.8vw, 16px);
+    font-weight: 300;
+    color: var(--color-credit);
+    letter-spacing: 0.03em;
+    margin-bottom: 2em;
+  }
+  .reading-article .article-credit {
+    font-size: 11px;
+    font-weight: 300;
+    color: var(--color-note);
+    letter-spacing: 0.02em;
+    margin-bottom: 2.5em;
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  /* ── stanza (詩的テキスト — 真ん中寄せ) ── */
+  .reading-article .stanza {
+    font-family: var(--font-jp);
+    font-size: clamp(13px, 1.5vw, 15px);
+    font-weight: 300;
+    line-height: 2.2;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.6em;
+    color: var(--color-title);
+  }
+  .reading-article .stanza:last-child { margin-bottom: 0; }
+  .reading-article .stanza-end {
+    font-family: var(--font-jp);
+    font-size: clamp(13px, 1.5vw, 15px);
+    font-weight: 300;
+    line-height: 2.2;
+    margin-top: 2em;
+    color: var(--color-title);
+  }
+  .reading-article .stanza.en,
+  .reading-article .stanza-end.en {
+    font-family: var(--font);
+    font-size: clamp(12px, 1.4vw, 14px);
+    line-height: 2.0;
+    letter-spacing: 0.01em;
+  }
+  .reading-article .placeholder {
+    color: var(--color-note);
+    font-style: italic;
+    font-size: 13px;
+  }
+  .reading-article .lang-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--color-rule);
+    margin: 2.5em auto;
+  }
+
+  /* ════════════════════════════════════════
+     MODE A: 半透明オーバーレイ
+     ════════════════════════════════════════ */
+  .reading-layer.mode-overlay {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(28, 27, 24, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transform: none;
+  }
+
+  /* ════════════════════════════════════════
+     MODE B: 全画面切替
+     ════════════════════════════════════════ */
+  .reading-layer.mode-fullscreen {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--color-bg);
+    transform: none;
+  }
+
+  /* ════════════════════════════════════════
+     MODE C: ボトムシート
+     ════════════════════════════════════════ */
+  .reading-layer.mode-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100%;
+    height: 85vh;
+    height: 85dvh;
+    background: var(--color-bg);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    transform: translateY(100%);
+  }
+  .reading-layer.mode-sheet[open] {
+    transform: translateY(0);
+  }
+  .reading-layer.mode-sheet::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  .reading-layer.mode-sheet[open]::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  /* シートのドラッグハンドル */
+  .sheet-handle {
+    display: none;
+    width: 36px;
+    height: 4px;
+    background: var(--color-note);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    opacity: 0.4;
+  }
+  .mode-sheet .sheet-handle { display: block; }
+
+  /* ════════════════════════════════════════
+     CHECKLIST (テスト結果記録用 — フルスクリーン)
+     ════════════════════════════════════════ */
+  .checklist-toggle {
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    z-index: 100;
+    background: rgba(28,27,24,0.85);
+    border: 1px solid var(--color-rule);
+    border-radius: 8px;
+    color: var(--color-note);
+    font-family: var(--font);
+    font-size: 11px;
+    padding: 6px 12px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .checklist-panel {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--color-bg);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: 0 20px calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+  .checklist-panel.open { display: block; }
+  .checklist-header {
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 0 12px;
+    border-bottom: 1px solid var(--color-rule);
+    margin-bottom: 16px;
+    z-index: 1;
+  }
+  .checklist-header h2 {
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--color-title);
+    letter-spacing: 0.04em;
+  }
+  .checklist-header button {
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .checklist-panel h3 {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-credit);
+    margin-bottom: 10px;
+    letter-spacing: 0.04em;
+  }
+  .checklist-item {
+    margin-bottom: 12px;
+  }
+  .checklist-item label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--color-title);
+    cursor: pointer;
+    line-height: 1.5;
+    padding: 4px 0;
+  }
+  .checklist-item input[type="checkbox"] {
+    margin-top: 4px;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+  }
+  .checklist-item .memo {
+    display: block;
+    width: 100%;
+    margin-top: 6px;
+    margin-left: 28px;
+    width: calc(100% - 28px);
+    background: var(--color-rule);
+    border: none;
+    border-radius: 6px;
+    color: var(--color-title);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 300;
+    padding: 8px 10px;
+    resize: vertical;
+    min-height: 32px;
+    line-height: 1.5;
+  }
+  .checklist-item .memo::placeholder {
+    color: var(--color-note);
+  }
+  .checklist-item .memo:focus {
+    outline: 1px solid var(--color-note);
+  }
+  .cat {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-rule);
+  }
+  .cat:first-child { margin-top: 0; border-top: none; padding-top: 0; }
+  /* ── デバイス・ブラウザ入力 ── */
+  .device-info {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .device-info input {
+    flex: 1;
+    background: var(--color-rule);
+    border: none;
+    border-radius: 6px;
+    color: var(--color-title);
+    font-family: var(--font);
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .device-info input::placeholder { color: var(--color-note); }
+  .device-info input:focus { outline: 1px solid var(--color-note); }
+  /* ── コピーボタン ── */
+  .checklist-copy {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 201;
+    display: none;
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px));
+    background: var(--color-bg);
+    border-top: 1px solid var(--color-rule);
+  }
+  .checklist-panel.open ~ .checklist-copy { display: block; }
+  .checklist-copy button {
+    width: 100%;
+    background: var(--color-rule);
+    border: none;
+    border-radius: 8px;
+    color: var(--color-title);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 12px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    transition: background 0.2s;
+  }
+  .checklist-copy button:active {
+    background: var(--color-note);
+  }
+</style>
+</head>
+<body>
+
+<!-- ── 写真ページのシミュレーション ── -->
+<div class="photo-sim">
+  <img src="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
+  <div class="sim-label">
+    <div class="sim-title">
+      「見えないもの」を知覚する
+      <span class="sim-sub">グレーに浮かぶ、桜のピンク</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── 📖 開くボタン ── -->
+<button class="open-reading" id="openBtn">📖 read</button>
+
+<!-- ── モード切替（テスト用） ── -->
+<div class="mode-switcher">
+  <button class="active" data-mode="overlay">半透明</button>
+  <button data-mode="fullscreen">全画面</button>
+  <button data-mode="sheet">シート</button>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     <dialog> READING-LAYER
+     ═══════════════════════════════════════════ -->
+<dialog class="reading-layer mode-overlay" id="readingLayer">
+  <div class="sheet-handle"></div>
+  <div class="reading-close">
+    <button id="closeBtn" aria-label="閉じる">✕</button>
+  </div>
+  <article class="reading-article">
+    <header>
+      <h1>「見えないもの」を知覚する</h1>
+      <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
+      <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
+    </header>
+
+    <section lang="ja">
+      <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
+      <p class="stanza">マーファは雨が降るのだろうか。</p>
+      <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
+      <p class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
+      <p class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
+      <p class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
+      <p class="stanza-end">春の気配がした</p>
+    </section>
+
+    <div class="lang-divider" role="separator"></div>
+
+    <section lang="en">
+      <p class="stanza en">A rainy afternoon<br>Quiet Watari-Um</p>
+      <p class="stanza en">Does it rain in Marfa?</p>
+      <p class="stanza en">Thinking about that<br>as I enter Judd's world</p>
+      <p class="stanza en">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</p>
+      <p class="stanza en">Yet its surface was soft and warm<br>draped in drifting light</p>
+      <p class="stanza en">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</p>
+      <p class="stanza-end en">A hint of spring</p>
+    </section>
+  </article>
+</dialog>
+
+<!-- ── チェックリスト（テスト用 — フルスクリーン） ── -->
+<button class="checklist-toggle" id="checklistBtn">Checklist</button>
+<div class="checklist-panel" id="checklistPanel">
+  <div class="checklist-header">
+    <h2>reading-layer テスト</h2>
+    <button id="checklistCloseBtn" aria-label="閉じる">✕</button>
+  </div>
+
+  <div class="device-info">
+    <input type="text" id="deviceInput" placeholder="デバイス (例: iPhone 17 Pro)">
+    <input type="text" id="browserInput" placeholder="ブラウザ (例: Safari)">
+  </div>
+
+  <div class="cat">
+    <h3>読む</h3>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="ピンチズーム → レイアウト崩れない"> ピンチズーム → レイアウト崩れない</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="OS文字サイズ変更 → 読める、崩れない"> OS文字サイズ変更 → 読める、崩れない</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="縦スクロール → ネイティブで動く"> 縦スクロール → ネイティブで動く</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+  </div>
+
+  <div class="cat">
+    <h3>操作</h3>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="テキスト選択 → 動作する"> テキスト選択 → 動作する</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="コピー → 動作する"> コピー → 動作する</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="辞書（iOS長押し）→ 動作する"> 辞書（iOS長押し）→ 動作する</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="ページ内検索 → ヒットする"> ページ内検索 → ヒットする</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+  </div>
+
+  <div class="cat">
+    <h3>ブラウザ支援</h3>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="ブラウザ翻訳 → 動作する"> ブラウザ翻訳 → 動作する</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="リーダーモード → 認識される"> リーダーモード → 認識される</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+  </div>
+
+  <div class="cat">
+    <h3>アクセシビリティ</h3>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="スクリーンリーダー → 読み上げ"> スクリーンリーダー → 読み上げ</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="Dynamic Type → 反映される"> Dynamic Type → 反映される</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+  </div>
+
+  <div class="cat">
+    <h3>ナビゲーション</h3>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="overscroll → containされる"> overscroll → containされる</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="ブラウザ戻る → 正常動作"> ブラウザ戻る → 正常動作</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="Esc → 閉じる (PC)"> Esc → 閉じる (PC)</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+  </div>
+
+  <div class="cat">
+    <h3>写真世界との共存</h3>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="開閉がスムーズ"> 開閉がスムーズ</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="閉じた後に写真操作が正常に戻る"> 閉じた後に写真操作が正常に戻る</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+    <div class="checklist-item">
+      <label><input type="checkbox" data-label="背面の写真が適切に見える/隠れる"> 背面の写真が適切に見える/隠れる</label>
+      <textarea class="memo" placeholder="メモ" rows="1"></textarea>
+    </div>
+  </div>
+
+  <div class="cat">
+    <h3>その他メモ</h3>
+    <textarea class="memo" id="generalMemo" placeholder="全体的な感想・気づき" rows="3" style="width:100%; margin-left:0;"></textarea>
+  </div>
+</div>
+<div class="checklist-copy" id="checklistCopy">
+  <button id="copyBtn">結果をコピー</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// reading-layer prototype
+// ══════════════════════════════════════════════
+
+const dialog = document.getElementById('readingLayer');
+const openBtn = document.getElementById('openBtn');
+const closeBtn = document.getElementById('closeBtn');
+const modeBtns = document.querySelectorAll('.mode-switcher button');
+const checklistBtn = document.getElementById('checklistBtn');
+
+let currentMode = 'overlay';
+
+// ── モード切替 ──
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const mode = btn.dataset.mode;
+    if (mode === currentMode) return;
+
+    // ボタン状態更新
+    modeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // dialog が開いていたら一旦閉じてモード変更して再度開く
+    const wasOpen = dialog.open;
+    if (wasOpen) {
+      dialog.close();
+      document.body.classList.remove('is-reading');
+    }
+
+    // クラス切替
+    dialog.classList.remove('mode-overlay', 'mode-fullscreen', 'mode-sheet');
+    dialog.classList.add('mode-' + mode);
+    currentMode = mode;
+
+    if (wasOpen) {
+      requestAnimationFrame(() => openDialog());
+    }
+  });
+});
+
+// ── 開く ──
+function openDialog() {
+  dialog.showModal();
+  document.body.classList.add('is-reading');
+  // スクロール位置リセット
+  dialog.scrollTop = 0;
+}
+
+openBtn.addEventListener('click', openDialog);
+
+// ── 閉じる ──
+function closeDialog() {
+  document.body.classList.remove('is-reading');
+  dialog.close();
+}
+
+closeBtn.addEventListener('click', closeDialog);
+
+// Esc は <dialog> のビルトイン（自動で閉じる）
+// → is-reading のクリーンアップだけ追加
+dialog.addEventListener('close', () => {
+  document.body.classList.remove('is-reading');
+});
+
+// ::backdrop クリックで閉じる（overlay / fullscreen モード）
+dialog.addEventListener('click', (e) => {
+  // dialog 自体がクリックされた場合（= backdrop 領域）
+  if (e.target === dialog) {
+    const rect = dialog.getBoundingClientRect();
+    const inside = (
+      e.clientX >= rect.left &&
+      e.clientX <= rect.right &&
+      e.clientY >= rect.top &&
+      e.clientY <= rect.bottom
+    );
+    // sheet モードでは backdrop クリックで閉じる
+    // overlay/fullscreen では dialog 全体がコンテンツなので、
+    // backdrop は基本的にない。ただし sheet の backdrop をタップで閉じる。
+    if (!inside) {
+      closeDialog();
+    }
+  }
+});
+
+// ── チェックリスト ──
+const checklistPanel = document.getElementById('checklistPanel');
+checklistBtn.addEventListener('click', () => {
+  checklistPanel.classList.add('open');
+});
+document.getElementById('checklistCloseBtn').addEventListener('click', () => {
+  checklistPanel.classList.remove('open');
+});
+
+// ── 結果をコピー ──
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const device = document.getElementById('deviceInput').value || '未入力';
+  const browser = document.getElementById('browserInput').value || '未入力';
+  const items = checklistPanel.querySelectorAll('.checklist-item');
+  const general = document.getElementById('generalMemo').value;
+
+  let text = `reading-layer テスト結果\nデバイス: ${device} / ブラウザ: ${browser}\n\n`;
+
+  let currentCat = '';
+  items.forEach(item => {
+    const cat = item.closest('.cat');
+    const catTitle = cat ? cat.querySelector('h3').textContent : '';
+    if (catTitle !== currentCat) {
+      currentCat = catTitle;
+      text += `【${catTitle}】\n`;
+    }
+    const cb = item.querySelector('input[type="checkbox"]');
+    const label = cb.dataset.label;
+    const memo = item.querySelector('.memo').value;
+    const status = cb.checked ? '✅' : '❌';
+    text += `${status} ${label}`;
+    if (memo) text += ` — ${memo}`;
+    text += '\n';
+  });
+
+  if (general) {
+    text += `\n【その他メモ】\n${general}\n`;
+  }
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'コピーしました';
+    setTimeout(() => { btn.textContent = '結果をコピー'; }, 2000);
+  });
+});
+</script>
+</body>
+</html>
