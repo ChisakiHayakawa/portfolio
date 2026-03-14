@@ -236,6 +236,15 @@
     padding-bottom: 1.5em;
     border-bottom: 1px solid var(--color-rule);
   }
+  /* ── EN section header ── */
+  .reading-article section[lang="en"] h1 {
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+  }
+  .reading-article section[lang="en"] .article-sub {
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+  }
   .reading-article .stanza {
     font-family: var(--font-jp);
     font-size: clamp(0.8125em, 1.5vw, 0.9375em);
@@ -267,17 +276,65 @@
     background: var(--color-rule);
     margin: 2.5em auto;
   }
+  /* ── 言語切替: 非選択セクションを非表示 ── */
+  .reading-article[data-lang="ja"] section[lang="en"],
+  .reading-article[data-lang="ja"] .lang-divider {
+    display: none;
+  }
+  .reading-article[data-lang="en"] section[lang="ja"],
+  .reading-article[data-lang="en"] .lang-divider {
+    display: none;
+  }
 
-  /* ── A-/A+ 文字サイズ変更 ── */
+  /* ── TOOLBAR ── */
   .reading-toolbar {
     position: sticky;
     top: 0;
     z-index: 10;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 0;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
+    margin-bottom: 1.5em;
   }
+  .reading-toolbar .lang-toggle { justify-self: start; }
+  .reading-toolbar .text-size-controls { justify-self: center; }
+  .reading-toolbar .close-btn { justify-self: end; }
+  /* ── JP | EN 切替 ── */
+  .lang-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+  .lang-toggle button {
+    background: none;
+    border: none;
+    color: var(--color-note);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    padding: 8px 4px;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s;
+  }
+  .lang-toggle button.active {
+    color: var(--color-title);
+  }
+  .lang-toggle button:not(.active):hover {
+    color: var(--color-credit);
+  }
+  .lang-toggle .lang-sep {
+    color: var(--color-rule);
+    padding: 0 4px;
+    user-select: none;
+  }
+  /* ── A-/A+ 文字サイズ変更 ── */
   .text-size-controls {
     display: flex;
     align-items: center;
@@ -307,13 +364,6 @@
   .text-size-controls button:disabled {
     opacity: 0.3;
     cursor: default;
-  }
-  .text-size-label {
-    font-size: 11px;
-    color: var(--color-note);
-    min-width: 36px;
-    text-align: center;
-    letter-spacing: 0.02em;
   }
   .reading-toolbar .close-btn {
     background: none;
@@ -459,21 +509,24 @@
      ════════════════════════════════════════ -->
 <dialog class="reading-layer" id="readingLayer">
   <div class="reading-toolbar">
+    <div class="lang-toggle">
+      <button id="langJa" class="active" aria-label="日本語">JP</button>
+      <span class="lang-sep">|</span>
+      <button id="langEn" aria-label="English">EN</button>
+    </div>
     <div class="text-size-controls">
       <button id="textSmaller" aria-label="文字を小さく">A-</button>
-      <span class="text-size-label" id="textSizeLabel">100%</span>
       <button id="textLarger" aria-label="文字を大きく">A+</button>
     </div>
     <button class="close-btn" id="closeBtn" aria-label="閉じる">✕</button>
   </div>
   <article class="reading-article">
-    <header>
-      <h1>「見えないもの」を知覚する</h1>
-      <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
-      <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
-    </header>
-
     <section lang="ja">
+      <header>
+        <h1>「見えないもの」を知覚する</h1>
+        <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
+        <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
+      </header>
       <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
       <p class="stanza">マーファは雨が降るのだろうか。</p>
       <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
@@ -486,6 +539,11 @@
     <div class="lang-divider" role="separator"></div>
 
     <section lang="en">
+      <header>
+        <h1>Perceiving the invisible</h1>
+        <p class="article-sub">Cherry blossom pink, floating in grey</p>
+        <p class="article-credit">Untitled, 1967, Galvanized iron<br>Collection: Ohara Museum of Art</p>
+      </header>
       <p class="stanza en">A rainy afternoon<br>Quiet Watari-Um</p>
       <p class="stanza en">Does it rain in Marfa?</p>
       <p class="stanza en">Thinking about that<br>as I enter Judd's world</p>
@@ -709,7 +767,6 @@ dialog.addEventListener('close', function() {
 
 // ── A-/A+ 文字サイズ制御 ──
 var article = dialog.querySelector('.reading-article');
-var textSizeLabel = document.getElementById('textSizeLabel');
 var textSmaller = document.getElementById('textSmaller');
 var textLarger = document.getElementById('textLarger');
 var SCALE_STEPS = [0.75, 0.875, 1, 1.125, 1.25, 1.5];
@@ -718,7 +775,6 @@ var scaleIndex = 2; // default = 1 (100%)
 function updateTextSize() {
   var scale = SCALE_STEPS[scaleIndex];
   article.style.setProperty('--reading-scale', scale);
-  textSizeLabel.textContent = Math.round(scale * 100) + '%';
   textSmaller.disabled = (scaleIndex === 0);
   textLarger.disabled = (scaleIndex === SCALE_STEPS.length - 1);
 }
@@ -730,6 +786,23 @@ textLarger.addEventListener('click', function() {
   if (scaleIndex < SCALE_STEPS.length - 1) { scaleIndex++; updateTextSize(); }
 });
 updateTextSize();
+
+// ── JP | EN 言語切替 ──
+var langJaBtn = document.getElementById('langJa');
+var langEnBtn = document.getElementById('langEn');
+
+function setLang(lang) {
+  article.dataset.lang = lang;
+  langJaBtn.classList.toggle('active', lang === 'ja');
+  langEnBtn.classList.toggle('active', lang === 'en');
+  dialog.scrollTop = 0;
+}
+
+langJaBtn.addEventListener('click', function() { setLang('ja'); });
+langEnBtn.addEventListener('click', function() { setLang('en'); });
+
+// デフォルト: 日本語
+setLang('ja');
 
 // ══════════════════════════════════════
 // CHECKLIST
