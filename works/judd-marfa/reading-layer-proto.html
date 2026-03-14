@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>reading-layer prototype — B-Side</title>
-<!-- reading-layer proto v4.2 / 2026.03.14 — extract checklist, JA direct DOM for reader mode, semantic footer -->
+<!-- reading-layer proto v5.0 / 2026.03.14 — arch: booklet-viewport wrapper, remove overflow/touch-action from html/body, 100vw→100% -->
 <link rel="alternate" hreflang="ja" href="./">
 <link rel="alternate" hreflang="en" href="?lang=en">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
@@ -22,36 +22,50 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
+  /*
+    html / body にはレイアウト制御を置かない。
+    overflow / touch-action / user-select は .booklet-viewport に集約。
+    → body の overflow がビューポートに伝搬する問題を構造的に排除。
+    → ブラウザズーム時はビューポートがスクロール可能（デフォルト動作維持）。
+  */
+  html {
     height: 100%;
-    overflow: hidden;
+  }
+  body {
+    height: 100%;
     font-family: var(--font);
     color: var(--color-title);
     background: var(--color-bg);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* ════════════════════════════════════════
+     BOOKLET VIEWPORT — booklet の封じ込め層
+     overflow / touch-action / user-select はここだけ
+     ════════════════════════════════════════ */
+  .booklet-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     touch-action: none;
     user-select: none;
   }
 
-  /* ════════════════════════════════════════
-     BOOKLET (本番と同じ構造)
-     ════════════════════════════════════════ */
   .booklet {
     display: flex;
     width: 100%;
     height: 100%;
     will-change: transform;
     transform: translate3d(0,0,0);
-    touch-action: none;
   }
   .page {
-    flex: 0 0 100vw;
-    width: 100vw;
+    flex: 0 0 100%;
+    width: 100%;
     height: 100%;
     position: relative;
     overflow: hidden;
     contain: paint;
-    touch-action: none;
   }
   .page img.bg {
     position: absolute;
@@ -383,6 +397,7 @@
     -webkit-tap-highlight-color: transparent;
     transition: opacity 0.2s, color 0.2s;
     opacity: 0.4;
+    touch-action: none;  /* viewport wrapper の外なので個別指定 */
   }
   .nav-arrow:hover { opacity: 0.8; color: var(--color-title); }
   .nav-arrow:disabled { opacity: 0; pointer-events: none; }
@@ -396,8 +411,9 @@
 <body style="background:#1c1b18">
 
 <!-- ════════════════════════════════════════
-     BOOKLET (3ページ: cover → 2A photo → closing)
+     BOOKLET VIEWPORT — overflow/touch-action の封じ込め層
      ════════════════════════════════════════ -->
+<div class="booklet-viewport">
 <main class="booklet" id="booklet">
   <section class="page page-cover">
     <h1>JUDD | Marfa</h1>
@@ -420,6 +436,7 @@
     <p class="closing-title">JUDD | Marfa</p>
   </section>
 </main>
+</div>
 
 <!-- Page indicator -->
 <nav class="page-indicator" id="indicator">
@@ -503,8 +520,8 @@
 
 <script>
 // ══════════════════════════════════════════════
-// reading-layer prototype v4.2
-// unified setAppLang, DOM single-lang, URL param
+// reading-layer prototype v5.0
+// booklet-viewport wrapper architecture
 // ══════════════════════════════════════════════
 
 const booklet = document.getElementById('booklet');
