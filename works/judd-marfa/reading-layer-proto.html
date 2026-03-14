@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>reading-layer prototype — B-Side</title>
-<!-- reading-layer proto v4.0 / 2026.03.14 — unified setAppLang, DOM single-lang, URL param, hreflang -->
+<!-- reading-layer proto v4.2 / 2026.03.14 — extract checklist, JA direct DOM for reader mode, semantic footer -->
 <link rel="alternate" hreflang="ja" href="./">
 <link rel="alternate" hreflang="en" href="?lang=en">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
@@ -302,6 +302,7 @@
   .lang-toggle button {
     background: none;
     border: none;
+    outline: none;
     color: var(--color-note);
     font-family: inherit;
     font-size: inherit;
@@ -331,8 +332,8 @@
   }
   .text-size-controls button {
     background: none;
-    border: 1px solid var(--color-rule);
-    border-radius: 6px;
+    border: none;
+    outline: none;
     color: var(--color-note);
     font-family: var(--font);
     font-size: 14px;
@@ -341,14 +342,13 @@
     height: 36px;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .text-size-controls button:hover {
     color: var(--color-title);
-    border-color: var(--color-note);
   }
   .text-size-controls button:disabled {
     opacity: 0.3;
@@ -390,68 +390,7 @@
   .nav-next { right: 8px; }
   body.is-reading .nav-arrow { opacity: 0; pointer-events: none; }
 
-  /* ════════════════════════════════════════
-     CHECKLIST
-     ════════════════════════════════════════ */
-  .checklist-toggle {
-    position: fixed;
-    bottom: 12px;
-    left: 12px;
-    z-index: 100;
-    background: rgba(28,27,24,0.85);
-    border: 1px solid var(--color-rule);
-    border-radius: 8px;
-    color: var(--color-note);
-    font-family: var(--font);
-    font-size: 11px;
-    padding: 6px 12px;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  .checklist-panel {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: var(--color-bg);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    padding: 0 20px calc(80px + env(safe-area-inset-bottom, 0px));
-  }
-  .checklist-panel.open { display: block; }
-  .checklist-header {
-    position: sticky;
-    top: 0;
-    background: var(--color-bg);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: calc(16px + env(safe-area-inset-top, 0px)) 0 12px;
-    border-bottom: 1px solid var(--color-rule);
-    margin-bottom: 16px;
-    z-index: 1;
-  }
-  .checklist-header h2 { font-size: 15px; font-weight: 400; color: var(--color-title); letter-spacing: 0.04em; }
-  .checklist-header button { background: none; border: none; color: var(--color-note); font-size: 20px; cursor: pointer; padding: 8px; -webkit-tap-highlight-color: transparent; }
-  .checklist-panel h3 { font-size: 13px; font-weight: 500; color: var(--color-credit); margin-bottom: 10px; letter-spacing: 0.04em; }
-  .checklist-item { margin-bottom: 12px; }
-  .checklist-item label { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; font-weight: 300; color: var(--color-title); cursor: pointer; line-height: 1.5; padding: 4px 0; }
-  .checklist-item input[type="checkbox"] { margin-top: 4px; flex-shrink: 0; width: 18px; height: 18px; }
-  .checklist-item .memo { display: block; margin-top: 6px; margin-left: 28px; width: calc(100% - 28px); background: var(--color-rule); border: none; border-radius: 6px; color: var(--color-title); font-family: var(--font); font-size: 13px; font-weight: 300; padding: 8px 10px; resize: vertical; min-height: 32px; line-height: 1.5; }
-  .checklist-item .memo::placeholder { color: var(--color-note); }
-  .checklist-item .memo:focus { outline: 1px solid var(--color-note); }
-  .cat { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-rule); }
-  .cat:first-child { margin-top: 0; border-top: none; padding-top: 0; }
-  .device-info { display: flex; gap: 8px; margin-bottom: 16px; }
-  .device-info input { flex: 1; background: var(--color-rule); border: none; border-radius: 6px; color: var(--color-title); font-family: var(--font); font-size: 13px; padding: 8px 10px; }
-  .device-info input::placeholder { color: var(--color-note); }
-  .device-info input:focus { outline: 1px solid var(--color-note); }
-  .checklist-copy { position: fixed; bottom: 0; left: 0; right: 0; z-index: 201; display: none; padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); background: var(--color-bg); border-top: 1px solid var(--color-rule); }
-  .checklist-panel.open ~ .checklist-copy { display: block; }
-  .checklist-copy button { width: 100%; background: var(--color-rule); border: none; border-radius: 8px; color: var(--color-title); font-family: var(--font); font-size: 14px; font-weight: 400; padding: 12px; cursor: pointer; letter-spacing: 0.04em; }
-  .checklist-copy button:active { background: var(--color-note); }
+
 </style>
 </head>
 <body style="background:#1c1b18">
@@ -473,7 +412,7 @@
         <span class="label-sub i18n" data-ja="グレーに浮かぶ、桜のピンク" data-en="Cherry blossom pink, floating in grey"></span>
       </div>
     </div>
-    <div class="page-credit">Untitled, 1967, Galvanized iron<br><span class="i18n" data-ja="所蔵：公益財団法人大原芸術財団 大原美術館" data-en="Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki"></span></div>
+    <footer class="page-credit">Untitled, 1967, Galvanized iron<br><span class="i18n" data-ja="所蔵：公益財団法人大原芸術財団 大原美術館" data-en="Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki"></span></footer>
     <button class="open-reading" id="openBtn">📖 read</button>
   </section>
 
@@ -542,98 +481,29 @@
         <p class="stanza-end">A hint of spring</p>
       </section>
     </template>
+    <!-- JA 直書き: リーディングモード用。setAppLang() 初回実行で template クローンに置換される -->
+    <section lang="ja">
+      <header>
+        <h1>「見えないもの」を知覚する</h1>
+        <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
+        <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
+      </header>
+      <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
+      <p class="stanza">マーファは雨が降るのだろうか。</p>
+      <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
+      <p class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
+      <p class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
+      <p class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
+      <p class="stanza-end">春の気配がした</p>
+    </section>
   </article>
 </dialog>
 
-<!-- ════════════════════════════════════════
-     CHECKLIST
-     ════════════════════════════════════════ -->
-<button class="checklist-toggle" id="checklistBtn">Checklist</button>
-<div class="checklist-panel" id="checklistPanel">
-  <div class="checklist-header">
-    <h2>reading-layer v4.0 テスト</h2>
-    <button id="checklistCloseBtn" aria-label="閉じる">✕</button>
-  </div>
-  <div class="device-info">
-    <input type="text" id="deviceInput" placeholder="デバイス (例: iPhone 17 Pro)">
-    <input type="text" id="browserInput" placeholder="ブラウザ (例: Safari)">
-  </div>
-  <div class="cat">
-    <h3>★ N6 検証（今回の核心）</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Chrome翻訳: JP→EN 正しい方向で翻訳される"> Chrome翻訳: JP→EN 正しい方向で翻訳される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Chrome翻訳後 → JP|EN切替が正常動作"> Chrome翻訳後 → JP|EN切替が正常動作</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Safari翻訳: 正しい方向で翻訳される"> Safari翻訳: 正しい方向で翻訳される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>★ booklet ← → reading-layer 連動</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="reading-layer で EN → booklet ラベルも英語"> reading-layer で EN → booklet ラベルも英語</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="reading-layer で JP → booklet ラベルも日本語"> reading-layer で JP → booklet ラベルも日本語</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="booklet クレジットも連動して切り替わる"> booklet クレジットも連動して切り替わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>★ URL 言語パラメータ</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="パラメータなし → 日本語で開く"> パラメータなし → 日本語で開く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="?lang=en → 英語で開く"> ?lang=en → 英語で開く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="EN切替 → URLが ?lang=en に変わる"> EN切替 → URLが ?lang=en に変わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="JP切替 → URL から lang パラメータ消える"> JP切替 → URL から lang パラメータ消える</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>JP | EN 切替（reading-layer 内）</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="JP → 日本語のみ表示"> JP → 日本語のみ表示</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="EN → 英語のみ表示"> EN → 英語のみ表示</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="タイトル・サブ・クレジットも切り替わる"> タイトル・サブ・クレジットも切り替わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="選択中が通常色、非選択がグレー"> 選択中が通常色、非選択がグレー</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="切替時にスクロールトップに戻る"> 切替時にスクロールトップに戻る</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>A- A+ 文字サイズ</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="A+ → テキスト全体が大きくなる"> A+ → テキスト全体が大きくなる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="A- → テキスト全体が小さくなる"> A- → テキスト全体が小さくなる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="h1・sub・credit・本文すべてスケールする"> h1・sub・credit・本文すべてスケールする</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="最小/最大でボタンがdisabledになる"> 最小/最大でボタンがdisabledになる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>読む・スクロール</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="縦スクロール → ネイティブで動く"> 縦スクロール → ネイティブで動く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 無効（想定通り）"> ピンチズーム → 無効（想定通り）</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 隣ページ露出しない (F4)"> ピンチズーム → 隣ページ露出しない (F4)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト最上部/最下部でスクロール後、背面ページが動かない"> テキスト最上部/最下部でスクロール後、背面ページが動かない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト最上部で更に引き下げても、リフレッシュが出ない"> テキスト最上部で更に引き下げても、リフレッシュが出ない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>テキスト操作</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト選択 → 動作する"> テキスト選択 → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="コピー → 動作する"> コピー → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト選択後 →「調べる」が使える"> テキスト選択後 →「調べる」が使える</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ページ内検索 → ヒットする"> ページ内検索 → ヒットする</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>ブラウザ支援</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ翻訳 → 動作する（N6確認は上の★セクション）"> ブラウザ翻訳 → 動作する（N6確認は上の★セクション）</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Safari: リーダーを表示 → 認識される"> Safari: リーダーを表示 → 認識される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="デスクトップ: ブラウザ文字サイズ設定 → 反映される"> デスクトップ: ブラウザ文字サイズ設定 → 反映される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>写真世界との共存</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="開閉がスムーズ"> 開閉がスムーズ</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="✕ → 閉じる"> ✕ → 閉じる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Esc → 閉じる (PC)"> Esc → 閉じる (PC)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="閉じた後 → ページ送りが正常に戻る"> 閉じた後 → ページ送りが正常に戻る</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="半透明 → 背面の写真が透けて見える"> 半透明 → 背面の写真が透けて見える</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ戻る → 正常動作"> ブラウザ戻る → 正常動作</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>その他メモ</h3>
-    <textarea class="memo" id="generalMemo" placeholder="全体的な感想・気づき" rows="3" style="width:100%; margin-left:0;"></textarea>
-  </div>
-</div>
-<div class="checklist-copy" id="checklistCopy">
-  <button id="copyBtn">結果をコピー</button>
-</div>
+
 
 <script>
 // ══════════════════════════════════════════════
-// reading-layer prototype v4.0
+// reading-layer prototype v4.2
 // unified setAppLang, DOM single-lang, URL param
 // ══════════════════════════════════════════════
 
@@ -860,48 +730,7 @@ langEnBtn.addEventListener('click', function() {
 var initLang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ja';
 setAppLang(initLang);
 
-// ══════════════════════════════════════
-// CHECKLIST
-// ══════════════════════════════════════
-var checklistPanel = document.getElementById('checklistPanel');
-document.getElementById('checklistBtn').addEventListener('click', function() {
-  checklistPanel.classList.add('open');
-});
-document.getElementById('checklistCloseBtn').addEventListener('click', function() {
-  checklistPanel.classList.remove('open');
-});
 
-document.getElementById('copyBtn').addEventListener('click', function() {
-  var device = document.getElementById('deviceInput').value || '未入力';
-  var browser = document.getElementById('browserInput').value || '未入力';
-  var items = checklistPanel.querySelectorAll('.checklist-item');
-  var general = document.getElementById('generalMemo').value;
-
-  var text = 'reading-layer テスト結果\nデバイス: ' + device + ' / ブラウザ: ' + browser + '\n\n';
-  var currentCat = '';
-  items.forEach(function(item) {
-    var cat = item.closest('.cat');
-    var catTitle = cat ? cat.querySelector('h3').textContent : '';
-    if (catTitle !== currentCat) {
-      currentCat = catTitle;
-      text += '【' + catTitle + '】\n';
-    }
-    var cb = item.querySelector('input[type="checkbox"]');
-    var label = cb.dataset.label;
-    var memo = item.querySelector('.memo').value;
-    var status = cb.checked ? '✅' : '❌';
-    text += status + ' ' + label;
-    if (memo) text += ' — ' + memo;
-    text += '\n';
-  });
-  if (general) text += '\n【その他メモ】\n' + general + '\n';
-
-  navigator.clipboard.writeText(text).then(function() {
-    var btn = document.getElementById('copyBtn');
-    btn.textContent = 'コピーしました';
-    setTimeout(function() { btn.textContent = '結果をコピー'; }, 2000);
-  });
-});
 </script>
 </body>
 </html>
