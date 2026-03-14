@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>reading-layer prototype — B-Side</title>
-<!-- reading-layer proto v2 / 2026.03.12 — booklet構造シミュレーション + <dialog> 半透明オーバーレイ -->
+<!-- reading-layer proto v3 / 2026.03.14 — booklet構造 + rem + pan-y + A-/A+ -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -190,7 +190,7 @@
     overflow-y: auto;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
-    touch-action: manipulation;
+    touch-action: pan-y;  /* 縦スクロールのみ。ピンチズームはA-/A+で代替 */
     color: var(--color-title);
     font-family: var(--font);
     opacity: 0;
@@ -199,16 +199,123 @@
   .reading-layer[open] { opacity: 1; }
   .reading-layer::backdrop { background: transparent; }
 
-  /* ── 閉じボタン ── */
-  .reading-close {
+  /* ── 記事本文 ── */
+  .reading-article {
+    --reading-scale: 1;  /* A-/A+ で変更 */
+    width: min(100% - 2rem, 68ch);
+    margin-inline: auto;
+    padding: 0 0 4rem;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+    text-align: center;
+    user-select: text;
+    -webkit-user-select: text;
+    font-size: calc(1rem * var(--reading-scale));
+  }
+  .reading-article h1 {
+    font-family: var(--font-jp);
+    font-size: clamp(1.25rem, 3vw, 1.75rem);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+  .reading-article .article-sub {
+    font-size: clamp(0.8125rem, 1.8vw, 1rem);
+    font-weight: 300;
+    color: var(--color-credit);
+    letter-spacing: 0.03em;
+    margin-bottom: 2em;
+  }
+  .reading-article .article-credit {
+    font-size: 0.6875rem;
+    font-weight: 300;
+    color: var(--color-note);
+    letter-spacing: 0.02em;
+    margin-bottom: 2.5em;
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  .reading-article .stanza {
+    font-family: var(--font-jp);
+    font-size: clamp(0.8125rem, 1.5vw, 0.9375rem);
+    font-weight: 300;
+    line-height: 2.2;
+    letter-spacing: 0.02em;
+    margin-bottom: 1.6em;
+    color: var(--color-title);
+  }
+  .reading-article .stanza:last-child { margin-bottom: 0; }
+  .reading-article .stanza-end {
+    font-family: var(--font-jp);
+    font-size: clamp(0.8125rem, 1.5vw, 0.9375rem);
+    font-weight: 300;
+    line-height: 2.2;
+    margin-top: 2em;
+    color: var(--color-title);
+  }
+  .reading-article .stanza.en,
+  .reading-article .stanza-end.en {
+    font-family: var(--font);
+    font-size: clamp(0.75rem, 1.4vw, 0.875rem);
+    line-height: 2.0;
+    letter-spacing: 0.01em;
+  }
+  .reading-article .lang-divider {
+    width: 40px;
+    height: 1px;
+    background: var(--color-rule);
+    margin: 2.5em auto;
+  }
+
+  /* ── A-/A+ 文字サイズ変更 ── */
+  .reading-toolbar {
     position: sticky;
     top: 0;
     z-index: 10;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
     padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 0;
   }
-  .reading-close button {
+  .text-size-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .text-size-controls button {
+    background: none;
+    border: 1px solid var(--color-rule);
+    border-radius: 6px;
+    color: var(--color-note);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 400;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .text-size-controls button:hover {
+    color: var(--color-title);
+    border-color: var(--color-note);
+  }
+  .text-size-controls button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .text-size-label {
+    font-size: 11px;
+    color: var(--color-note);
+    min-width: 36px;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+  .reading-toolbar .close-btn {
     background: none;
     border: none;
     color: var(--color-note);
@@ -219,74 +326,30 @@
     -webkit-tap-highlight-color: transparent;
     transition: color 0.2s;
   }
-  .reading-close button:hover { color: var(--color-title); }
+  .reading-toolbar .close-btn:hover { color: var(--color-title); }
 
-  /* ── 記事本文 ── */
-  .reading-article {
-    width: min(100% - 32px, 68ch);
-    margin-inline: auto;
-    padding: 0 0 64px;
-    line-height: 1.75;
-    overflow-wrap: break-word;
-    text-align: center;
-    user-select: text;
-    -webkit-user-select: text;
-  }
-  .reading-article h1 {
-    font-family: var(--font-jp);
-    font-size: clamp(20px, 3vw, 28px);
-    font-weight: 400;
-    line-height: 1.6;
-    letter-spacing: 0.04em;
-    margin-bottom: 8px;
-  }
-  .reading-article .article-sub {
-    font-size: clamp(13px, 1.8vw, 16px);
-    font-weight: 300;
-    color: var(--color-credit);
-    letter-spacing: 0.03em;
-    margin-bottom: 2em;
-  }
-  .reading-article .article-credit {
-    font-size: 11px;
-    font-weight: 300;
+  /* ── NAV ARROWS (PC) ── */
+  .nav-arrow {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 5;
+    background: none;
+    border: none;
     color: var(--color-note);
-    letter-spacing: 0.02em;
-    margin-bottom: 2.5em;
-    padding-bottom: 1.5em;
-    border-bottom: 1px solid var(--color-rule);
+    font-size: 36px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 20px 12px;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s, color 0.2s;
+    opacity: 0.4;
   }
-  .reading-article .stanza {
-    font-family: var(--font-jp);
-    font-size: clamp(13px, 1.5vw, 15px);
-    font-weight: 300;
-    line-height: 2.2;
-    letter-spacing: 0.02em;
-    margin-bottom: 1.6em;
-    color: var(--color-title);
-  }
-  .reading-article .stanza:last-child { margin-bottom: 0; }
-  .reading-article .stanza-end {
-    font-family: var(--font-jp);
-    font-size: clamp(13px, 1.5vw, 15px);
-    font-weight: 300;
-    line-height: 2.2;
-    margin-top: 2em;
-    color: var(--color-title);
-  }
-  .reading-article .stanza.en,
-  .reading-article .stanza-end.en {
-    font-family: var(--font);
-    font-size: clamp(12px, 1.4vw, 14px);
-    line-height: 2.0;
-    letter-spacing: 0.01em;
-  }
-  .reading-article .lang-divider {
-    width: 40px;
-    height: 1px;
-    background: var(--color-rule);
-    margin: 2.5em auto;
-  }
+  .nav-arrow:hover { opacity: 0.8; color: var(--color-title); }
+  .nav-arrow:disabled { opacity: 0; pointer-events: none; }
+  .nav-prev { left: 8px; }
+  .nav-next { right: 8px; }
+  body.is-reading .nav-arrow { opacity: 0; pointer-events: none; }
 
   /* ════════════════════════════════════════
      CHECKLIST
@@ -387,12 +450,21 @@
   <span class="dot"></span>
 </nav>
 
+<!-- Nav arrows (PC) -->
+<button class="nav-arrow nav-prev" id="prevBtn" aria-label="前のページ">‹</button>
+<button class="nav-arrow nav-next" id="nextBtn" aria-label="次のページ">›</button>
+
 <!-- ════════════════════════════════════════
      <dialog> READING-LAYER
      ════════════════════════════════════════ -->
 <dialog class="reading-layer" id="readingLayer">
-  <div class="reading-close">
-    <button id="closeBtn" aria-label="閉じる">✕</button>
+  <div class="reading-toolbar">
+    <div class="text-size-controls">
+      <button id="textSmaller" aria-label="文字を小さく">A-</button>
+      <span class="text-size-label" id="textSizeLabel">100%</span>
+      <button id="textLarger" aria-label="文字を大きく">A+</button>
+    </div>
+    <button class="close-btn" id="closeBtn" aria-label="閉じる">✕</button>
   </div>
   <article class="reading-article">
     <header>
@@ -485,7 +557,7 @@
 
 <script>
 // ══════════════════════════════════════════════
-// reading-layer prototype v2
+// reading-layer prototype v3
 // ══════════════════════════════════════════════
 
 const booklet = document.getElementById('booklet');
@@ -494,54 +566,125 @@ const dots = document.querySelectorAll('.page-indicator .dot');
 const dialog = document.getElementById('readingLayer');
 const openBtn = document.getElementById('openBtn');
 const closeBtn = document.getElementById('closeBtn');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
 const TOTAL = pages.length;
-let currentPage = 0;
+var currentPage = 0;
 
 // ══════════════════════════════════════
-// BOOKLET — 簡易ページ送り
+// BOOKLET — ページ送り
 // ══════════════════════════════════════
 function goTo(idx) {
   if (idx < 0 || idx >= TOTAL) return;
   currentPage = idx;
   booklet.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1)';
-  booklet.style.transform = 'translate3d(' + (-currentPage * 100) + 'vw, 0, 0)';
+  booklet.style.transform = 'translate3d(' + (-currentPage * window.innerWidth) + 'px, 0, 0)';
   dots.forEach(function(d, i) { d.classList.toggle('active', i === currentPage); });
   openBtn.style.display = pages[currentPage].dataset.hasReading ? 'block' : 'none';
+  prevBtn.disabled = (currentPage === 0);
+  nextBtn.disabled = (currentPage === TOTAL - 1);
 }
 
+// ── ナビ矢印 (PC) ──
+prevBtn.addEventListener('click', function() { goTo(currentPage - 1); });
+nextBtn.addEventListener('click', function() { goTo(currentPage + 1); });
+
 // ── タッチスワイプ ──
-var touchStartX = 0, touchStartY = 0, swiping = false;
+var startX = 0, startY = 0, startTime = 0;
+var tracking = false, dirLocked = false, isHorizontal = false;
 
 document.addEventListener('touchstart', function(e) {
   if (dialog.open) return;
-  touchStartX = e.touches[0].clientX;
-  touchStartY = e.touches[0].clientY;
-  swiping = false;
-}, { passive: true });
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  startTime = Date.now();
+  tracking = true;
+  dirLocked = false;
+  isHorizontal = false;
+  booklet.style.transition = 'none';
+}, false);
 
 document.addEventListener('touchmove', function(e) {
-  if (dialog.open) return;
-  var dx = e.touches[0].clientX - touchStartX;
-  var dy = e.touches[0].clientY - touchStartY;
-  if (!swiping && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
-    swiping = true;
+  if (!tracking || dialog.open) return;
+  var dx = e.touches[0].clientX - startX;
+  var dy = e.touches[0].clientY - startY;
+
+  if (!dirLocked) {
+    if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+      dirLocked = true;
+      isHorizontal = Math.abs(dx) > Math.abs(dy);
+      if (!isHorizontal) { tracking = false; return; }
+    } else { return; }
   }
-}, { passive: true });
+
+  if (isHorizontal) {
+    e.preventDefault();
+    var offset = (-currentPage * window.innerWidth) + dx;
+    booklet.style.transform = 'translate3d(' + offset + 'px, 0, 0)';
+  }
+}, { passive: false });
 
 document.addEventListener('touchend', function(e) {
-  if (dialog.open) return;
-  if (!swiping) return;
-  var dx = e.changedTouches[0].clientX - touchStartX;
+  if (!tracking || !isHorizontal || dialog.open) { tracking = false; return; }
+  tracking = false;
+  var dx = e.changedTouches[0].clientX - startX;
+  var elapsed = Date.now() - startTime;
+  var velocity = Math.abs(dx) / elapsed;
+  if (dx < -50 || (dx < -20 && velocity > 0.3)) goTo(currentPage + 1);
+  else if (dx > 50 || (dx > 20 && velocity > 0.3)) goTo(currentPage - 1);
+  else goTo(currentPage);
+}, false);
+
+// ── マウスドラッグ (PC) ──
+var mouseDown = false, mouseStartX = 0;
+
+document.addEventListener('mousedown', function(e) {
+  if (dialog.open || e.target.closest('button') || e.target.closest('.checklist-panel')) return;
+  mouseDown = true;
+  mouseStartX = e.clientX;
+  booklet.style.transition = 'none';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (!mouseDown || dialog.open) return;
+  var dx = e.clientX - mouseStartX;
+  var offset = (-currentPage * window.innerWidth) + dx;
+  booklet.style.transform = 'translate3d(' + offset + 'px, 0, 0)';
+});
+
+document.addEventListener('mouseup', function(e) {
+  if (!mouseDown) return;
+  mouseDown = false;
+  var dx = e.clientX - mouseStartX;
   if (dx < -50) goTo(currentPage + 1);
   else if (dx > 50) goTo(currentPage - 1);
-  swiping = false;
+  else goTo(currentPage);
 });
+
+// ── ホイール (PC trackpad) ──
+var wheelLock = false;
+document.addEventListener('wheel', function(e) {
+  if (dialog.open || wheelLock) return;
+  if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30) {
+    wheelLock = true;
+    if (e.deltaX > 0) goTo(currentPage + 1);
+    else goTo(currentPage - 1);
+    setTimeout(function() { wheelLock = false; }, 500);
+  }
+}, { passive: true });
 
 // ── キーボード ──
 document.addEventListener('keydown', function(e) {
   if (dialog.open) return;
   if (e.key === 'ArrowRight') goTo(currentPage + 1);
   if (e.key === 'ArrowLeft') goTo(currentPage - 1);
+});
+
+// ── 画面回転/リサイズ ──
+window.addEventListener('resize', function() {
+  booklet.style.transition = 'none';
+  booklet.style.transform = 'translate3d(' + (-currentPage * window.innerWidth) + 'px, 0, 0)';
 });
 
 goTo(0);
@@ -563,6 +706,30 @@ closeBtn.addEventListener('click', closeDialog);
 dialog.addEventListener('close', function() {
   document.body.classList.remove('is-reading');
 });
+
+// ── A-/A+ 文字サイズ制御 ──
+var article = dialog.querySelector('.reading-article');
+var textSizeLabel = document.getElementById('textSizeLabel');
+var textSmaller = document.getElementById('textSmaller');
+var textLarger = document.getElementById('textLarger');
+var SCALE_STEPS = [0.75, 0.875, 1, 1.125, 1.25, 1.5];
+var scaleIndex = 2; // default = 1 (100%)
+
+function updateTextSize() {
+  var scale = SCALE_STEPS[scaleIndex];
+  article.style.setProperty('--reading-scale', scale);
+  textSizeLabel.textContent = Math.round(scale * 100) + '%';
+  textSmaller.disabled = (scaleIndex === 0);
+  textLarger.disabled = (scaleIndex === SCALE_STEPS.length - 1);
+}
+
+textSmaller.addEventListener('click', function() {
+  if (scaleIndex > 0) { scaleIndex--; updateTextSize(); }
+});
+textLarger.addEventListener('click', function() {
+  if (scaleIndex < SCALE_STEPS.length - 1) { scaleIndex++; updateTextSize(); }
+});
+updateTextSize();
 
 // ══════════════════════════════════════
 // CHECKLIST
