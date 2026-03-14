@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>reading-layer prototype — B-Side</title>
-<!-- reading-layer proto v3 / 2026.03.14 — booklet構造 + rem + pan-y + A-/A+ -->
+<!-- reading-layer proto v3.1 / 2026.03.14 — JP|EN toggle + em chain + toolbar grid -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -296,6 +296,8 @@
     align-items: center;
     padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
     margin-bottom: 1.5em;
+    user-select: none;
+    -webkit-user-select: none;
   }
   .reading-toolbar .lang-toggle { justify-self: start; }
   .reading-toolbar .text-size-controls { justify-self: center; }
@@ -561,7 +563,7 @@
 <button class="checklist-toggle" id="checklistBtn">Checklist</button>
 <div class="checklist-panel" id="checklistPanel">
   <div class="checklist-header">
-    <h2>reading-layer テスト</h2>
+    <h2>reading-layer v3.1 テスト</h2>
     <button id="checklistCloseBtn" aria-label="閉じる">✕</button>
   </div>
   <div class="device-info">
@@ -569,14 +571,30 @@
     <input type="text" id="browserInput" placeholder="ブラウザ (例: Safari)">
   </div>
   <div class="cat">
-    <h3>読む</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → レイアウト崩れない"> ピンチズーム → レイアウト崩れない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 隣ページ露出しない (F4)"> ピンチズーム → 隣ページ露出しない (F4)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="OS文字サイズ変更 → 読める、崩れない"> OS文字サイズ変更 → 読める、崩れない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="縦スクロール → ネイティブで動く"> 縦スクロール → ネイティブで動く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <h3>JP | EN 切替</h3>
+    <div class="checklist-item"><label><input type="checkbox" data-label="JP → 日本語のみ表示"> JP → 日本語のみ表示</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="EN → 英語のみ表示"> EN → 英語のみ表示</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="タイトル・サブ・クレジットも切り替わる"> タイトル・サブ・クレジットも切り替わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="選択中が通常色、非選択がグレー"> 選択中が通常色、非選択がグレー</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="切替時にスクロールトップに戻る"> 切替時にスクロールトップに戻る</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
   </div>
   <div class="cat">
-    <h3>操作</h3>
+    <h3>A- A+ 文字サイズ</h3>
+    <div class="checklist-item"><label><input type="checkbox" data-label="A+ → テキスト全体が大きくなる"> A+ → テキスト全体が大きくなる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="A- → テキスト全体が小さくなる"> A- → テキスト全体が小さくなる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="h1・sub・credit・本文すべてスケールする"> h1・sub・credit・本文すべてスケールする</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="最小/最大でボタンがdisabledになる"> 最小/最大でボタンがdisabledになる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+  </div>
+  <div class="cat">
+    <h3>読む・スクロール</h3>
+    <div class="checklist-item"><label><input type="checkbox" data-label="縦スクロール → ネイティブで動く"> 縦スクロール → ネイティブで動く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 無効（想定通り）"> ピンチズーム → 無効（想定通り）</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 隣ページ露出しない (F4)"> ピンチズーム → 隣ページ露出しない (F4)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="overscroll → containされる (F5)"> overscroll → containされる (F5)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="pull-to-refresh → 発動しない"> pull-to-refresh → 発動しない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+  </div>
+  <div class="cat">
+    <h3>テキスト操作</h3>
     <div class="checklist-item"><label><input type="checkbox" data-label="テキスト選択 → 動作する"> テキスト選択 → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="コピー → 動作する"> コピー → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="辞書（iOS長押し）→ 動作する"> 辞書（iOS長押し）→ 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
@@ -586,23 +604,16 @@
     <h3>ブラウザ支援</h3>
     <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ翻訳 → 動作する"> ブラウザ翻訳 → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="リーダーモード → 認識される"> リーダーモード → 認識される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>アクセシビリティ</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="スクリーンリーダー → 読み上げ"> スクリーンリーダー → 読み上げ</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Dynamic Type → 反映される"> Dynamic Type → 反映される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-  </div>
-  <div class="cat">
-    <h3>ナビゲーション</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="overscroll → containされる"> overscroll → containされる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ戻る → 正常動作"> ブラウザ戻る → 正常動作</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Esc → 閉じる (PC)"> Esc → 閉じる (PC)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="Dynamic Type / ブラウザ文字サイズ → 反映される"> Dynamic Type / ブラウザ文字サイズ → 反映される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
   </div>
   <div class="cat">
     <h3>写真世界との共存</h3>
     <div class="checklist-item"><label><input type="checkbox" data-label="開閉がスムーズ"> 開閉がスムーズ</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="✕ → 閉じる"> ✕ → 閉じる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="Esc → 閉じる (PC)"> Esc → 閉じる (PC)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="閉じた後 → ページ送りが正常に戻る"> 閉じた後 → ページ送りが正常に戻る</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="半透明 → 背面の写真が透けて見える"> 半透明 → 背面の写真が透けて見える</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ戻る → 正常動作"> ブラウザ戻る → 正常動作</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
   </div>
   <div class="cat">
     <h3>その他メモ</h3>
@@ -615,7 +626,7 @@
 
 <script>
 // ══════════════════════════════════════════════
-// reading-layer prototype v3
+// reading-layer prototype v3.1
 // ══════════════════════════════════════════════
 
 const booklet = document.getElementById('booklet');
