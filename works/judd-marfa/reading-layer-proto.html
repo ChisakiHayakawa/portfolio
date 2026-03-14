@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>reading-layer prototype — B-Side</title>
-<!-- reading-layer proto v3.1 / 2026.03.14 — JP|EN toggle + em chain + toolbar grid -->
+<!-- reading-layer proto v4.0 / 2026.03.14 — unified setAppLang, DOM single-lang, URL param, hreflang -->
+<link rel="alternate" hreflang="ja" href="./">
+<link rel="alternate" hreflang="en" href="?lang=en">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -237,11 +239,11 @@
     border-bottom: 1px solid var(--color-rule);
   }
   /* ── EN section header ── */
-  .reading-article section[lang="en"] h1 {
+  html[data-lang="en"] .reading-article h1 {
     font-family: var(--font);
     letter-spacing: 0.01em;
   }
-  .reading-article section[lang="en"] .article-sub {
+  html[data-lang="en"] .reading-article .article-sub {
     font-family: var(--font);
     letter-spacing: 0.01em;
   }
@@ -263,27 +265,12 @@
     margin-top: 2em;
     color: var(--color-title);
   }
-  .reading-article .stanza.en,
-  .reading-article .stanza-end.en {
+  html[data-lang="en"] .reading-article .stanza,
+  html[data-lang="en"] .reading-article .stanza-end {
     font-family: var(--font);
     font-size: clamp(0.75em, 1.4vw, 0.875em);
     line-height: 2.0;
     letter-spacing: 0.01em;
-  }
-  .reading-article .lang-divider {
-    width: 40px;
-    height: 1px;
-    background: var(--color-rule);
-    margin: 2.5em auto;
-  }
-  /* ── 言語切替: 非選択セクションを非表示 ── */
-  .reading-article[data-lang="ja"] section[lang="en"],
-  .reading-article[data-lang="ja"] .lang-divider {
-    display: none;
-  }
-  .reading-article[data-lang="en"] section[lang="ja"],
-  .reading-article[data-lang="en"] .lang-divider {
-    display: none;
   }
 
   /* ── TOOLBAR ── */
@@ -482,11 +469,11 @@
     <img class="bg" src="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
     <div class="page-label">
       <div class="label-title">
-        「見えないもの」を知覚する
-        <span class="label-sub">グレーに浮かぶ、桜のピンク</span>
+        <span class="i18n" data-ja="「見えないもの」を知覚する" data-en="Perceiving the invisible"></span>
+        <span class="label-sub i18n" data-ja="グレーに浮かぶ、桜のピンク" data-en="Cherry blossom pink, floating in grey"></span>
       </div>
     </div>
-    <div class="page-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</div>
+    <div class="page-credit">Untitled, 1967, Galvanized iron<br><span class="i18n" data-ja="所蔵：公益財団法人大原芸術財団 大原美術館" data-en="Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki"></span></div>
     <button class="open-reading" id="openBtn">📖 read</button>
   </section>
 
@@ -523,37 +510,38 @@
     <button class="close-btn" id="closeBtn" aria-label="閉じる">✕</button>
   </div>
   <article class="reading-article">
-    <section lang="ja">
-      <header>
-        <h1>「見えないもの」を知覚する</h1>
-        <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
-        <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
-      </header>
-      <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
-      <p class="stanza">マーファは雨が降るのだろうか。</p>
-      <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
-      <p class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
-      <p class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
-      <p class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
-      <p class="stanza-end">春の気配がした</p>
-    </section>
-
-    <div class="lang-divider" role="separator"></div>
-
-    <section lang="en">
-      <header>
-        <h1>Perceiving the invisible</h1>
-        <p class="article-sub">Cherry blossom pink, floating in grey</p>
-        <p class="article-credit">Untitled, 1967, Galvanized iron<br>Collection: Ohara Museum of Art</p>
-      </header>
-      <p class="stanza en">A rainy afternoon<br>Quiet Watari-Um</p>
-      <p class="stanza en">Does it rain in Marfa?</p>
-      <p class="stanza en">Thinking about that<br>as I enter Judd's world</p>
-      <p class="stanza en">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</p>
-      <p class="stanza en">Yet its surface was soft and warm<br>draped in drifting light</p>
-      <p class="stanza en">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</p>
-      <p class="stanza-end en">A hint of spring</p>
-    </section>
+    <template data-lang="ja">
+      <section lang="ja">
+        <header>
+          <h1>「見えないもの」を知覚する</h1>
+          <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
+          <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
+        </header>
+        <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
+        <p class="stanza">マーファは雨が降るのだろうか。</p>
+        <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
+        <p class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
+        <p class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
+        <p class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
+        <p class="stanza-end">春の気配がした</p>
+      </section>
+    </template>
+    <template data-lang="en">
+      <section lang="en">
+        <header>
+          <h1>Perceiving the invisible</h1>
+          <p class="article-sub">Cherry blossom pink, floating in grey</p>
+          <p class="article-credit">Untitled, 1967, Galvanized iron<br>Collection: Ohara Museum of Art</p>
+        </header>
+        <p class="stanza">A rainy afternoon<br>Quiet Watari-Um</p>
+        <p class="stanza">Does it rain in Marfa?</p>
+        <p class="stanza">Thinking about that<br>as I enter Judd's world</p>
+        <p class="stanza">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</p>
+        <p class="stanza">Yet its surface was soft and warm<br>draped in drifting light</p>
+        <p class="stanza">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</p>
+        <p class="stanza-end">A hint of spring</p>
+      </section>
+    </template>
   </article>
 </dialog>
 
@@ -563,7 +551,7 @@
 <button class="checklist-toggle" id="checklistBtn">Checklist</button>
 <div class="checklist-panel" id="checklistPanel">
   <div class="checklist-header">
-    <h2>reading-layer v3.1 テスト</h2>
+    <h2>reading-layer v4.0 テスト</h2>
     <button id="checklistCloseBtn" aria-label="閉じる">✕</button>
   </div>
   <div class="device-info">
@@ -571,7 +559,26 @@
     <input type="text" id="browserInput" placeholder="ブラウザ (例: Safari)">
   </div>
   <div class="cat">
-    <h3>JP | EN 切替</h3>
+    <h3>★ N6 検証（今回の核心）</h3>
+    <div class="checklist-item"><label><input type="checkbox" data-label="Chrome翻訳: JP→EN 正しい方向で翻訳される"> Chrome翻訳: JP→EN 正しい方向で翻訳される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="Chrome翻訳後 → JP|EN切替が正常動作"> Chrome翻訳後 → JP|EN切替が正常動作</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="Safari翻訳: 正しい方向で翻訳される"> Safari翻訳: 正しい方向で翻訳される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+  </div>
+  <div class="cat">
+    <h3>★ booklet ← → reading-layer 連動</h3>
+    <div class="checklist-item"><label><input type="checkbox" data-label="reading-layer で EN → booklet ラベルも英語"> reading-layer で EN → booklet ラベルも英語</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="reading-layer で JP → booklet ラベルも日本語"> reading-layer で JP → booklet ラベルも日本語</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="booklet クレジットも連動して切り替わる"> booklet クレジットも連動して切り替わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+  </div>
+  <div class="cat">
+    <h3>★ URL 言語パラメータ</h3>
+    <div class="checklist-item"><label><input type="checkbox" data-label="パラメータなし → 日本語で開く"> パラメータなし → 日本語で開く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="?lang=en → 英語で開く"> ?lang=en → 英語で開く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="EN切替 → URLが ?lang=en に変わる"> EN切替 → URLが ?lang=en に変わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="JP切替 → URL から lang パラメータ消える"> JP切替 → URL から lang パラメータ消える</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+  </div>
+  <div class="cat">
+    <h3>JP | EN 切替（reading-layer 内）</h3>
     <div class="checklist-item"><label><input type="checkbox" data-label="JP → 日本語のみ表示"> JP → 日本語のみ表示</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="EN → 英語のみ表示"> EN → 英語のみ表示</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="タイトル・サブ・クレジットも切り替わる"> タイトル・サブ・クレジットも切り替わる</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
@@ -590,21 +597,21 @@
     <div class="checklist-item"><label><input type="checkbox" data-label="縦スクロール → ネイティブで動く"> 縦スクロール → ネイティブで動く</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 無効（想定通り）"> ピンチズーム → 無効（想定通り）</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="ピンチズーム → 隣ページ露出しない (F4)"> ピンチズーム → 隣ページ露出しない (F4)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="overscroll → containされる (F5)"> overscroll → containされる (F5)</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="pull-to-refresh → 発動しない"> pull-to-refresh → 発動しない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト最上部/最下部でスクロール後、背面ページが動かない"> テキスト最上部/最下部でスクロール後、背面ページが動かない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト最上部で更に引き下げても、リフレッシュが出ない"> テキスト最上部で更に引き下げても、リフレッシュが出ない</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
   </div>
   <div class="cat">
     <h3>テキスト操作</h3>
     <div class="checklist-item"><label><input type="checkbox" data-label="テキスト選択 → 動作する"> テキスト選択 → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="コピー → 動作する"> コピー → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="辞書（iOS長押し）→ 動作する"> 辞書（iOS長押し）→ 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="テキスト選択後 →「調べる」が使える"> テキスト選択後 →「調べる」が使える</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
     <div class="checklist-item"><label><input type="checkbox" data-label="ページ内検索 → ヒットする"> ページ内検索 → ヒットする</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
   </div>
   <div class="cat">
     <h3>ブラウザ支援</h3>
-    <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ翻訳 → 動作する"> ブラウザ翻訳 → 動作する</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="リーダーモード → 認識される"> リーダーモード → 認識される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
-    <div class="checklist-item"><label><input type="checkbox" data-label="Dynamic Type / ブラウザ文字サイズ → 反映される"> Dynamic Type / ブラウザ文字サイズ → 反映される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="ブラウザ翻訳 → 動作する（N6確認は上の★セクション）"> ブラウザ翻訳 → 動作する（N6確認は上の★セクション）</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="Safari: リーダーを表示 → 認識される"> Safari: リーダーを表示 → 認識される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
+    <div class="checklist-item"><label><input type="checkbox" data-label="デスクトップ: ブラウザ文字サイズ設定 → 反映される"> デスクトップ: ブラウザ文字サイズ設定 → 反映される</label><textarea class="memo" placeholder="メモ" rows="1"></textarea></div>
   </div>
   <div class="cat">
     <h3>写真世界との共存</h3>
@@ -626,7 +633,8 @@
 
 <script>
 // ══════════════════════════════════════════════
-// reading-layer prototype v3.1
+// reading-layer prototype v4.0
+// unified setAppLang, DOM single-lang, URL param
 // ══════════════════════════════════════════════
 
 const booklet = document.getElementById('booklet');
@@ -798,22 +806,59 @@ textLarger.addEventListener('click', function() {
 });
 updateTextSize();
 
-// ── JP | EN 言語切替 ──
+// ── 言語管理 — 唯一の状態管理 + URL同期 + DOM注入 ──
 var langJaBtn = document.getElementById('langJa');
 var langEnBtn = document.getElementById('langEn');
 
-function setLang(lang) {
-  article.dataset.lang = lang;
+function setAppLang(lang) {
+  // 1. ブラウザへの言語シグナル
+  document.documentElement.lang = lang;
+  document.documentElement.dataset.lang = lang;
+
+  // 2. i18n テキスト注入（booklet ラベル・クレジット）
+  document.querySelectorAll('.i18n').forEach(function(el) {
+    el.textContent = el.dataset[lang] || '';
+  });
+
+  // 3. template ベースの reading-layer コンテンツ切替
+  var containers = [article];
+  containers.forEach(function(container) {
+    var tpl = container.querySelector('template[data-lang="' + lang + '"]');
+    if (!tpl) return;
+    var children = [].slice.call(container.childNodes);
+    children.forEach(function(n) {
+      if (n.nodeName !== 'TEMPLATE') n.remove();
+    });
+    container.appendChild(tpl.content.cloneNode(true));
+  });
+
+  // 4. toolbar ボタン状態更新
   langJaBtn.classList.toggle('active', lang === 'ja');
   langEnBtn.classList.toggle('active', lang === 'en');
-  dialog.scrollTop = 0;
+
+  // 5. URL に言語状態を反映（ja はデフォルトなのでパラメータ不要）
+  var url = new URL(location);
+  if (lang === 'en') {
+    url.searchParams.set('lang', 'en');
+  } else {
+    url.searchParams.delete('lang');
+  }
+  history.replaceState(null, '', url);
+
+  // 6. dialog が開いていればスクロールトップ
+  if (dialog.open) dialog.scrollTop = 0;
 }
 
-langJaBtn.addEventListener('click', function() { setLang('ja'); });
-langEnBtn.addEventListener('click', function() { setLang('en'); });
+langJaBtn.addEventListener('click', function() {
+  setAppLang('ja');
+});
+langEnBtn.addEventListener('click', function() {
+  setAppLang('en');
+});
 
-// デフォルト: 日本語
-setLang('ja');
+// 初期化: URL パラメータから言語を取得
+var initLang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ja';
+setAppLang(initLang);
 
 // ══════════════════════════════════════
 // CHECKLIST
