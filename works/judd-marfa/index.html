@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v11.0 / 2026.03.11 — Veil統合: 写真+テキスト一体化, Endmatter削除, タップ開閉, 暫定wheel / F1修正: trackpad縦スワイプのページ送りブロック -->
+<!-- v141 / 2026.03.16 — Step1: booklet-viewport wrapper, 100vw→100%, html/body清掃, nav-arrow touch-action, page-credit footer化 -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -19,6 +19,8 @@
 <meta name="twitter:description" content="素材・光・色・空間・反復・時間——6つの視点でジャッドを読む。">
 <meta name="twitter:image" content="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/images/judd-og.jpg">
 <link rel="canonical" href="https://chisakihayakawa.github.io/portfolio/works/judd-marfa/">
+<link rel="alternate" hreflang="ja" href="./">
+<link rel="alternate" hreflang="en" href="?lang=en">
 <script>
 (function(d) {
   var config = {
@@ -67,13 +69,32 @@
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
-  html, body {
+  /*
+    html / body にはレイアウト制御を置かない。
+    overflow / touch-action / user-select は .booklet-viewport に集約。
+    → body の overflow がビューポートに伝搬する問題を構造的に排除。
+    → ブラウザズーム時はビューポートがスクロール可能（デフォルト動作維持）。
+  */
+  html {
     height: 100%;
-    overflow: hidden;
+  }
+  body {
+    height: 100%;
     font-family: var(--font);
     color: var(--color-title);
     background: var(--color-bg);
     -webkit-font-smoothing: antialiased;
+  }
+
+  /* ════════════════════════════════════════
+     BOOKLET VIEWPORT — booklet の封じ込め層
+     overflow / touch-action / user-select はここだけ
+     ════════════════════════════════════════ */
+  .booklet-viewport {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     touch-action: none;
     user-select: none;
   }
@@ -87,17 +108,15 @@
     height: 100%;
     will-change: transform;
     transform: translate3d(0,0,0);
-    touch-action: none;
   }
 
   .page {
-    flex: 0 0 100vw;
-    width: 100vw;
+    flex: 0 0 100%;
+    width: 100%;
     height: 100%;
     position: relative;
     overflow: hidden;
     contain: paint;
-    touch-action: none;
   }
 
   .page img.bg {
@@ -168,12 +187,12 @@
     margin-top: 4px;
     letter-spacing: 0.03em;
   }
-  .label-title .lang-en {
+  html[data-lang="en"] .label-title {
     font-family: var(--font);
     font-size: clamp(19px, 2.8vw, 27px);
     letter-spacing: 0.01em;
   }
-  .label-title .lang-en .sub {
+  html[data-lang="en"] .label-title .sub {
     font-size: clamp(13px, 1.8vw, 16px);
   }
   .label-readmore {
@@ -279,8 +298,8 @@
     margin-top: 2em;
     color: var(--color-title);
   }
-  .veil-text .stanza.en,
-  .veil-text .stanza-end.en {
+  html[data-lang="en"] .veil-text .stanza,
+  html[data-lang="en"] .veil-text .stanza-end {
     font-family: var(--font);
     font-size: clamp(12px, 1.4vw, 14px);
     line-height: 2.0;
@@ -355,16 +374,6 @@
     opacity: 0.8;
   }
 
-
-  /* ════════════════════════════════════════
-     日英切替（グローバル）
-     ════════════════════════════════════════ */
-  .lang-ja, .lang-en { transition: opacity 0.4s ease; }
-  .lang-en { display: none; }
-  body.show-en .lang-ja { display: none; }
-  body.show-en .lang-en { display: block; }
-  body.show-en span.lang-en { display: inline; }
-  span.lang-ja { display: inline; }
 
   /* ════════════════════════════════════════
      LANG BUTTON（全ページ共通）
@@ -499,6 +508,7 @@
     padding: 16px;
     font-family: var(--font);
     font-weight: 300;
+    touch-action: none;  /* viewport wrapper の外なので個別指定 */
   }
   .nav-arrow:hover { opacity: 0.6; }
   .nav-prev { left: calc(8px + env(safe-area-inset-left, 0px)); }
@@ -510,10 +520,10 @@
       left: calc(20px + env(safe-area-inset-left, 0px));
       max-width: 75%;
     }
-    .label-title .lang-en {
+    html[data-lang="en"] .label-title {
       font-size: 22px;
     }
-    .label-title .lang-en .sub {
+    html[data-lang="en"] .label-title .sub {
       font-size: 14px;
     }
     .page-credit {
@@ -553,6 +563,7 @@
 </head>
 <body style="background:#1c1b18">
 
+<div class="booklet-viewport">
 <main class="booklet" id="booklet">
 
   <!-- ══════════════════════════════════════════════
@@ -571,16 +582,15 @@
     <img class="bg" src="images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
-        <span class="lang-ja">「見えないもの」を知覚する<span class="sub">グレーに浮かぶ、桜のピンク</span></span>
-        <span class="lang-en" lang="en">Perceiving the invisible<span class="sub">Cherry blossom pink, floating in grey</span></span>
+        <span class="i18n" data-ja="「見えないもの」を知覚する" data-en="Perceiving the invisible"></span><span class="sub i18n" data-ja="グレーに浮かぶ、桜のピンク" data-en="Cherry blossom pink, floating in grey"></span>
       </div>
       <span class="label-readmore">…read more</span>
     </div>
-    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1967, Galvanized iron<br><span class="lang-ja">所蔵：公益財団法人大原芸術財団 大原美術館</span><span class="lang-en" lang="en">Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</span></div>
+    <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1967, Galvanized iron<br><span class="i18n" data-ja="所蔵：公益財団法人大原芸術財団 大原美術館" data-en="Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki"></span></footer>
     <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
-          <div class="lang-ja">
+          <template data-lang="ja">
             <div class="stanza">雨の日の昼下がり<br>静かなワタリウム</div>
             <div class="stanza">マーファは雨が降るのだろうか。</div>
             <div class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</div>
@@ -588,16 +598,16 @@
             <div class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</div>
             <div class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</div>
             <div class="stanza-end">春の気配がした</div>
-          </div>
-          <div class="lang-en" lang="en">
-            <div class="stanza en">A rainy afternoon<br>Quiet Watari-Um</div>
-            <div class="stanza en">Does it rain in Marfa?</div>
-            <div class="stanza en">Thinking about that<br>as I enter Judd's world</div>
-            <div class="stanza en">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</div>
-            <div class="stanza en">Yet its surface was soft and warm<br>draped in drifting light</div>
-            <div class="stanza en">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</div>
-            <div class="stanza-end en">A hint of spring</div>
-          </div>
+          </template>
+          <template data-lang="en">
+            <div class="stanza">A rainy afternoon<br>Quiet Watari-Um</div>
+            <div class="stanza">Does it rain in Marfa?</div>
+            <div class="stanza">Thinking about that<br>as I enter Judd's world</div>
+            <div class="stanza">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</div>
+            <div class="stanza">Yet its surface was soft and warm<br>draped in drifting light</div>
+            <div class="stanza">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</div>
+            <div class="stanza-end">A hint of spring</div>
+          </template>
         </div>
       </div>
     </div>
@@ -612,16 +622,15 @@
     <img class="bg" src="images/judd-w1.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
-        <span class="lang-ja">Light</span>
-        <span class="lang-en" lang="en">Light</span>
+        <span class="i18n" data-ja="Light" data-en="Light"></span>
       </div>
       <span class="label-readmore">…read more</span>
     </div>
-    <div class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</div>
+    <footer class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</footer>
     <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
-          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
         </div>
       </div>
     </div>
@@ -636,16 +645,15 @@
     <img class="bg" src="images/judd-6d.jpg" loading="lazy" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
-        <span class="lang-ja">Color</span>
-        <span class="lang-en" lang="en">Color</span>
+        <span class="i18n" data-ja="Color" data-en="Color"></span>
       </div>
       <span class="label-readmore">…read more</span>
     </div>
-    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass<br><span class="lang-ja">所蔵：Judd Foundation</span><span class="lang-en" lang="en">Collection: Judd Foundation</span></div>
+    <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass<br><span class="i18n" data-ja="所蔵：Judd Foundation" data-en="Collection: Judd Foundation"></span></footer>
     <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
-          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
         </div>
       </div>
     </div>
@@ -660,16 +668,15 @@
     <img class="bg" src="images/judd-w2.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
-        <span class="lang-ja">Space</span>
-        <span class="lang-en" lang="en">Space</span>
+        <span class="i18n" data-ja="Space" data-en="Space"></span>
       </div>
       <span class="label-readmore">…read more</span>
     </div>
-    <div class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</div>
+    <footer class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</footer>
     <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
-          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
         </div>
       </div>
     </div>
@@ -684,16 +691,15 @@
     <img class="bg" src="images/judd-2b.jpg" loading="lazy" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
-        <span class="lang-ja">Repetition</span>
-        <span class="lang-en" lang="en">Repetition</span>
+        <span class="i18n" data-ja="Repetition" data-en="Repetition"></span>
       </div>
       <span class="label-readmore">…read more</span>
     </div>
-    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)<br><span class="lang-ja">所蔵：静岡県立美術館</span><span class="lang-en" lang="en">Collection: Shizuoka Prefectural Museum of Art</span></div>
+    <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)<br><span class="i18n" data-ja="所蔵：静岡県立美術館" data-en="Collection: Shizuoka Prefectural Museum of Art"></span></footer>
     <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
-          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
         </div>
       </div>
     </div>
@@ -708,16 +714,15 @@
     <img class="bg" src="images/judd-5b.jpg" loading="lazy" alt="Untitled, 1989, Painted aluminum">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
-        <span class="lang-ja">Time</span>
-        <span class="lang-en" lang="en">Time</span>
+        <span class="i18n" data-ja="Time" data-en="Time"></span>
       </div>
       <span class="label-readmore">…read more</span>
     </div>
-    <div class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1989, Painted aluminum<br><span class="lang-ja">所蔵：鹿児島県霧島アートの森</span><span class="lang-en" lang="en">Collection: Kirishima Open-Air Museum</span></div>
+    <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1989, Painted aluminum<br><span class="i18n" data-ja="所蔵：鹿児島県霧島アートの森" data-en="Collection: Kirishima Open-Air Museum"></span></footer>
     <div class="veil" tabindex="-1">
       <div class="veil-content">
         <div class="veil-text">
-          <p class="placeholder"><span class="lang-ja">（テキスト準備中）</span><span class="lang-en" lang="en">(Text in progress)</span></p>
+          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
         </div>
       </div>
     </div>
@@ -735,6 +740,7 @@
   </section>
 
 </main>
+</div><!-- .booklet-viewport -->
 
 <!-- Page indicator dots -->
 <nav class="page-indicator" id="indicator" aria-label="ページ"></nav>
@@ -1445,17 +1451,51 @@ document.querySelectorAll('.page img.bg[loading="lazy"]').forEach(function(img) 
 });
 
 // ══════════════════════════════════════════════
-// 言語切替 (T19: html lang 属性も変更)
+// 言語管理 — 唯一の状態管理 + URL同期 + DOM注入
 // ══════════════════════════════════════════════
 
 const langBtns = document.querySelectorAll('.lang-btn');
 
-function toggleLang() {
-  const isEn = document.body.classList.toggle('show-en');
-  document.documentElement.lang = isEn ? 'en' : 'ja';
-  langBtns.forEach(function(btn) {
-    btn.textContent = isEn ? 'JP' : 'EN';
+function setAppLang(lang) {
+  // 1. ブラウザへの言語シグナル
+  document.documentElement.lang = lang;
+  document.documentElement.dataset.lang = lang;
+
+  // 2. i18n テキスト注入（ラベル・クレジット・プレースホルダー）
+  document.querySelectorAll('.i18n').forEach(function(el) {
+    el.textContent = el.dataset[lang] || '';
   });
+
+  // 3. template ベースの veil コンテンツ切替
+  document.querySelectorAll('.veil-text').forEach(function(container) {
+    var tpl = container.querySelector('template[data-lang="' + lang + '"]');
+    if (!tpl) return;
+    // template 以外の既存コンテンツをクリア
+    var children = [].slice.call(container.childNodes);
+    children.forEach(function(n) {
+      if (n.nodeName !== 'TEMPLATE') n.remove();
+    });
+    container.appendChild(tpl.content.cloneNode(true));
+  });
+
+  // 4. ボタン表示更新
+  langBtns.forEach(function(btn) {
+    btn.textContent = lang === 'ja' ? 'EN' : 'JP';
+  });
+
+  // 5. URL に言語状態を反映（ja はデフォルトなのでパラメータ不要）
+  var url = new URL(location);
+  if (lang === 'en') {
+    url.searchParams.set('lang', 'en');
+  } else {
+    url.searchParams.delete('lang');
+  }
+  history.replaceState(null, '', url);
+}
+
+function toggleLang() {
+  var current = document.documentElement.dataset.lang || 'ja';
+  setAppLang(current === 'ja' ? 'en' : 'ja');
 }
 
 langBtns.forEach(function(btn) {
@@ -1525,6 +1565,8 @@ pages.forEach(function(pg, i) {
 // Init
 // ══════════════════════════════════════════════
 
+var initLang = new URLSearchParams(location.search).get('lang') === 'en' ? 'en' : 'ja';
+setAppLang(initLang);
 setActivePage(0);
 onPageArrive(0, 0);
 </script>
