@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v146 / 2026.03.16 — Step3b-i-a: photo zoom overlay base (click open/close, mouse pan, Esc) -->
+<!-- v146b / 2026.03.16 — Step3b-i-b: wheel/gesture unified on document, pinch→overlay, overlay zoom/pan -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -941,9 +941,9 @@
 
 <script>
 // ══════════════════════════════════════════════
-// B-Side Booklet Engine v14.0
-// Step 3b-i-a: photo zoom overlay base (click/close/mouse-pan/Esc)
-// Wheel は暫定処理（v4.15d 統合前）
+// B-Side Booklet Engine v14.1
+// Step 3b-i-b: wheel/gesture unified on document, pinch→overlay, overlay zoom/pan
+// Wheel は暫定ページ送りロジック（v4.15d 統合前）
 // ══════════════════════════════════════════════
 
 // ── 順方向到着: 暗転→フェードイン (T22: timestamp) ──
@@ -1032,6 +1032,15 @@ let overlayOpen = false;
 let overlayMode = 'contain';
 let ovS = 1, ovPX = 0, ovPY = 0;
 let ovImgW = 1, ovImgH = 1;
+
+// ── Mac pinch state (wheel + gesture) ──
+let wPinchAcc = 0, wPinchT = null, wPinchDecided = false;
+const W_PINCH_THRESHOLD = 8;
+let safariPinchDecided = false;
+const SAFARI_PINCH_THRESHOLD = 0.15;
+let ovPS0 = 0; // overlay 内 gesture 用 scale 保存
+let floorPushAcc = 0;
+const FLOOR_PUSH_CLOSE = 15;
 
 function openDialog(pageIndex) {
   const pg = pages[pageIndex];
@@ -1124,6 +1133,20 @@ function closeOverlay() {
   overlay.classList.remove('open');
   overlayOpen = false;
   document.body.classList.remove('is-overlay');
+  // ピンチ state リセット
+  wPinchAcc = 0; wPinchDecided = false;
+  safariPinchDecided = false;
+  floorPushAcc = 0;
+}
+
+function macPushFloor(zoomOutDelta) {
+  if (!overlayOpen) return;
+  if (zoomOutDelta <= 0) { floorPushAcc = 0; return; }
+  if (ovS > 1.05) { floorPushAcc = 0; return; }
+  floorPushAcc += zoomOutDelta;
+  if (floorPushAcc > FLOOR_PUSH_CLOSE) {
+    closeOverlay();
+  }
 }
 
 function clampPan() {
@@ -1684,9 +1707,8 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ══════════════════════════════════════════════
-// Wheel — 暫定処理（v4.15d 統合前）
-// deltaX → ページ送り、deltaY → マウスホイール: ページ送り / trackpad: 無視
-// F1修正: trackpad縦スワイプでページ送りしないよう、マウスホイール判定を追加
+// Wheel — document レベル統合（v4.15d 統合前の暫定 + overlay zoom/pan + ピンチ→overlay）
+// 4分岐: dialog.open → return / overlayOpen → zoom/pan / Normal+ctrlKey → ピンチ累積 / Normal → ページ送り
 // ══════════════════════════════════════════════
 
 function isMouseWheel(e) {
@@ -1700,32 +1722,72 @@ let wheelAccumY = 0;
 let wheelTimer = null;
 const WHEEL_PAGE_DIST = 300;
 
-booklet.addEventListener('wheel', function(e) {
+document.addEventListener('wheel', function(e) {
+  // ── 1. dialog open → ネイティブスクロール維持（preventDefault しない） ──
+  if (dialog.open) return;
+
+  // ── 2. overlay open → zoom/pan ──
+  if (overlayOpen) {
+    e.preventDefault();
+    if (e.ctrlKey || e.metaKey) {
+      // ズーム: deltaY > 0 = pinch in (zoom out), deltaY < 0 = pinch out (zoom in)
+      var minS = overlayMode === 'cover' ? getContainRatio() : 1;
+      ovS = Math.max(minS, Math.min(6, ovS - e.deltaY * 0.004));
+      applyOv();
+      macPushFloor(e.deltaY * 0.4);
+    } else {
+      // パン
+      ovPX -= e.deltaX; ovPY -= e.deltaY;
+      applyOv();
+    }
+    return;
+  }
+
+  // ── 3. Normal + ctrlKey → Mac trackpad ピンチ（Chrome） ──
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    if (wPinchDecided) return;
+
+    wPinchAcc += e.deltaY;
+    clearTimeout(wPinchT);
+    wPinchT = setTimeout(function() { wPinchAcc = 0; wPinchDecided = false; }, 300);
+
+    // ピンチアウトのみ overlay を開く（deltaY が負方向に累積）
+    if (wPinchAcc < -W_PINCH_THRESHOLD) {
+      if (!pages[currentPage].classList.contains('photo-d')) {
+        wPinchDecided = true; return;
+      }
+      wPinchDecided = true;
+      openOverlay('cover');
+      wPinchAcc = 0;
+    }
+    // ピンチインは無視
+    if (wPinchAcc > W_PINCH_THRESHOLD) {
+      wPinchDecided = true; wPinchAcc = 0;
+    }
+    return;
+  }
+
+  // ── 4. Normal → ページ送り ──
   e.preventDefault();
-  // Mac trackpad pinch (Chrome: ctrlKey + wheel) — already prevented, skip page logic
-  if (e.ctrlKey) return;
   if (isAnimating) return;
 
-  const absX = Math.abs(e.deltaX);
-  const absY = Math.abs(e.deltaY);
+  var absX = Math.abs(e.deltaX);
+  var absY = Math.abs(e.deltaY);
 
   if (absX > absY * 1.2) {
-    // 横 → ページ送り（dialog 開中はブロック）
-    if (!dialog.open) {
-      wheelAccumX += e.deltaX;
-      if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
-        animateToPage(currentPage + 1);
-        wheelAccumX = 0;
-      } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
-        animateToPage(currentPage - 1);
-        wheelAccumX = 0;
-      }
+    // 横 → ページ送り
+    wheelAccumX += e.deltaX;
+    if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+      animateToPage(currentPage + 1);
+      wheelAccumX = 0;
+    } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
+      animateToPage(currentPage - 1);
+      wheelAccumX = 0;
     }
   } else if (absY > absX * 1.2) {
-    // 縦 → dialog 開中はスキップ、閉じていればマウスホイールのみページ送り
-    if (dialog.open) {
-      // dialog 開中: dialog 自身がスクロール処理
-    } else if (isMouseWheel(e)) {
+    // 縦 → マウスホイールのみページ送り
+    if (isMouseWheel(e)) {
       wheelAccumY += e.deltaY;
       if (wheelAccumY > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
         animateToPage(currentPage + 1);
@@ -1742,19 +1804,51 @@ booklet.addEventListener('wheel', function(e) {
 }, { passive: false });
 
 // ══════════════════════════════════════════════
-// Mac trackpad pinch zoom prevention
+// Safari gesture events — overlay 統合
 // ══════════════════════════════════════════════
 
-// Chrome: trackpad pinch = wheel + ctrlKey. Must be on document
-// (booklet handler misses events targeting fixed elements outside booklet)
-document.addEventListener('wheel', function(e) {
-  if (e.ctrlKey) e.preventDefault();
-}, { passive: false });
+document.addEventListener('gesturestart', function(e) {
+  e.preventDefault();
+  if (overlayOpen) {
+    ovPS0 = ovS;
+  } else {
+    safariPinchDecided = false;
+  }
+});
 
-// Safari: gesture events
-document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
-document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
-document.addEventListener('gestureend', function(e) { e.preventDefault(); });
+document.addEventListener('gesturechange', function(e) {
+  e.preventDefault();
+
+  // ── overlay open → zoom + floor-push ──
+  if (overlayOpen) {
+    if (ovPS0 === 0) ovPS0 = ovS;
+    var minS = overlayMode === 'cover' ? getContainRatio() : 1;
+    var dampedScale = 1 + (e.scale - 1) * 0.4;
+    ovS = Math.max(minS, Math.min(6, ovPS0 * dampedScale));
+    applyOv();
+    var zoomOutDelta = (1.0 - e.scale) * 8;
+    macPushFloor(zoomOutDelta);
+    return;
+  }
+
+  // ── Normal → ピンチアウトのみ overlay を開く ──
+  if (safariPinchDecided) return;
+  var deviation = e.scale - 1.0;
+  if (deviation > SAFARI_PINCH_THRESHOLD) {
+    if (!pages[currentPage].classList.contains('photo-d')) {
+      safariPinchDecided = true; return;
+    }
+    safariPinchDecided = true;
+    openOverlay('cover');
+    ovPS0 = 1;
+  } else if (deviation < -SAFARI_PINCH_THRESHOLD) {
+    safariPinchDecided = true;
+  }
+});
+
+document.addEventListener('gestureend', function(e) {
+  e.preventDefault();
+});
 
 // ══════════════════════════════════════════════
 // Dots & Arrows (T16: dot aria-labels)
