@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v144 / 2026.03.16 — Step2b: toolbar, i18n, A-/A+, 2-stage close, fixed lang-btn, body.is-reading -->
+<!-- v144b / 2026.03.16 — Step2b fix: open fade-in, page-label/credit hide, 📖 instant hide on leave -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -257,7 +257,7 @@
     opacity: 0;
     transition: opacity 0.4s ease;
   }
-  .reading-layer[open] { opacity: 1; }
+  .reading-layer.visible { opacity: 1; }
   .reading-layer::backdrop { background: transparent; }
 
   /* ── 記事本文 ── */
@@ -459,14 +459,13 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* ── body.is-reading: dialog 開中に固定要素を隠す ── */
+  /* ── body.is-reading: dialog 開中に固定要素とページ要素を隠す ── */
   body.is-reading .lang-btn { opacity: 0; pointer-events: none; }
   body.is-reading .open-reading { opacity: 0 !important; pointer-events: none; }
   body.is-reading .nav-arrow { opacity: 0 !important; pointer-events: none; }
   body.is-reading .page-indicator { opacity: 0; pointer-events: none; }
-
-  /* ── 2段階 close アニメーション ── */
-  .reading-layer.closing { opacity: 0; }
+  body.is-reading .page-label { opacity: 0; pointer-events: none; }
+  body.is-reading .page-credit { opacity: 0; pointer-events: none; }
 
   /* ════════════════════════════════════════
      CLOSING
@@ -971,16 +970,21 @@ function openDialog(pageIndex) {
 
   dialog.showModal();
   dialog.scrollTop = 0;
+  // opacity: 0 の状態で1フレーム描画させてから .visible を付けてフェードイン
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      dialog.classList.add('visible');
+    });
+  });
 }
 
 function closeDialog() {
   if (!dialog.open) return;
-  // 2段階 close: opacity transition → transitionend → dialog.close()
-  dialog.classList.add('closing');
+  // .visible を外して opacity: 0 へ transition → transitionend で dialog.close()
+  dialog.classList.remove('visible');
   function onFaded(e) {
     if (e.propertyName !== 'opacity') return;
     dialog.removeEventListener('transitionend', onFaded);
-    dialog.classList.remove('closing');
     dialog.close();
   }
   dialog.addEventListener('transitionend', onFaded);
@@ -988,7 +992,6 @@ function closeDialog() {
   setTimeout(function() {
     if (dialog.open) {
       dialog.removeEventListener('transitionend', onFaded);
-      dialog.classList.remove('closing');
       dialog.close();
     }
   }, 600);
@@ -1199,6 +1202,9 @@ function onPageLeave(pageIndex, targetPage) {
 
   // dialog が開いていたら閉じる（安全弁）
   closeDialog();
+
+  // 📖 ボタンを即座に隠す（遷移中に残らないように）
+  fixedOpenReading.style.display = 'none';
 
   // Exit mode C: 方向スライド + フェード
   pg.classList.add('leaving-slide');
@@ -1550,7 +1556,7 @@ window.addEventListener('pageshow', function(e) {
   if (e.persisted) {
     // dialog を閉じる（即座に — bfcache 復帰時はアニメーション不要）
     if (dialog.open) {
-      dialog.classList.remove('closing');
+      dialog.classList.remove('visible');
       dialog.close();
     }
     document.body.classList.remove('is-reading');
@@ -1705,6 +1711,7 @@ dialog.addEventListener('cancel', function(e) {
 
 // dialog の close イベント — cleanup
 dialog.addEventListener('close', function() {
+  dialog.classList.remove('visible');
   document.body.classList.remove('is-reading');
   readingArticle.innerHTML = '';
   delete dialog.dataset.pageId;
