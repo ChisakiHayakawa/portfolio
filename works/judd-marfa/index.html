@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v142 / 2026.03.16 — Step2a: Veil→dialog骨格。旧Veil全削除, dialog shell配置, 2A template, 📖開閉, isVeilOpen→dialog.open -->
+<!-- v144 / 2026.03.16 — Step2b: toolbar, i18n, A-/A+, 2-stage close, fixed lang-btn, body.is-reading -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -223,8 +223,11 @@
     color: var(--color-bg);
     text-shadow: 0 1px 4px rgba(255,255,255,0.15);
   }
-  [data-tone="dark"] .page-credit,
-  [data-tone="dark"] .open-reading {
+  [data-tone="dark"] .page-credit {
+    color: var(--color-bg);
+    text-shadow: 0 1px 4px rgba(255,255,255,0.15);
+  }
+  .open-reading[data-tone="dark"] {
     color: var(--color-bg);
     text-shadow: 0 1px 4px rgba(255,255,255,0.15);
   }
@@ -259,6 +262,7 @@
 
   /* ── 記事本文 ── */
   .reading-article {
+    --reading-scale: 1;  /* A-/A+ で変更 */
     width: min(100% - 2rem, 68ch);
     margin-inline: auto;
     padding: 0 0 4rem;
@@ -267,6 +271,7 @@
     text-align: center;
     user-select: text;
     -webkit-user-select: text;
+    font-size: calc(1rem * var(--reading-scale));
   }
   .reading-article h1 {
     font-family: var(--font-jp);
@@ -331,19 +336,88 @@
     font-size: 13px;
   }
 
-  /* ── READING-LAYER ✕ ── */
-  .reading-close {
+  /* ── TOOLBAR ── */
+  .reading-toolbar {
     position: sticky;
     top: 0;
     z-index: 10;
-    display: flex;
-    justify-content: flex-end;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
     padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
     margin-bottom: 1.5em;
     user-select: none;
     -webkit-user-select: none;
   }
-  .reading-close button {
+  .reading-toolbar .lang-toggle { justify-self: start; }
+  .reading-toolbar .text-size-controls { justify-self: center; }
+  .reading-toolbar .close-btn { justify-self: end; }
+  /* ── JP | EN 切替 ── */
+  .lang-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+  .lang-toggle button {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-note);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+    cursor: pointer;
+    padding: 8px 4px;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s;
+  }
+  .lang-toggle button.active {
+    color: var(--color-title);
+  }
+  .lang-toggle button:not(.active):hover {
+    color: var(--color-credit);
+  }
+  .lang-toggle .lang-sep {
+    color: var(--color-rule);
+    padding: 0 4px;
+    user-select: none;
+  }
+  /* ── A-/A+ 文字サイズ変更 ── */
+  .text-size-controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .text-size-controls button {
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--color-note);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 400;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .text-size-controls button:hover {
+    color: var(--color-title);
+  }
+  .text-size-controls button:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+  .reading-toolbar .close-btn {
     background: none;
     border: none;
     outline: none;
@@ -355,14 +429,15 @@
     -webkit-tap-highlight-color: transparent;
     transition: color 0.2s;
   }
-  .reading-close button:hover { color: var(--color-title); }
+  .reading-toolbar .close-btn:hover { color: var(--color-title); }
 
-  /* ── 📖 READ ボタン ── */
+  /* ── 📖 READ ボタン（固定、booklet 外） ── */
   .open-reading {
-    position: absolute;
+    display: none;
+    position: fixed;
     bottom: calc(36px + env(safe-area-inset-bottom, 0px));
     left: calc(28px + env(safe-area-inset-left, 0px));
-    z-index: 5;
+    z-index: 100;
     background: none;
     border: none;
     color: var(--color-title);
@@ -383,6 +458,15 @@
     box-shadow: none;
     -webkit-tap-highlight-color: transparent;
   }
+
+  /* ── body.is-reading: dialog 開中に固定要素を隠す ── */
+  body.is-reading .lang-btn { opacity: 0; pointer-events: none; }
+  body.is-reading .open-reading { opacity: 0 !important; pointer-events: none; }
+  body.is-reading .nav-arrow { opacity: 0 !important; pointer-events: none; }
+  body.is-reading .page-indicator { opacity: 0; pointer-events: none; }
+
+  /* ── 2段階 close アニメーション ── */
+  .reading-layer.closing { opacity: 0; }
 
   /* ════════════════════════════════════════
      CLOSING
@@ -421,10 +505,10 @@
 
 
   /* ════════════════════════════════════════
-     LANG BUTTON（全ページ共通）
+     LANG BUTTON（固定、booklet 外）
      ════════════════════════════════════════ */
   .lang-btn {
-    position: absolute;
+    position: fixed;
     top: calc(28px + env(safe-area-inset-top, 0px));
     right: calc(32px + env(safe-area-inset-right, 0px));
     font-size: 11px;
@@ -439,7 +523,7 @@
     cursor: pointer;
     background: none;
     color: var(--color-note);
-    z-index: 10;
+    z-index: 100;
     -webkit-tap-highlight-color: transparent;
   }
   .lang-btn:hover { opacity: 0.5; }
@@ -612,7 +696,6 @@
   <section class="page page-cover">
     <h1 class="cover-title">JUDD | Marfa</h1>
     <p class="cover-hint ent-fade" style="--ent-opacity:0.4;">Swipe to read →</p>
-    <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -659,8 +742,23 @@
         <p class="stanza-end">A hint of spring</p>
       </section>
     </template>
-    <button class="open-reading">📖 read</button>
-    <button class="lang-btn">EN</button>
+    <!-- JA 直書き: リーディングモード / Safari Reader 用 -->
+    <article class="reading-article" hidden>
+      <section lang="ja">
+        <header>
+          <h1>「見えないもの」を知覚する</h1>
+          <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
+          <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
+        </header>
+        <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
+        <p class="stanza">マーファは雨が降るのだろうか。</p>
+        <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
+        <p class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
+        <p class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
+        <p class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
+        <p class="stanza-end">春の気配がした</p>
+      </section>
+    </article>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -674,7 +772,6 @@
       </div>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</footer>
-    <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -688,7 +785,6 @@
       </div>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass<br><span class="i18n" data-ja="所蔵：Judd Foundation" data-en="Collection: Judd Foundation"></span></footer>
-    <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -702,7 +798,6 @@
       </div>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</footer>
-    <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -716,7 +811,6 @@
       </div>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)<br><span class="i18n" data-ja="所蔵：静岡県立美術館" data-en="Collection: Shizuoka Prefectural Museum of Art"></span></footer>
-    <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -730,7 +824,6 @@
       </div>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1989, Painted aluminum<br><span class="i18n" data-ja="所蔵：鹿児島県霧島アートの森" data-en="Collection: Kirishima Open-Air Museum"></span></footer>
-    <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
@@ -739,21 +832,35 @@
   <section class="page page-closing">
     <p class="closing-title ent-fade">JUDD | Marfa</p>
     <a class="closing-home ent-fade" href="../../" style="--ent-opacity:0.5;">Home →</a>
-    <button class="lang-btn">EN</button>
   </section>
 
 </main>
 </div><!-- .booklet-viewport -->
 
 <!-- ════════════════════════════════════════
-     <dialog> READING-LAYER (Step 2a: skeleton)
+     <dialog> READING-LAYER (Step 2b: toolbar + i18n + A-/A+)
      ════════════════════════════════════════ -->
 <dialog class="reading-layer" id="readingLayer">
-  <div class="reading-close">
-    <button id="closeReading" aria-label="閉じる">✕</button>
+  <div class="reading-toolbar">
+    <div class="lang-toggle">
+      <button id="dialogLangJa" class="active" aria-label="日本語">JP</button>
+      <span class="lang-sep">|</span>
+      <button id="dialogLangEn" aria-label="English">EN</button>
+    </div>
+    <div class="text-size-controls">
+      <button id="textSmaller" aria-label="文字を小さく">A-</button>
+      <button id="textLarger" aria-label="文字を大きく">A+</button>
+    </div>
+    <button class="close-btn" id="closeReading" aria-label="閉じる">✕</button>
   </div>
   <article class="reading-article" id="readingArticle"></article>
 </dialog>
+
+<!-- Fixed lang-btn（booklet 外、全ページ共通） -->
+<button class="lang-btn" id="fixedLangBtn">EN</button>
+
+<!-- Fixed 📖 button（booklet 外、data-has-reading ページのみ表示） -->
+<button class="open-reading" id="fixedOpenReading">📖 read</button>
 
 <!-- Page indicator dots -->
 <nav class="page-indicator" id="indicator" aria-label="ページ"></nav>
@@ -764,8 +871,8 @@
 
 <script>
 // ══════════════════════════════════════════════
-// B-Side Booklet Engine v12.0
-// dialog ベース reading-layer (Step 2a skeleton)
+// B-Side Booklet Engine v13.0
+// dialog reading-layer (Step 2b: toolbar + i18n + A-/A+ + 2-stage close)
 // Wheel は暫定処理（v4.15d 統合前）
 // ══════════════════════════════════════════════
 
@@ -836,6 +943,12 @@ let isAnimating = false;
 
 const dialog = document.getElementById('readingLayer');
 const readingArticle = document.getElementById('readingArticle');
+const fixedLangBtn = document.getElementById('fixedLangBtn');
+const fixedOpenReading = document.getElementById('fixedOpenReading');
+const dialogLangJa = document.getElementById('dialogLangJa');
+const dialogLangEn = document.getElementById('dialogLangEn');
+const textSmaller = document.getElementById('textSmaller');
+const textLarger = document.getElementById('textLarger');
 
 function openDialog(pageIndex) {
   const pg = pages[pageIndex];
@@ -846,12 +959,15 @@ function openDialog(pageIndex) {
   const tpl = pg.querySelector('template[data-reading="' + lang + '"]');
   if (!tpl) return;
 
-  // dialog に data-page-id を設定（将来の setAppLang 用）
+  // dialog に data-page-id を設定（setAppLang 用）
   dialog.dataset.pageId = String(pageIndex);
 
   // article をクリアして template を注入
   readingArticle.innerHTML = '';
   readingArticle.appendChild(tpl.content.cloneNode(true));
+
+  // 固定要素を隠す
+  document.body.classList.add('is-reading');
 
   dialog.showModal();
   dialog.scrollTop = 0;
@@ -859,11 +975,23 @@ function openDialog(pageIndex) {
 
 function closeDialog() {
   if (!dialog.open) return;
-  dialog.close();
-  // dialog close 後にフォーカスが 📖 ボタンに戻るのを防止
-  if (document.activeElement) document.activeElement.blur();
-  readingArticle.innerHTML = '';
-  delete dialog.dataset.pageId;
+  // 2段階 close: opacity transition → transitionend → dialog.close()
+  dialog.classList.add('closing');
+  function onFaded(e) {
+    if (e.propertyName !== 'opacity') return;
+    dialog.removeEventListener('transitionend', onFaded);
+    dialog.classList.remove('closing');
+    dialog.close();
+  }
+  dialog.addEventListener('transitionend', onFaded);
+  // フォールバック: transition が発火しない場合
+  setTimeout(function() {
+    if (dialog.open) {
+      dialog.removeEventListener('transitionend', onFaded);
+      dialog.classList.remove('closing');
+      dialog.close();
+    }
+  }, 600);
 }
 
 // ══════════════════════════════════════════════
@@ -1048,6 +1176,21 @@ function setActivePage(index) {
     var delay = i < slots.length ? slots[i] : slots[slots.length - 1];
     el.style.setProperty('--ent-delay', delay + 'ms');
   });
+
+  // 📖 ボタン: data-has-reading があるページでだけ表示
+  if (pg.dataset.hasReading) {
+    fixedOpenReading.style.display = 'block';
+  } else {
+    fixedOpenReading.style.display = 'none';
+  }
+
+  // 📖 ボタンの tone: ページの data-tone に追従
+  var tone = pg.dataset.tone;
+  if (tone) {
+    fixedOpenReading.dataset.tone = tone;
+  } else {
+    delete fixedOpenReading.dataset.tone;
+  }
 }
 
 function onPageLeave(pageIndex, targetPage) {
@@ -1405,8 +1548,12 @@ window.addEventListener('resize', function() {
 
 window.addEventListener('pageshow', function(e) {
   if (e.persisted) {
-    // dialog を閉じる
-    closeDialog();
+    // dialog を閉じる（即座に — bfcache 復帰時はアニメーション不要）
+    if (dialog.open) {
+      dialog.classList.remove('closing');
+      dialog.close();
+    }
+    document.body.classList.remove('is-reading');
 
     // ページ位置をリセット
     setPageOffset(-currentPage * window.innerWidth);
@@ -1416,10 +1563,10 @@ window.addEventListener('pageshow', function(e) {
     // Closing 遷移状態をリセット（inline style を除去して ent-fade に戻す）
     var home = document.querySelector('.closing-home');
     var ctitle = document.querySelector('.closing-title');
-    var clangBtn = document.querySelector('.page-closing .lang-btn');
     if (home) { home.removeAttribute('style'); home.removeAttribute('data-animating'); }
     if (ctitle) ctitle.removeAttribute('style');
-    if (clangBtn) clangBtn.removeAttribute('style');
+    // 固定 lang-btn のリセット
+    fixedLangBtn.removeAttribute('style');
     // closing-home の --ent-opacity を再設定（removeAttribute('style') で消えるため）
     if (home) home.style.setProperty('--ent-opacity', '0.5');
 
@@ -1447,8 +1594,6 @@ document.querySelectorAll('.page img.bg[loading="lazy"]').forEach(function(img) 
 // 言語管理 — 唯一の状態管理 + URL同期 + DOM注入
 // ══════════════════════════════════════════════
 
-const langBtns = document.querySelectorAll('.lang-btn');
-
 function setAppLang(lang) {
   // 1. ブラウザへの言語シグナル
   document.documentElement.lang = lang;
@@ -1473,12 +1618,14 @@ function setAppLang(lang) {
     }
   }
 
-  // 4. ボタン表示更新
-  langBtns.forEach(function(btn) {
-    btn.textContent = lang === 'ja' ? 'EN' : 'JP';
-  });
+  // 4. 固定 lang-btn 表示更新
+  fixedLangBtn.textContent = lang === 'ja' ? 'EN' : 'JP';
 
-  // 5. URL に言語状態を反映（ja はデフォルトなのでパラメータ不要）
+  // 5. dialog toolbar JP|EN 状態更新
+  dialogLangJa.classList.toggle('active', lang === 'ja');
+  dialogLangEn.classList.toggle('active', lang === 'en');
+
+  // 6. URL に言語状態を反映（ja はデフォルトなのでパラメータ不要）
   var url = new URL(location);
   if (lang === 'en') {
     url.searchParams.set('lang', 'en');
@@ -1493,12 +1640,15 @@ function toggleLang() {
   setAppLang(current === 'ja' ? 'en' : 'ja');
 }
 
-langBtns.forEach(function(btn) {
-  btn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    toggleLang();
-  });
+// 固定 lang-btn
+fixedLangBtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  toggleLang();
 });
+
+// dialog toolbar JP|EN
+dialogLangJa.addEventListener('click', function() { setAppLang('ja'); });
+dialogLangEn.addEventListener('click', function() { setAppLang('en'); });
 
 // ══════════════════════════════════════════════
 // CLOSING → Home 逆遷移
@@ -1508,7 +1658,6 @@ const closingHome = document.querySelector('.closing-home');
 if (closingHome) {
   const closingDest = closingHome.getAttribute('href');
   const closingTitle = document.querySelector('.closing-title');
-  const closingLangBtn = document.querySelector('.page-closing .lang-btn');
 
   closingHome.addEventListener('click', function(e) {
     e.preventDefault();
@@ -1522,10 +1671,8 @@ if (closingHome) {
       closingTitle.style.transition = 'opacity 0.4s ease';
       closingTitle.style.opacity = '0';
     }
-    if (closingLangBtn) {
-      closingLangBtn.style.transition = 'opacity 0.4s ease';
-      closingLangBtn.style.opacity = '0';
-    }
+    fixedLangBtn.style.transition = 'opacity 0.4s ease';
+    fixedLangBtn.style.opacity = '0';
 
     // 暗闘後に遷移
     setTimeout(function() {
@@ -1536,18 +1683,13 @@ if (closingHome) {
 }
 
 // ══════════════════════════════════════════════
-// Reading-layer interaction — 📖 open / ✕ close
+// Reading-layer interaction — 📖 open / ✕ close / A-/A+
 // ══════════════════════════════════════════════
 
-// 📖 ボタン → dialog 開
-pages.forEach(function(pg, i) {
-  var openBtn = pg.querySelector('.open-reading');
-  if (openBtn) {
-    openBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      openDialog(i);
-    });
-  }
+// 📖 固定ボタン → dialog 開（currentPage を使用）
+fixedOpenReading.addEventListener('click', function(e) {
+  e.stopPropagation();
+  openDialog(currentPage);
 });
 
 // ✕ ボタン → dialog 閉
@@ -1555,20 +1697,46 @@ document.getElementById('closeReading').addEventListener('click', function() {
   closeDialog();
 });
 
-// dialog の cancel イベント（Esc キー / backdrop クリック）
+// dialog の cancel イベント（Esc キー）— 2段階 close を使う
 dialog.addEventListener('cancel', function(e) {
-  // デフォルトの close は許可（dialog.close() が自動で呼ばれる）
+  e.preventDefault();
+  closeDialog();
 });
+
+// dialog の close イベント — cleanup
 dialog.addEventListener('close', function() {
+  document.body.classList.remove('is-reading');
   readingArticle.innerHTML = '';
   delete dialog.dataset.pageId;
   // Safari: フォーカス復元が非同期の場合に備え、rAF で blur
   requestAnimationFrame(function() {
-    if (document.activeElement && document.activeElement.classList.contains('open-reading')) {
+    if (document.activeElement && (
+      document.activeElement === fixedOpenReading ||
+      document.activeElement.classList.contains('close-btn')
+    )) {
       document.activeElement.blur();
     }
   });
 });
+
+// ── A-/A+ 文字サイズ制御 ──
+var SCALE_STEPS = [0.75, 0.875, 1, 1.125, 1.25, 1.5];
+var scaleIndex = 2; // default = 1 (100%)
+
+function updateTextSize() {
+  var scale = SCALE_STEPS[scaleIndex];
+  readingArticle.style.setProperty('--reading-scale', scale);
+  textSmaller.disabled = (scaleIndex === 0);
+  textLarger.disabled = (scaleIndex === SCALE_STEPS.length - 1);
+}
+
+textSmaller.addEventListener('click', function() {
+  if (scaleIndex > 0) { scaleIndex--; updateTextSize(); }
+});
+textLarger.addEventListener('click', function() {
+  if (scaleIndex < SCALE_STEPS.length - 1) { scaleIndex++; updateTextSize(); }
+});
+updateTextSize();
 
 // ══════════════════════════════════════════════
 // Init
