@@ -377,6 +377,12 @@
     transition: opacity 0.2s;
   }
   .open-reading:hover { opacity: 0.7; }
+  .open-reading:focus,
+  .open-reading:focus-visible {
+    outline: none;
+    box-shadow: none;
+    -webkit-tap-highlight-color: transparent;
+  }
 
   /* ════════════════════════════════════════
      CLOSING
@@ -854,6 +860,8 @@ function openDialog(pageIndex) {
 function closeDialog() {
   if (!dialog.open) return;
   dialog.close();
+  // dialog close 後にフォーカスが 📖 ボタンに戻るのを防止
+  if (document.activeElement) document.activeElement.blur();
   readingArticle.innerHTML = '';
   delete dialog.dataset.pageId;
 }
@@ -1554,6 +1562,12 @@ dialog.addEventListener('cancel', function(e) {
 dialog.addEventListener('close', function() {
   readingArticle.innerHTML = '';
   delete dialog.dataset.pageId;
+  // Safari: フォーカス復元が非同期の場合に備え、rAF で blur
+  requestAnimationFrame(function() {
+    if (document.activeElement && document.activeElement.classList.contains('open-reading')) {
+      document.activeElement.blur();
+    }
+  });
 });
 
 // ══════════════════════════════════════════════
