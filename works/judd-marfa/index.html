@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v144b / 2026.03.16 — Step2b fix: open fade-in, page-label/credit hide, 📖 instant hide on leave -->
+<!-- v145b / 2026.03.16 — Step3a fix: document-level wheel ctrlKey prevention (booklet missed fixed elements) -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -1469,6 +1469,8 @@ const WHEEL_PAGE_DIST = 300;
 
 booklet.addEventListener('wheel', function(e) {
   e.preventDefault();
+  // Mac trackpad pinch (Chrome: ctrlKey + wheel) — already prevented, skip page logic
+  if (e.ctrlKey) return;
   if (isAnimating) return;
 
   const absX = Math.abs(e.deltaX);
@@ -1505,6 +1507,21 @@ booklet.addEventListener('wheel', function(e) {
   clearTimeout(wheelTimer);
   wheelTimer = setTimeout(function() { wheelAccumX = 0; wheelAccumY = 0; }, 200);
 }, { passive: false });
+
+// ══════════════════════════════════════════════
+// Mac trackpad pinch zoom prevention
+// ══════════════════════════════════════════════
+
+// Chrome: trackpad pinch = wheel + ctrlKey. Must be on document
+// (booklet handler misses events targeting fixed elements outside booklet)
+document.addEventListener('wheel', function(e) {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
+
+// Safari: gesture events
+document.addEventListener('gesturestart', function(e) { e.preventDefault(); });
+document.addEventListener('gesturechange', function(e) { e.preventDefault(); });
+document.addEventListener('gestureend', function(e) { e.preventDefault(); });
 
 // ══════════════════════════════════════════════
 // Dots & Arrows (T16: dot aria-labels)
