@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v145b / 2026.03.16 — Step3a fix: document-level wheel ctrlKey prevention (booklet missed fixed elements) -->
+<!-- v146 / 2026.03.16 — Step3b-i-a: photo zoom overlay base (click open/close, mouse pan, Esc) -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -467,6 +467,69 @@
   body.is-reading .page-label { opacity: 0; pointer-events: none; }
   body.is-reading .page-credit { opacity: 0; pointer-events: none; }
 
+  /* ── body.is-overlay: overlay 開中に固定要素とページ要素を隠す ── */
+  body.is-overlay .lang-btn { opacity: 0; pointer-events: none; }
+  body.is-overlay .open-reading { opacity: 0 !important; pointer-events: none; }
+  body.is-overlay .nav-arrow { opacity: 0 !important; pointer-events: none; }
+  body.is-overlay .page-indicator { opacity: 0; pointer-events: none; }
+  body.is-overlay .page-label { opacity: 0; pointer-events: none; }
+  body.is-overlay .page-credit { opacity: 0; pointer-events: none; }
+
+  /* ════════════════════════════════════════
+     PHOTO ZOOM OVERLAY (Step 3b)
+     ════════════════════════════════════════ */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.92);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+    overflow: hidden;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+  .overlay-img {
+    position: absolute;
+    will-change: transform;
+    transform-origin: center center;
+  }
+  .overlay-img.mode-contain {
+    top: 50%; left: 50%;
+    max-width: 100%; max-height: 100%;
+    width: auto; height: auto;
+    object-fit: contain;
+  }
+  .overlay-img.mode-cover {
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    max-width: none; max-height: none;
+    object-fit: cover;
+  }
+  .overlay-close {
+    position: absolute;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    z-index: 210;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--color-title);
+    font-size: 16px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .overlay-close:hover { opacity: 1; }
+  .overlay-close:focus,
+  .overlay-close:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
   /* ════════════════════════════════════════
      CLOSING
      ════════════════════════════════════════ */
@@ -855,6 +918,14 @@
   <article class="reading-article" id="readingArticle"></article>
 </dialog>
 
+<!-- ════════════════════════════════════════
+     PHOTO ZOOM OVERLAY (Step 3b)
+     ════════════════════════════════════════ -->
+<div class="overlay" id="overlay">
+  <img class="overlay-img" id="overlayImg">
+  <button class="overlay-close" id="overlayClose">✕</button>
+</div>
+
 <!-- Fixed lang-btn（booklet 外、全ページ共通） -->
 <button class="lang-btn" id="fixedLangBtn">EN</button>
 
@@ -870,8 +941,8 @@
 
 <script>
 // ══════════════════════════════════════════════
-// B-Side Booklet Engine v13.0
-// dialog reading-layer (Step 2b: toolbar + i18n + A-/A+ + 2-stage close)
+// B-Side Booklet Engine v14.0
+// Step 3b-i-a: photo zoom overlay base (click/close/mouse-pan/Esc)
 // Wheel は暫定処理（v4.15d 統合前）
 // ══════════════════════════════════════════════
 
@@ -949,9 +1020,22 @@ const dialogLangEn = document.getElementById('dialogLangEn');
 const textSmaller = document.getElementById('textSmaller');
 const textLarger = document.getElementById('textLarger');
 
+// ══════════════════════════════════════════════
+// Photo zoom overlay — elements & state (Step 3b)
+// ══════════════════════════════════════════════
+
+const overlay = document.getElementById('overlay');
+const overlayImg = document.getElementById('overlayImg');
+const overlayClose = document.getElementById('overlayClose');
+
+let overlayOpen = false;
+let overlayMode = 'contain';
+let ovS = 1, ovPX = 0, ovPY = 0;
+let ovImgW = 1, ovImgH = 1;
+
 function openDialog(pageIndex) {
   const pg = pages[pageIndex];
-  if (!pg || dialog.open) return;
+  if (!pg || dialog.open || overlayOpen) return;
 
   // ページ内の template から現在の言語のコンテンツを注入
   const lang = document.documentElement.dataset.lang || 'ja';
@@ -995,6 +1079,96 @@ function closeDialog() {
       dialog.close();
     }
   }, 600);
+}
+
+// ══════════════════════════════════════════════
+// Photo zoom overlay — open / close / transform (Step 3b)
+// ══════════════════════════════════════════════
+
+function getContainRatio() {
+  var vw = innerWidth, vh = innerHeight;
+  var coverScale = Math.max(vw / ovImgW, vh / ovImgH);
+  var containScale = Math.min(vw / ovImgW, vh / ovImgH);
+  return containScale / coverScale;
+}
+
+function openOverlay(mode) {
+  if (overlayOpen || dialog.open) return;
+  var pg = pages[currentPage];
+  if (!pg.classList.contains('photo-d')) return;
+  var img = pg.querySelector('img.bg');
+  if (!img) return;
+
+  overlayMode = mode;
+  overlayImg.src = img.src;
+  ovImgW = img.naturalWidth || 1600;
+  ovImgH = img.naturalHeight || 1000;
+  ovS = 1; ovPX = 0; ovPY = 0;
+
+  overlayImg.classList.remove('mode-contain', 'mode-cover');
+  if (mode === 'contain') {
+    overlayImg.classList.add('mode-contain');
+    overlayImg.style.transform = 'translate(-50%, -50%) scale(1)';
+  } else {
+    overlayImg.classList.add('mode-cover');
+    overlayImg.style.transform = 'translate(0, 0) scale(1)';
+  }
+
+  overlay.classList.add('open');
+  overlayOpen = true;
+  document.body.classList.add('is-overlay');
+}
+
+function closeOverlay() {
+  if (!overlayOpen) return;
+  overlay.classList.remove('open');
+  overlayOpen = false;
+  document.body.classList.remove('is-overlay');
+}
+
+function clampPan() {
+  var vw = innerWidth, vh = innerHeight;
+  if (overlayMode === 'contain') {
+    var containW = Math.min(vw, ovImgW * (vh / ovImgH));
+    var containH = Math.min(vh, ovImgH * (vw / ovImgW));
+    var scaledW = containW * ovS;
+    var scaledH = containH * ovS;
+    var maxPX = Math.max(0, (scaledW - vw) / 2);
+    var maxPY = Math.max(0, (scaledH - vh) / 2);
+    ovPX = Math.max(-maxPX, Math.min(maxPX, ovPX));
+    ovPY = Math.max(-maxPY, Math.min(maxPY, ovPY));
+  } else {
+    if (ovS < 0.98) { ovPX = 0; ovPY = 0; return; }
+    var coverScale = Math.max(vw / ovImgW, vh / ovImgH);
+    var scaledW = ovImgW * coverScale * ovS;
+    var scaledH = ovImgH * coverScale * ovS;
+    var maxPX = Math.max(0, (scaledW - vw) / 2);
+    var maxPY = Math.max(0, (scaledH - vh) / 2);
+    ovPX = Math.max(-maxPX, Math.min(maxPX, ovPX));
+    ovPY = Math.max(-maxPY, Math.min(maxPY, ovPY));
+  }
+}
+
+function applyOv() {
+  if (overlayMode === 'contain') {
+    ovS = Math.max(1, Math.min(6, ovS));
+    clampPan();
+    overlayImg.style.transform = 'translate(calc(-50% + ' + ovPX + 'px), calc(-50% + ' + ovPY + 'px)) scale(' + ovS + ')';
+  } else {
+    var floor = getContainRatio();
+    ovS = Math.max(floor, Math.min(6, ovS));
+    clampPan();
+    if (ovS < 0.98) {
+      overlayImg.classList.remove('mode-cover');
+      overlayImg.classList.add('mode-contain');
+      var displayScale = ovS / floor;
+      overlayImg.style.transform = 'translate(calc(-50% + ' + ovPX + 'px), calc(-50% + ' + ovPY + 'px)) scale(' + displayScale + ')';
+    } else {
+      overlayImg.classList.remove('mode-contain');
+      overlayImg.classList.add('mode-cover');
+      overlayImg.style.transform = 'translate(' + ovPX + 'px, ' + ovPY + 'px) scale(' + ovS + ')';
+    }
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1374,10 +1548,12 @@ document.addEventListener('touchend', function(e) {
 
 let mouseStartX = 0;
 let mouseIsDragging = false;
+let mouseHasDragged = false;
 let mouseHistory = [];
 
 booklet.addEventListener('mousedown', function(e) {
   if (dialog.open) return;  // dialog 開中はドラッグ禁止
+  if (overlayOpen) return;  // overlay 開中はドラッグ禁止
   if (isAnimating) {
     cancelAnimation();
     snapToCurrentPage();
@@ -1385,6 +1561,7 @@ booklet.addEventListener('mousedown', function(e) {
   if (e.target.closest('button, a')) return;
   mouseStartX = e.clientX;
   mouseIsDragging = true;
+  mouseHasDragged = false;
   mouseHistory = [{ x: e.clientX, t: performance.now() }];
   booklet.style.cursor = 'grabbing';
   e.preventDefault();
@@ -1393,6 +1570,7 @@ booklet.addEventListener('mousedown', function(e) {
 document.addEventListener('mousemove', function(e) {
   if (!mouseIsDragging) return;
   const dx = e.clientX - mouseStartX;
+  if (!mouseHasDragged && Math.abs(dx) > 5) mouseHasDragged = true;
   const baseX = -currentPage * window.innerWidth;
 
   let dragDelta = dx;
@@ -1410,6 +1588,14 @@ document.addEventListener('mouseup', function(e) {
   if (!mouseIsDragging) return;
   mouseIsDragging = false;
   booklet.style.cursor = '';
+
+  // Click（ドラッグなし）→ photo ページなら overlay
+  if (!mouseHasDragged) {
+    if (!isAnimating && pages[currentPage].classList.contains('photo-d')) {
+      openOverlay('contain');
+    }
+    return;
+  }
 
   const dx = e.clientX - mouseStartX;
   let velocity = 0;
@@ -1438,10 +1624,57 @@ document.addEventListener('mouseup', function(e) {
 });
 
 // ══════════════════════════════════════════════
+// Overlay — mouse drag (pan) + click-to-close (Step 3b)
+// ══════════════════════════════════════════════
+
+var ovMPan = false, ovMPX = 0, ovMPY = 0, ovMDragged = false;
+
+overlay.addEventListener('mousedown', function(e) {
+  if (!overlayOpen || e.button !== 0) return;
+  if (e.target === overlayClose) return;
+  ovMPan = true;
+  ovMDragged = false;
+  ovMPX = e.clientX;
+  ovMPY = e.clientY;
+  document.body.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+
+document.addEventListener('mousemove', function(e) {
+  if (!ovMPan) return;
+  var dx = e.clientX - ovMPX, dy = e.clientY - ovMPY;
+  if (Math.abs(dx) > 4 || Math.abs(dy) > 4) ovMDragged = true;
+  ovPX += dx;
+  ovPY += dy;
+  ovMPX = e.clientX;
+  ovMPY = e.clientY;
+  applyOv();
+});
+
+document.addEventListener('mouseup', function(e) {
+  if (!ovMPan) return;
+  ovMPan = false;
+  document.body.style.cursor = '';
+  if (!ovMDragged) {
+    closeOverlay();
+  }
+});
+
+overlayClose.addEventListener('click', function(e) {
+  e.stopPropagation();
+  closeOverlay();
+});
+
+// ══════════════════════════════════════════════
 // Keyboard
 // ══════════════════════════════════════════════
 
 document.addEventListener('keydown', function(e) {
+  // Overlay: Esc で閉じる（他のキーは無視）
+  if (overlayOpen) {
+    if (e.key === 'Escape') closeOverlay();
+    return;
+  }
   // Escape は dialog が showModal() のネイティブ動作で処理
   if (isAnimating) return;
   if (dialog.open) return;  // dialog 開中はページ送りブロック
@@ -1562,6 +1795,7 @@ updateArrows();
 // ══════════════════════════════════════════════
 
 window.addEventListener('resize', function() {
+  if (overlayOpen) closeOverlay();
   setPageOffset(-currentPage * window.innerWidth);
 });
 
@@ -1577,6 +1811,9 @@ window.addEventListener('pageshow', function(e) {
       dialog.close();
     }
     document.body.classList.remove('is-reading');
+
+    // overlay を閉じる
+    if (overlayOpen) closeOverlay();
 
     // ページ位置をリセット
     setPageOffset(-currentPage * window.innerWidth);
