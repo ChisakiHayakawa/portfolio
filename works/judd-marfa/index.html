@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v141 / 2026.03.16 — Step1: booklet-viewport wrapper, 100vw→100%, html/body清掃, nav-arrow touch-action, page-credit footer化 -->
+<!-- v142 / 2026.03.16 — Step2a: Veil→dialog骨格。旧Veil全削除, dialog shell配置, 2A template, 📖開閉, isVeilOpen→dialog.open -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -159,10 +159,10 @@
   }
 
   /* ════════════════════════════════════════
-     PHOTO PAGE — LABEL (top-left) + CREDIT (bottom-right) + VEIL
+     PHOTO PAGE — LABEL (top-left) + CREDIT (bottom-right)
      ════════════════════════════════════════ */
 
-  /* ── LABEL: タイトル + リード + read more（左上） ── */
+  /* ── LABEL: タイトル + リード（左上） ── */
   .page-label {
     position: absolute;
     top: calc(36px + env(safe-area-inset-top, 0px));
@@ -195,20 +195,7 @@
   html[data-lang="en"] .label-title .sub {
     font-size: clamp(13px, 1.8vw, 16px);
   }
-  .label-readmore {
-    display: inline-block;
-    margin-top: 10px;
-    font-family: var(--font);
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.06em;
-    color: var(--color-title);
-    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-    transition: opacity 0.2s;
-  }
-  .label-readmore:hover { opacity: 0.7; }
+
 
   /* ── CREDIT: 作品名・建築家等（右下） ── */
   .page-credit {
@@ -232,112 +219,164 @@
 
   /* ── TONE: 明るい写真用（黒系テキスト） ── */
   [data-tone="dark"] .page-label,
-  [data-tone="dark"] .label-title,
-  [data-tone="dark"] .label-readmore {
+  [data-tone="dark"] .label-title {
     color: var(--color-bg);
     text-shadow: 0 1px 4px rgba(255,255,255,0.15);
   }
-  [data-tone="dark"] .label-readmore:hover { opacity: 0.7; }
-  [data-tone="dark"] .page-credit {
+  [data-tone="dark"] .page-credit,
+  [data-tone="dark"] .open-reading {
     color: var(--color-bg);
     text-shadow: 0 1px 4px rgba(255,255,255,0.15);
   }
 
-  /* ── VEIL: 全画面テキストオーバーレイ ── */
-  .veil {
-    position: absolute;
+
+  /* ════════════════════════════════════════
+     <dialog> READING-LAYER — 半透明オーバーレイ
+     ════════════════════════════════════════ */
+  .reading-layer {
+    position: fixed;
     inset: 0;
-    background: rgba(28,27,24,0.92);
-    z-index: 10;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    max-width: none;
+    max-height: none;
+    background: rgba(28, 27, 24, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
     overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
     overscroll-behavior: contain;
-  }
-  .veil.open {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .veil:focus { outline: none; }  /* v123: フォーカスリング非表示 */
-  .veil-content {
-    padding: 60px 40px 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100%;
-  }
-  .veil-text {
-    max-width: 480px;
-    text-align: center;
-    transform: translateY(20px);
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    color: var(--color-title);
+    font-family: var(--font);
     opacity: 0;
-    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s,
-                opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1) 0.08s;
+    transition: opacity 0.4s ease;
   }
-  .veil.open .veil-text {
-    transform: translateY(0);
-    opacity: 1;
+  .reading-layer[open] { opacity: 1; }
+  .reading-layer::backdrop { background: transparent; }
+
+  /* ── 記事本文 ── */
+  .reading-article {
+    width: min(100% - 2rem, 68ch);
+    margin-inline: auto;
+    padding: 0 0 4rem;
+    line-height: 1.75;
+    overflow-wrap: break-word;
+    text-align: center;
+    user-select: text;
+    -webkit-user-select: text;
   }
-  .veil-text .stanza {
+  .reading-article h1 {
     font-family: var(--font-jp);
-    font-size: clamp(13px, 1.5vw, 15px);
+    font-size: clamp(1.25em, 3vw, 1.75em);
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+  }
+  .reading-article .article-sub {
+    font-size: clamp(0.8125em, 1.8vw, 1em);
+    font-weight: 300;
+    color: var(--color-credit);
+    letter-spacing: 0.03em;
+    margin-bottom: 2em;
+  }
+  .reading-article .article-credit {
+    font-size: 0.6875em;
+    font-weight: 300;
+    color: var(--color-note);
+    letter-spacing: 0.02em;
+    margin-bottom: 2.5em;
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid var(--color-rule);
+  }
+  html[data-lang="en"] .reading-article h1 {
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+  }
+  html[data-lang="en"] .reading-article .article-sub {
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+  }
+  .reading-article .stanza {
+    font-family: var(--font-jp);
+    font-size: clamp(0.8125em, 1.5vw, 0.9375em);
     font-weight: 300;
     line-height: 2.2;
+    letter-spacing: 0.02em;
     margin-bottom: 1.6em;
     color: var(--color-title);
   }
-  .veil-text .stanza:last-child { margin-bottom: 0; }
-  .veil-text .stanza-end {
+  .reading-article .stanza:last-child { margin-bottom: 0; }
+  .reading-article .stanza-end {
     font-family: var(--font-jp);
-    font-size: clamp(13px, 1.5vw, 15px);
+    font-size: clamp(0.8125em, 1.5vw, 0.9375em);
     font-weight: 300;
     line-height: 2.2;
     margin-top: 2em;
     color: var(--color-title);
   }
-  html[data-lang="en"] .veil-text .stanza,
-  html[data-lang="en"] .veil-text .stanza-end {
+  html[data-lang="en"] .reading-article .stanza,
+  html[data-lang="en"] .reading-article .stanza-end {
     font-family: var(--font);
-    font-size: clamp(12px, 1.4vw, 14px);
+    font-size: clamp(0.75em, 1.4vw, 0.875em);
     line-height: 2.0;
     letter-spacing: 0.01em;
   }
-  .veil-text .placeholder {
+  .reading-article .placeholder {
     color: var(--color-note);
     font-style: italic;
     font-size: 13px;
   }
-  /* ── VEIL CLOSE ×（右上） ── */
-  .veil-close {
-    position: absolute;
-    top: calc(24px + env(safe-area-inset-top, 0px));
-    right: calc(28px + env(safe-area-inset-right, 0px));
-    z-index: 12;
+
+  /* ── READING-LAYER ✕ ── */
+  .reading-close {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    justify-content: flex-end;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
+    margin-bottom: 1.5em;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .reading-close button {
     background: none;
     border: none;
+    outline: none;
     color: var(--color-note);
     font-size: 20px;
     line-height: 1;
     cursor: pointer;
     padding: 10px;
     -webkit-tap-highlight-color: transparent;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease 0.15s, color 0.2s;
+    transition: color 0.2s;
   }
-  .page.veil-active .veil-close {
-    opacity: 0.6;
-    pointer-events: auto;
-  }
-  .veil-close:hover { color: var(--color-title); opacity: 0.9; }
+  .reading-close button:hover { color: var(--color-title); }
 
-  /* ── Veil 開中: ラベル・クレジット・lang-btn を非表示 ── */
-  .page.veil-active .page-label { opacity: 0; pointer-events: none; }
-  .page.veil-active .page-credit { opacity: 0; pointer-events: none; }
-  .page.veil-active .lang-btn { opacity: 0 !important; pointer-events: none; }
+  /* ── 📖 READ ボタン ── */
+  .open-reading {
+    position: absolute;
+    bottom: calc(36px + env(safe-area-inset-bottom, 0px));
+    left: calc(28px + env(safe-area-inset-left, 0px));
+    z-index: 5;
+    background: none;
+    border: none;
+    color: var(--color-title);
+    font-family: var(--font);
+    font-size: 14px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    padding: 10px;
+    transition: opacity 0.2s;
+  }
+  .open-reading:hover { opacity: 0.7; }
 
   /* ════════════════════════════════════════
      CLOSING
@@ -532,11 +571,6 @@
       padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
       padding-right: calc(28px + env(safe-area-inset-right, 0px));
     }
-    .veil-content { padding: 48px 28px 60px; }
-    .veil-close {
-      top: calc(20px + env(safe-area-inset-top, 0px));
-      right: calc(20px + env(safe-area-inset-right, 0px));
-    }
     .nav-arrow { display: none; }
     .lang-btn {
       top: calc(24px + env(safe-area-inset-top, 0px));
@@ -576,157 +610,120 @@
   </section>
 
   <!-- ══════════════════════════════════════════════
-       2A: Material — 写真 + Veil
+       2A: Material — 写真
        ══════════════════════════════════════════════ -->
-  <section class="page photo-d" aria-label="Material — 「見えないもの」を知覚する" data-has-veil="true" data-tone="dark">
+  <section class="page photo-d" aria-label="Material — 「見えないもの」を知覚する" data-has-reading="true" data-tone="dark">
     <img class="bg" src="images/judd-2a.jpg" alt="Untitled, 1967, Galvanized iron">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
         <span class="i18n" data-ja="「見えないもの」を知覚する" data-en="Perceiving the invisible"></span><span class="sub i18n" data-ja="グレーに浮かぶ、桜のピンク" data-en="Cherry blossom pink, floating in grey"></span>
       </div>
-      <span class="label-readmore">…read more</span>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1967, Galvanized iron<br><span class="i18n" data-ja="所蔵：公益財団法人大原芸術財団 大原美術館" data-en="Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki"></span></footer>
-    <div class="veil" tabindex="-1">
-      <div class="veil-content">
-        <div class="veil-text">
-          <template data-lang="ja">
-            <div class="stanza">雨の日の昼下がり<br>静かなワタリウム</div>
-            <div class="stanza">マーファは雨が降るのだろうか。</div>
-            <div class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</div>
-            <div class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</div>
-            <div class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</div>
-            <div class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</div>
-            <div class="stanza-end">春の気配がした</div>
-          </template>
-          <template data-lang="en">
-            <div class="stanza">A rainy afternoon<br>Quiet Watari-Um</div>
-            <div class="stanza">Does it rain in Marfa?</div>
-            <div class="stanza">Thinking about that<br>as I enter Judd's world</div>
-            <div class="stanza">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</div>
-            <div class="stanza">Yet its surface was soft and warm<br>draped in drifting light</div>
-            <div class="stanza">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</div>
-            <div class="stanza-end">A hint of spring</div>
-          </template>
-        </div>
-      </div>
-    </div>
-    <button class="veil-close">✕</button>
+    <!-- reading-layer templates (Step 2a: 2A only) -->
+    <template data-reading="ja">
+      <section lang="ja">
+        <header>
+          <h1>「見えないもの」を知覚する</h1>
+          <p class="article-sub">グレーに浮かぶ、桜のピンク</p>
+          <p class="article-credit">Untitled, 1967, Galvanized iron<br>所蔵：公益財団法人大原芸術財団 大原美術館</p>
+        </header>
+        <p class="stanza">雨の日の昼下がり<br>静かなワタリウム</p>
+        <p class="stanza">マーファは雨が降るのだろうか。</p>
+        <p class="stanza">そんなことを考えながら<br>ジャッドの世界に入る</p>
+        <p class="stanza">Untitled,<br>身近な商業素材のそのトタンから<br>硬い影が落ちている<br>雨垂れの調べが聞こえる気がした</p>
+        <p class="stanza">しかし、その表面は柔く温かい<br>たゆたう光を纏っていた</p>
+        <p class="stanza">予期せぬ結晶化がもたらした<br>桜の絨毯のようなスパングル結晶</p>
+        <p class="stanza-end">春の気配がした</p>
+      </section>
+    </template>
+    <template data-reading="en">
+      <section lang="en">
+        <header>
+          <h1>Perceiving the invisible</h1>
+          <p class="article-sub">Cherry blossom pink, floating in grey</p>
+          <p class="article-credit">Untitled, 1967, Galvanized iron<br>Collection: Ohara Museum of Art, Ohara Art Foundation, Kurashiki</p>
+        </header>
+        <p class="stanza">A rainy afternoon<br>Quiet Watari-Um</p>
+        <p class="stanza">Does it rain in Marfa?</p>
+        <p class="stanza">Thinking about that<br>as I enter Judd's world</p>
+        <p class="stanza">Untitled,<br>From that corrugated steel of everyday commerce<br>hard shadows fall<br>I thought I heard the rhythm of raindrops</p>
+        <p class="stanza">Yet its surface was soft and warm<br>draped in drifting light</p>
+        <p class="stanza">An unexpected crystallization brought forth<br>spangle crystals like a carpet of cherry blossoms</p>
+        <p class="stanza-end">A hint of spring</p>
+      </section>
+    </template>
+    <button class="open-reading">📖 read</button>
     <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
-       W1: Light — 写真 + Veil
+       W1: Light — 写真
        ══════════════════════════════════════════════ -->
-  <section class="page photo-d" aria-label="Light — WATARI-UM" data-has-veil="true">
+  <section class="page photo-d" aria-label="Light — WATARI-UM">
     <img class="bg" src="images/judd-w1.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Light and shadow on concrete">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
         <span class="i18n" data-ja="Light" data-en="Light"></span>
       </div>
-      <span class="label-readmore">…read more</span>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</footer>
-    <div class="veil" tabindex="-1">
-      <div class="veil-content">
-        <div class="veil-text">
-          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
-        </div>
-      </div>
-    </div>
-    <button class="veil-close">✕</button>
     <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
-       6D: Color — 写真 + Veil
+       6D: Color — 写真
        ══════════════════════════════════════════════ -->
-  <section class="page photo-d" aria-label="Color — Untitled, 1991" data-has-veil="true" data-tone="dark">
+  <section class="page photo-d" aria-label="Color — Untitled, 1991" data-tone="dark">
     <img class="bg" src="images/judd-6d.jpg" loading="lazy" alt="Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
         <span class="i18n" data-ja="Color" data-en="Color"></span>
       </div>
-      <span class="label-readmore">…read more</span>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1991, Clear anodized aluminum with transparent amber over yellow plexiglass<br><span class="i18n" data-ja="所蔵：Judd Foundation" data-en="Collection: Judd Foundation"></span></footer>
-    <div class="veil" tabindex="-1">
-      <div class="veil-content">
-        <div class="veil-text">
-          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
-        </div>
-      </div>
-    </div>
-    <button class="veil-close">✕</button>
     <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
-       W2: Space — 写真 + Veil
+       W2: Space — 写真
        ══════════════════════════════════════════════ -->
-  <section class="page photo-d" aria-label="Space — WATARI-UM" data-has-veil="true">
+  <section class="page photo-d" aria-label="Space — WATARI-UM">
     <img class="bg" src="images/judd-w2.jpg" loading="lazy" alt="WATARI-UM, Mario Botta, 1990 — Spiral staircase and grid glass">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
         <span class="i18n" data-ja="Space" data-en="Space"></span>
       </div>
-      <span class="label-readmore">…read more</span>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">WATARI-UM, Mario Botta, 1990</footer>
-    <div class="veil" tabindex="-1">
-      <div class="veil-content">
-        <div class="veil-text">
-          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
-        </div>
-      </div>
-    </div>
-    <button class="veil-close">✕</button>
     <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
-       2B: Repetition — 写真 + Veil
+       2B: Repetition — 写真
        ══════════════════════════════════════════════ -->
-  <section class="page photo-d" aria-label="Repetition — Untitled, 1990" data-has-veil="true">
+  <section class="page photo-d" aria-label="Repetition — Untitled, 1990">
     <img class="bg" src="images/judd-2b.jpg" loading="lazy" alt="Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
         <span class="i18n" data-ja="Repetition" data-en="Repetition"></span>
       </div>
-      <span class="label-readmore">…read more</span>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1990, Black anodized aluminum with bronze plexiglass (10units)<br><span class="i18n" data-ja="所蔵：静岡県立美術館" data-en="Collection: Shizuoka Prefectural Museum of Art"></span></footer>
-    <div class="veil" tabindex="-1">
-      <div class="veil-content">
-        <div class="veil-text">
-          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
-        </div>
-      </div>
-    </div>
-    <button class="veil-close">✕</button>
     <button class="lang-btn">EN</button>
   </section>
 
   <!-- ══════════════════════════════════════════════
-       5B: Time — 写真 + Veil
+       5B: Time — 写真
        ══════════════════════════════════════════════ -->
-  <section class="page photo-d" aria-label="Time — Untitled, 1989" data-has-veil="true">
+  <section class="page photo-d" aria-label="Time — Untitled, 1989">
     <img class="bg" src="images/judd-5b.jpg" loading="lazy" alt="Untitled, 1989, Painted aluminum">
     <div class="page-label fade-target" style="--ent-slide:18px;">
       <div class="label-title">
         <span class="i18n" data-ja="Time" data-en="Time"></span>
       </div>
-      <span class="label-readmore">…read more</span>
     </div>
     <footer class="page-credit fade-target" style="--ent-slide:14px;">Untitled, 1989, Painted aluminum<br><span class="i18n" data-ja="所蔵：鹿児島県霧島アートの森" data-en="Collection: Kirishima Open-Air Museum"></span></footer>
-    <div class="veil" tabindex="-1">
-      <div class="veil-content">
-        <div class="veil-text">
-          <p class="placeholder i18n" data-ja="（テキスト準備中）" data-en="(Text in progress)"></p>
-        </div>
-      </div>
-    </div>
-    <button class="veil-close">✕</button>
     <button class="lang-btn">EN</button>
   </section>
 
@@ -742,6 +739,16 @@
 </main>
 </div><!-- .booklet-viewport -->
 
+<!-- ════════════════════════════════════════
+     <dialog> READING-LAYER (Step 2a: skeleton)
+     ════════════════════════════════════════ -->
+<dialog class="reading-layer" id="readingLayer">
+  <div class="reading-close">
+    <button id="closeReading" aria-label="閉じる">✕</button>
+  </div>
+  <article class="reading-article" id="readingArticle"></article>
+</dialog>
+
 <!-- Page indicator dots -->
 <nav class="page-indicator" id="indicator" aria-label="ページ"></nav>
 
@@ -751,8 +758,8 @@
 
 <script>
 // ══════════════════════════════════════════════
-// B-Side Booklet Engine v11.0
-// Veil統合: 写真+テキスト一体化, タップ開閉
+// B-Side Booklet Engine v12.0
+// dialog ベース reading-layer (Step 2a skeleton)
 // Wheel は暫定処理（v4.15d 統合前）
 // ══════════════════════════════════════════════
 
@@ -818,45 +825,37 @@ let currentPage = 0;
 let isAnimating = false;
 
 // ══════════════════════════════════════════════
-// Veil state management
+// Reading-layer (dialog) state management
 // ══════════════════════════════════════════════
 
-const veils = new Map();
-pages.forEach(function(pg, i) {
-  const veil = pg.querySelector('.veil');
-  if (veil) {
-    veils.set(i, { veil: veil });
-  }
-});
+const dialog = document.getElementById('readingLayer');
+const readingArticle = document.getElementById('readingArticle');
 
-function isVeilOpen(pageIndex) {
-  const v = veils.get(pageIndex);
-  return v && v.veil.classList.contains('open');
+function openDialog(pageIndex) {
+  const pg = pages[pageIndex];
+  if (!pg || dialog.open) return;
+
+  // ページ内の template から現在の言語のコンテンツを注入
+  const lang = document.documentElement.dataset.lang || 'ja';
+  const tpl = pg.querySelector('template[data-reading="' + lang + '"]');
+  if (!tpl) return;
+
+  // dialog に data-page-id を設定（将来の setAppLang 用）
+  dialog.dataset.pageId = String(pageIndex);
+
+  // article をクリアして template を注入
+  readingArticle.innerHTML = '';
+  readingArticle.appendChild(tpl.content.cloneNode(true));
+
+  dialog.showModal();
+  dialog.scrollTop = 0;
 }
 
-function openVeil(pageIndex) {
-  const v = veils.get(pageIndex);
-  if (!v || v.veil.classList.contains('open')) return;
-  v.veil.scrollTop = 0;
-  v.veil.classList.add('open');
-  pages[pageIndex].classList.add('veil-active');
-  v.veil.focus({ preventScroll: true });  // v123: ArrowUp/Downスクロール対応
-}
-
-function closeVeil(pageIndex) {
-  const v = veils.get(pageIndex);
-  if (!v || !v.veil.classList.contains('open')) return;
-  v.veil.classList.remove('open');
-  pages[pageIndex].classList.remove('veil-active');
-  if (document.activeElement === v.veil) document.activeElement.blur();  // v123
-  setTimeout(function() { v.veil.scrollTop = 0; }, 500);
-}
-
-function closeAllVeils() {
-  veils.forEach(function(v, i) {
-    v.veil.classList.remove('open');
-    pages[i].classList.remove('veil-active');
-  });
+function closeDialog() {
+  if (!dialog.open) return;
+  dialog.close();
+  readingArticle.innerHTML = '';
+  delete dialog.dataset.pageId;
 }
 
 // ══════════════════════════════════════════════
@@ -1047,8 +1046,8 @@ function onPageLeave(pageIndex, targetPage) {
   const pg = pages[pageIndex];
   if (!pg) return;
 
-  // Veil が開いていたら閉じる
-  closeVeil(pageIndex);
+  // dialog が開いていたら閉じる（安全弁）
+  closeDialog();
 
   // Exit mode C: 方向スライド + フェード
   pg.classList.add('leaving-slide');
@@ -1061,7 +1060,7 @@ function onPageArrive(pageIndex, fromIndex) {
 
 // ══════════════════════════════════════════════
 // Touch handling — document レベル
-// v129: 最上位で状態分岐。Veil Open → Normal のページ送りロジックに構造的に到達不可能
+// dialog.open で最上位分岐。Dialog Open → Normal のページ送りロジックに構造的に到達不可能
 // ══════════════════════════════════════════════
 
 let touchStartX = 0;
@@ -1073,7 +1072,7 @@ let isTouching = false;
 let touchDirection = null;  // null | 'horizontal' | 'vertical'
 let touchHistory = [];
 let touchTarget = null;
-let touchVeilState = false;  // ジェスチャー開始時のVeil状態（途中で変わらない）
+let touchDialogState = false;  // ジェスチャー開始時の dialog.open 状態（途中で変わらない）
 
 const DIRECTION_THRESHOLD = 10;
 
@@ -1090,17 +1089,11 @@ document.addEventListener('touchstart', function(e) {
   touchTarget = e.target;
   touchHistory = [{ x: touch.clientX, y: touch.clientY, t: touchStartTime }];
 
-  // ジェスチャー開始時のVeil状態をキャプチャ — 以後このジェスチャー中は変えない
-  touchVeilState = isVeilOpen(currentPage);
+  // ジェスチャー開始時の dialog 状態をキャプチャ
+  touchDialogState = dialog.open;
 
-  if (touchVeilState) {
-    // ── Veil Open: ネイティブスクロール許可（Veil内タッチのみ）──
-    const v = veils.get(currentPage);
-    const touchedVeil = v && v.veil.contains(e.target);
-    if (!touchedVeil) {
-      e.preventDefault();
-    }
-    // ページ送りの初期化は一切しない
+  if (touchDialogState) {
+    // ── Dialog Open: dialog は top layer でネイティブスクロール。ページ送りは不要 ──
     return;
   }
 
@@ -1119,9 +1112,8 @@ document.addEventListener('touchmove', function(e) {
   touchCurrentX = e.touches[0].clientX;
   touchCurrentY = e.touches[0].clientY;
 
-  if (touchVeilState) {
-    // ── Veil Open: ページドラッグに一切触れない ──
-    // preventDefaultを呼ばない → Veil内の縦スクロールはネイティブが処理
+  if (touchDialogState) {
+    // ── Dialog Open: ページドラッグに一切触れない ──
     return;
   }
 
@@ -1168,11 +1160,8 @@ document.addEventListener('touchend', function(e) {
   const dx = touchCurrentX - touchStartX;
   const dy = touchCurrentY - touchStartY;
 
-  if (touchVeilState) {
-    // ── Veil Open: タップのみ許可（×ボタン等）、ページ送りは構造的に不可能 ──
-    if (touchTarget && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
-      touchTarget.click();
-    }
+  if (touchDialogState) {
+    // ── Dialog Open: dialog は top layer で自身のイベントを処理 ──
     touchTarget = null;
     return;
   }
@@ -1231,7 +1220,7 @@ let mouseIsDragging = false;
 let mouseHistory = [];
 
 booklet.addEventListener('mousedown', function(e) {
-  if (isVeilOpen(currentPage)) return;  // v123: Veil開中はドラッグ禁止
+  if (dialog.open) return;  // dialog 開中はドラッグ禁止
   if (isAnimating) {
     cancelAnimation();
     snapToCurrentPage();
@@ -1296,20 +1285,17 @@ document.addEventListener('mouseup', function(e) {
 // ══════════════════════════════════════════════
 
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
-    if (isVeilOpen(currentPage)) closeVeil(currentPage);
-    return;
-  }
+  // Escape は dialog が showModal() のネイティブ動作で処理
   if (isAnimating) return;
-  if (isVeilOpen(currentPage)) return;  // v123: Veil開中はページ送りブロック
+  if (dialog.open) return;  // dialog 開中はページ送りブロック
 
   if (e.key === 'ArrowRight') animateToPage(currentPage + 1);
   if (e.key === 'ArrowLeft') animateToPage(currentPage - 1);
 });
 
 // ══════════════════════════════════════════════
-// Wheel — 暫定処理（v4.15d 統合前。Veil スクロール対応）
-// deltaX → ページ送り、deltaY → マウスホイール: ページ送り / trackpad: 無視 / Veil開中: テキストスクロール
+// Wheel — 暫定処理（v4.15d 統合前）
+// deltaX → ページ送り、deltaY → マウスホイール: ページ送り / trackpad: 無視
 // F1修正: trackpad縦スワイプでページ送りしないよう、マウスホイール判定を追加
 // ══════════════════════════════════════════════
 
@@ -1332,8 +1318,8 @@ booklet.addEventListener('wheel', function(e) {
   const absY = Math.abs(e.deltaY);
 
   if (absX > absY * 1.2) {
-    // 横 → ページ送り（v123: Veil開中はブロック）
-    if (!isVeilOpen(currentPage)) {
+    // 横 → ページ送り（dialog 開中はブロック）
+    if (!dialog.open) {
       wheelAccumX += e.deltaX;
       if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
         animateToPage(currentPage + 1);
@@ -1344,10 +1330,9 @@ booklet.addEventListener('wheel', function(e) {
       }
     }
   } else if (absY > absX * 1.2) {
-    // 縦 → Veil 開中ならスクロール、閉じていればマウスホイールのみページ送り
-    if (isVeilOpen(currentPage)) {
-      const v = veils.get(currentPage);
-      if (v) v.veil.scrollTop += e.deltaY;
+    // 縦 → dialog 開中はスキップ、閉じていればマウスホイールのみページ送り
+    if (dialog.open) {
+      // dialog 開中: dialog 自身がスクロール処理
     } else if (isMouseWheel(e)) {
       wheelAccumY += e.deltaY;
       if (wheelAccumY > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
@@ -1388,11 +1373,11 @@ function updateArrows() {
 }
 
 prevBtn.addEventListener('click', function() {
-  if (!isAnimating && !isVeilOpen(currentPage)) animateToPage(currentPage - 1);
+  if (!isAnimating && !dialog.open) animateToPage(currentPage - 1);
   prevBtn.blur();
 });
 nextBtn.addEventListener('click', function() {
-  if (!isAnimating && !isVeilOpen(currentPage)) animateToPage(currentPage + 1);
+  if (!isAnimating && !dialog.open) animateToPage(currentPage + 1);
   nextBtn.blur();
 });
 
@@ -1412,8 +1397,8 @@ window.addEventListener('resize', function() {
 
 window.addEventListener('pageshow', function(e) {
   if (e.persisted) {
-    // Veil を閉じる
-    closeAllVeils();
+    // dialog を閉じる
+    closeDialog();
 
     // ページ位置をリセット
     setPageOffset(-currentPage * window.innerWidth);
@@ -1466,17 +1451,19 @@ function setAppLang(lang) {
     el.textContent = el.dataset[lang] || '';
   });
 
-  // 3. template ベースの veil コンテンツ切替
-  document.querySelectorAll('.veil-text').forEach(function(container) {
-    var tpl = container.querySelector('template[data-lang="' + lang + '"]');
-    if (!tpl) return;
-    // template 以外の既存コンテンツをクリア
-    var children = [].slice.call(container.childNodes);
-    children.forEach(function(n) {
-      if (n.nodeName !== 'TEMPLATE') n.remove();
-    });
-    container.appendChild(tpl.content.cloneNode(true));
-  });
+  // 3. dialog が開いていれば、該当ページの template でコンテンツを差し替え
+  if (dialog.open && dialog.dataset.pageId != null) {
+    var pageIdx = parseInt(dialog.dataset.pageId, 10);
+    var pg = pages[pageIdx];
+    if (pg) {
+      var tpl = pg.querySelector('template[data-reading="' + lang + '"]');
+      if (tpl) {
+        readingArticle.innerHTML = '';
+        readingArticle.appendChild(tpl.content.cloneNode(true));
+        dialog.scrollTop = 0;
+      }
+    }
+  }
 
   // 4. ボタン表示更新
   langBtns.forEach(function(btn) {
@@ -1541,24 +1528,32 @@ if (closingHome) {
 }
 
 // ══════════════════════════════════════════════
-// Veil interaction — read more / × / bfcache
+// Reading-layer interaction — 📖 open / ✕ close
 // ══════════════════════════════════════════════
 
+// 📖 ボタン → dialog 開
 pages.forEach(function(pg, i) {
-  var readmore = pg.querySelector('.label-readmore');
-  if (readmore && veils.has(i)) {
-    readmore.addEventListener('click', function(e) {
+  var openBtn = pg.querySelector('.open-reading');
+  if (openBtn) {
+    openBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      openVeil(i);
+      openDialog(i);
     });
   }
-  var closeBtn = pg.querySelector('.veil-close');
-  if (closeBtn && veils.has(i)) {
-    closeBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      closeVeil(i);
-    });
-  }
+});
+
+// ✕ ボタン → dialog 閉
+document.getElementById('closeReading').addEventListener('click', function() {
+  closeDialog();
+});
+
+// dialog の cancel イベント（Esc キー / backdrop クリック）
+dialog.addEventListener('cancel', function(e) {
+  // デフォルトの close は許可（dialog.close() が自動で呼ばれる）
+});
+dialog.addEventListener('close', function() {
+  readingArticle.innerHTML = '';
+  delete dialog.dataset.pageId;
 });
 
 // ══════════════════════════════════════════════
