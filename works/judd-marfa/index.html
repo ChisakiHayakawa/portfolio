@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v146b / 2026.03.16 — Step3b-i-b: wheel/gesture unified on document, pinch→overlay, overlay zoom/pan -->
+<!-- v146c / 2026.03.17 — Step3b-i-b fix: remove floor-push auto-close, add pinch-in→contain -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -1039,8 +1039,6 @@ const W_PINCH_THRESHOLD = 8;
 let safariPinchDecided = false;
 const SAFARI_PINCH_THRESHOLD = 0.15;
 let ovPS0 = 0; // overlay 内 gesture 用 scale 保存
-let floorPushAcc = 0;
-const FLOOR_PUSH_CLOSE = 15;
 
 function openDialog(pageIndex) {
   const pg = pages[pageIndex];
@@ -1136,17 +1134,6 @@ function closeOverlay() {
   // ピンチ state リセット
   wPinchAcc = 0; wPinchDecided = false;
   safariPinchDecided = false;
-  floorPushAcc = 0;
-}
-
-function macPushFloor(zoomOutDelta) {
-  if (!overlayOpen) return;
-  if (zoomOutDelta <= 0) { floorPushAcc = 0; return; }
-  if (ovS > 1.05) { floorPushAcc = 0; return; }
-  floorPushAcc += zoomOutDelta;
-  if (floorPushAcc > FLOOR_PUSH_CLOSE) {
-    closeOverlay();
-  }
 }
 
 function clampPan() {
@@ -1734,7 +1721,6 @@ document.addEventListener('wheel', function(e) {
       var minS = overlayMode === 'cover' ? getContainRatio() : 1;
       ovS = Math.max(minS, Math.min(6, ovS - e.deltaY * 0.004));
       applyOv();
-      macPushFloor(e.deltaY * 0.4);
     } else {
       // パン
       ovPX -= e.deltaX; ovPY -= e.deltaY;
@@ -1752,7 +1738,7 @@ document.addEventListener('wheel', function(e) {
     clearTimeout(wPinchT);
     wPinchT = setTimeout(function() { wPinchAcc = 0; wPinchDecided = false; }, 300);
 
-    // ピンチアウトのみ overlay を開く（deltaY が負方向に累積）
+    // ピンチアウト → cover overlay
     if (wPinchAcc < -W_PINCH_THRESHOLD) {
       if (!pages[currentPage].classList.contains('photo-d')) {
         wPinchDecided = true; return;
@@ -1761,9 +1747,14 @@ document.addEventListener('wheel', function(e) {
       openOverlay('cover');
       wPinchAcc = 0;
     }
-    // ピンチインは無視
+    // ピンチイン → contain overlay
     if (wPinchAcc > W_PINCH_THRESHOLD) {
-      wPinchDecided = true; wPinchAcc = 0;
+      if (!pages[currentPage].classList.contains('photo-d')) {
+        wPinchDecided = true; return;
+      }
+      wPinchDecided = true;
+      openOverlay('contain');
+      wPinchAcc = 0;
     }
     return;
   }
@@ -1819,22 +1810,21 @@ document.addEventListener('gesturestart', function(e) {
 document.addEventListener('gesturechange', function(e) {
   e.preventDefault();
 
-  // ── overlay open → zoom + floor-push ──
+  // ── overlay open → zoom ──
   if (overlayOpen) {
     if (ovPS0 === 0) ovPS0 = ovS;
     var minS = overlayMode === 'cover' ? getContainRatio() : 1;
     var dampedScale = 1 + (e.scale - 1) * 0.4;
     ovS = Math.max(minS, Math.min(6, ovPS0 * dampedScale));
     applyOv();
-    var zoomOutDelta = (1.0 - e.scale) * 8;
-    macPushFloor(zoomOutDelta);
     return;
   }
 
-  // ── Normal → ピンチアウトのみ overlay を開く ──
+  // ── Normal → ピンチで overlay を開く ──
   if (safariPinchDecided) return;
   var deviation = e.scale - 1.0;
   if (deviation > SAFARI_PINCH_THRESHOLD) {
+    // ピンチアウト → cover
     if (!pages[currentPage].classList.contains('photo-d')) {
       safariPinchDecided = true; return;
     }
@@ -1842,7 +1832,12 @@ document.addEventListener('gesturechange', function(e) {
     openOverlay('cover');
     ovPS0 = 1;
   } else if (deviation < -SAFARI_PINCH_THRESHOLD) {
+    // ピンチイン → contain
+    if (!pages[currentPage].classList.contains('photo-d')) {
+      safariPinchDecided = true; return;
+    }
     safariPinchDecided = true;
+    openOverlay('contain');
   }
 });
 
