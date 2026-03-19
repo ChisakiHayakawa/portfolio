@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v146c / 2026.03.17 — Step3b-i-b fix: remove floor-push auto-close, add pinch-in→contain -->
+<!-- v147 / 2026.03.17 — Step3b-ii: iPhone touch overlay (pinch→open, pan, zoom, tap-to-close) -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -487,6 +487,7 @@
     pointer-events: none;
     transition: opacity 0.35s cubic-bezier(0.4,0,0.2,1);
     overflow: hidden;
+    touch-action: none;
   }
   .overlay.open { opacity: 1; pointer-events: auto; }
   .overlay-img {
@@ -941,8 +942,8 @@
 
 <script>
 // ══════════════════════════════════════════════
-// B-Side Booklet Engine v14.1
-// Step 3b-i-b: wheel/gesture unified on document, pinch→overlay, overlay zoom/pan
+// B-Side Booklet Engine v14.2
+// Step 3b-ii: iPhone touch overlay (pinch→open, 1-finger pan, 2-finger zoom, tap-to-close)
 // Wheel は暫定ページ送りロジック（v4.15d 統合前）
 // ══════════════════════════════════════════════
 
@@ -1038,7 +1039,27 @@ let wPinchAcc = 0, wPinchT = null, wPinchDecided = false;
 const W_PINCH_THRESHOLD = 8;
 let safariPinchDecided = false;
 const SAFARI_PINCH_THRESHOLD = 0.15;
-let ovPS0 = 0; // overlay 内 gesture 用 scale 保存
+let ovPS0 = 0; // overlay 内 gesture/touch 用 scale 保存
+
+// ── iPhone touch pinch state (Normal → overlay open) ──
+let normalPinching = false;
+let normalPinchDist0 = 0;
+let normalPinchDecided = false;
+const PINCH_THRESHOLD = 30; // px distance change to trigger
+
+// ── overlay 内 touch state ──
+let ovTouching = false, ovPrevX = 0, ovPrevY = 0;
+let ovPinching = false, ovPDist0 = 0;
+let ovTapCandidate = false;
+
+// ── touch → mouse ゴースト防止 ──
+let lastTouchEnd = 0;
+
+function dist2(e) {
+  var dx = e.touches[1].clientX - e.touches[0].clientX;
+  var dy = e.touches[1].clientY - e.touches[0].clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
 
 function openDialog(pageIndex) {
   const pg = pages[pageIndex];
@@ -1131,9 +1152,11 @@ function closeOverlay() {
   overlay.classList.remove('open');
   overlayOpen = false;
   document.body.classList.remove('is-overlay');
-  // ピンチ state リセット
+  // ピンチ state リセット（Mac + iPhone）
   wPinchAcc = 0; wPinchDecided = false;
   safariPinchDecided = false;
+  normalPinching = false; normalPinchDecided = false;
+  ovTouching = false; ovPinching = false; ovTapCandidate = false;
 }
 
 function clampPan() {
@@ -1419,6 +1442,25 @@ const DIRECTION_THRESHOLD = 10;
 
 // ── touchstart ──
 document.addEventListener('touchstart', function(e) {
+  // overlay 内の touch は overlay 自身のハンドラに任せる
+  if (overlayOpen) return;
+
+  // ── 2本指 → Normal ピンチ検知 ──
+  if (e.touches.length === 2 && !dialog.open) {
+    e.preventDefault();
+    // 進行中の1本指ドラッグをキャンセル
+    isTouching = false;
+    touchDirection = null;
+    // ピンチ追跡開始
+    normalPinching = true;
+    normalPinchDecided = false;
+    normalPinchDist0 = dist2(e);
+    return;
+  }
+
+  // ── 1本指 ──
+  if (e.touches.length !== 1) return;
+
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
@@ -1448,6 +1490,30 @@ document.addEventListener('touchstart', function(e) {
 
 // ── touchmove ──
 document.addEventListener('touchmove', function(e) {
+  // overlay 内の touch は overlay 自身のハンドラに任せる
+  if (overlayOpen) return;
+
+  // ── 2本指ピンチ追跡 → overlay open ──
+  if (normalPinching && e.touches.length === 2) {
+    e.preventDefault();
+    if (normalPinchDecided) return;
+
+    var pinchDist = dist2(e);
+    var pinchDelta = pinchDist - normalPinchDist0;
+
+    if (Math.abs(pinchDelta) > PINCH_THRESHOLD) {
+      normalPinchDecided = true;
+      if (!pages[currentPage].classList.contains('photo-d')) return;
+      if (pinchDelta > 0) {
+        openOverlay('cover');   // ピンチアウト → cover
+      } else {
+        openOverlay('contain'); // ピンチイン → contain
+      }
+    }
+    return;
+  }
+
+  // ── 1本指ページドラッグ ──
   if (!isTouching) return;
 
   touchCurrentX = e.touches[0].clientX;
@@ -1495,6 +1561,19 @@ document.addEventListener('touchmove', function(e) {
 
 // ── touchend ──
 document.addEventListener('touchend', function(e) {
+  lastTouchEnd = performance.now();
+
+  // overlay 内の touch は overlay 自身のハンドラに任せる
+  if (overlayOpen) return;
+
+  // ── ピンチ終了処理 ──
+  if (normalPinching && e.touches.length < 2) {
+    normalPinching = false;
+    normalPinchDecided = false;
+    if (e.touches.length === 0) isTouching = false;
+    return;
+  }
+
   if (!isTouching) return;
   isTouching = false;
 
@@ -1512,7 +1591,13 @@ document.addEventListener('touchend', function(e) {
   // 方向未確定のまま終了 → タップ
   if (touchDirection === null) {
     if (touchTarget && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
-      touchTarget.click();
+      // photo-d ページの背景タップ → overlay（ボタン/リンクは除外）
+      if (pages[currentPage].classList.contains('photo-d') &&
+          !touchTarget.closest('button, a')) {
+        openOverlay('contain');
+      } else {
+        touchTarget.click();
+      }
     }
     touchTarget = null;
     return;
@@ -1601,6 +1686,8 @@ document.addEventListener('mouseup', function(e) {
 
   // Click（ドラッグなし）→ photo ページなら overlay
   if (!mouseHasDragged) {
+    // touch → mouse ゴースト防止（iPhone で touchend 後に合成 mouseup が発火する）
+    if (performance.now() - lastTouchEnd < 500) return;
     if (!isAnimating && pages[currentPage].classList.contains('photo-d')) {
       openOverlay('contain');
     }
@@ -1674,6 +1761,76 @@ overlayClose.addEventListener('click', function(e) {
   e.stopPropagation();
   closeOverlay();
 });
+
+// overlayClose: touchend でも close（iOS で click 合成が不安定な場合の安全弁）
+overlayClose.addEventListener('touchend', function(e) {
+  e.stopPropagation();
+  e.preventDefault();
+  closeOverlay();
+});
+
+// ══════════════════════════════════════════════
+// Overlay — touch (1本指パン + 2本指ズーム + タップ→close) (Step 3b-ii)
+// ══════════════════════════════════════════════
+
+overlay.addEventListener('touchstart', function(e) {
+  if (!overlayOpen) return;
+  e.preventDefault();
+  if (e.touches.length === 2) {
+    ovPinching = true;
+    ovPDist0 = dist2(e);
+    ovPS0 = ovS;
+    ovTapCandidate = false;
+    return;
+  }
+  if (e.touches.length === 1) {
+    ovTouching = true;
+    ovTapCandidate = true;
+    ovPrevX = e.touches[0].clientX;
+    ovPrevY = e.touches[0].clientY;
+  }
+}, { passive: false });
+
+overlay.addEventListener('touchmove', function(e) {
+  if (!overlayOpen) return;
+  e.preventDefault();
+  // 2本指ピンチズーム
+  if (ovPinching && e.touches.length === 2) {
+    var minS = overlayMode === 'cover' ? getContainRatio() : 1;
+    ovS = Math.max(minS, Math.min(6, ovPS0 * (dist2(e) / ovPDist0)));
+    applyOv();
+    return;
+  }
+  // 1本指パン
+  if (ovTouching && e.touches.length === 1) {
+    var t = e.touches[0];
+    var dx = t.clientX - ovPrevX, dy = t.clientY - ovPrevY;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) ovTapCandidate = false;
+    ovPX += dx; ovPY += dy;
+    ovPrevX = t.clientX; ovPrevY = t.clientY;
+    applyOv();
+  }
+}, { passive: false });
+
+overlay.addEventListener('touchend', function(e) {
+  if (!overlayOpen) return;
+  // ピンチ終了
+  if (ovPinching && e.touches.length < 2) {
+    ovPinching = false;
+    // cover mode: scale が 1 付近なら snap
+    if (overlayMode === 'cover' && ovS > 0.9 && ovS < 1.1) {
+      ovS = 1; ovPX = 0; ovPY = 0; applyOv();
+    }
+  }
+  // 全指離れ → タップなら close
+  if (e.touches.length === 0) {
+    if (ovTapCandidate && ovTouching) {
+      closeOverlay();
+    }
+    ovTouching = false;
+    ovTapCandidate = false;
+  }
+}, { passive: true });
 
 // ══════════════════════════════════════════════
 // Keyboard
@@ -1800,6 +1957,8 @@ document.addEventListener('wheel', function(e) {
 
 document.addEventListener('gesturestart', function(e) {
   e.preventDefault();
+  // iOS Safari: touch ハンドラがピンチを所有中 → gesture ロジックをスキップ
+  if (normalPinching || ovPinching) return;
   if (overlayOpen) {
     ovPS0 = ovS;
   } else {
@@ -1809,6 +1968,8 @@ document.addEventListener('gesturestart', function(e) {
 
 document.addEventListener('gesturechange', function(e) {
   e.preventDefault();
+  // iOS Safari: touch ハンドラがピンチを所有中 → gesture ロジックをスキップ
+  if (normalPinching || ovPinching) return;
 
   // ── overlay open → zoom ──
   if (overlayOpen) {
@@ -1843,6 +2004,8 @@ document.addEventListener('gesturechange', function(e) {
 
 document.addEventListener('gestureend', function(e) {
   e.preventDefault();
+  // iOS Safari: touch ハンドラがピンチを所有中 → gesture ロジックをスキップ
+  if (normalPinching || ovPinching) return;
 });
 
 // ══════════════════════════════════════════════
