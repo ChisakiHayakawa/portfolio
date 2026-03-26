@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://use.typekit.net" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v149 / 2026.03.19 — add: theme-color, preconnect, overlay alt, noscript fallback -->
+<!-- v151 / 2026.03.20 — Peek-and-Commit wheel engine (replaces Preset C accumulator) -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -1255,14 +1255,18 @@ const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 
 // ── Easing ──
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+function easeOutQuart(t) { return 1 - Math.pow(1 - t, 4); }
 
 // ══════════════════════════════════════════════
 // Core: ページ位置の制御
 // ══════════════════════════════════════════════
 
 function setPageOffset(px) {
-  booklet.style.transition = 'none';
   booklet.style.transform = `translate3d(${px}px,0,0)`;
+}
+
+function clearPageTransition() {
+  booklet.style.transition = 'none';
 }
 
 function getPageOffset() {
@@ -1282,7 +1286,8 @@ let animationId = 0;
 function cancelAnimation() {
   animationId++;
   isAnimating = false;
-  booklet.style.transition = 'none';
+  clearPageTransition();
+  if (typeof pkReset === 'function') pkReset();
 }
 
 function snapToCurrentPage() {
@@ -1297,6 +1302,7 @@ function animateToPage(targetPage, duration, easingFn) {
     if (Math.abs(currentX - correctX) < 1) return;
   }
 
+  clearPageTransition();
   isAnimating = true;
   animationId++;
   const myId = animationId;
@@ -1868,8 +1874,8 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ══════════════════════════════════════════════
-// Wheel — document レベル統合（v4.15d 統合前の暫定 + overlay zoom/pan + ピンチ→overlay）
-// 4分岐: dialog.open → return / overlayOpen → zoom/pan / Normal+ctrlKey → ピンチ累積 / Normal → ページ送り
+// Wheel — Peek-and-Commit engine + overlay zoom/pan + ピンチ→overlay
+// 4分岐: dialog.open → return / overlayOpen → zoom/pan / Normal+ctrlKey → ピンチ累積 / Normal → Peek-and-Commit (trackpad) / accumulate (mouse)
 // ══════════════════════════════════════════════
 
 function isMouseWheel(e) {
@@ -1878,9 +1884,85 @@ function isMouseWheel(e) {
   return Math.abs(e.deltaY) >= 90;
 }
 
-let wheelAccumX = 0;
-let wheelAccumY = 0;
-let wheelTimer = null;
+// ── Peek-and-Commit engine ──
+// Model: peek（小さな覗き見）→ 閾値到達で即 commit → absorb momentum tail。
+// Continuous tracking を使わない。peek cap で2ページ飛びを構造的に防止。
+const PK = {
+  peekCap: 0.15,       // peek 最大距離（viewport幅の比率）
+  peekGain: 0.50,      // 累積デルタ → peek 変位の変換率（上げて peek を見やすく）
+  commitPx: 300,       // commit に必要な累積 px（意図的なスワイプが必要な量）
+  gapMs: 150,          // 入力停止 → snap-back（閾値未到達時のみ）
+  absorbMs: 300,       // momentum tail 吸収（固定、リセットなし）
+  animMs: 600,         // commit アニメーション（ms）— Spaces に近い速度感
+  snapMs: 280,         // snap-back アニメーション（ms）
+};
+
+var pkPhase = 'idle';  // idle | peeking | animating | absorbing
+var pkAccum = 0;       // 累積 deltaX
+var pkGapT = null;     // gap タイマー
+
+function pkReset() {
+  pkPhase = 'idle';
+  pkAccum = 0;
+  clearTimeout(pkGapT);
+  pkGapT = null;
+  pkStopSmooth();
+}
+
+var pkTarget = 0;      // peek の目標位置（px）
+var pkCurrent = 0;     // peek の現在補間位置（px）
+var pkRafId = null;    // peek 補間の RAF
+
+function pkApplyPeek() {
+  var vw = window.innerWidth;
+  var cap = vw * PK.peekCap;
+  pkTarget = Math.max(-cap, Math.min(cap, pkAccum * PK.peekGain));
+  if (!pkRafId) pkRafId = requestAnimationFrame(pkSmoothTick);
+}
+
+function pkSmoothTick() {
+  pkRafId = null;
+  if (pkPhase !== 'peeking') return;
+  // 補間: 現在位置を目標に向けて滑らかに追従
+  var sm = 0.25;
+  pkCurrent += (pkTarget - pkCurrent) * sm;
+  if (Math.abs(pkTarget - pkCurrent) < 0.5) pkCurrent = pkTarget;
+  setPageOffset(-(currentPage * window.innerWidth) - pkCurrent);
+  if (pkPhase === 'peeking') pkRafId = requestAnimationFrame(pkSmoothTick);
+}
+
+function pkStopSmooth() {
+  if (pkRafId) { cancelAnimationFrame(pkRafId); pkRafId = null; }
+  pkTarget = 0;
+  pkCurrent = 0;
+}
+
+function pkCommit() {
+  if (pkPhase !== 'peeking') return;
+  clearTimeout(pkGapT);
+  pkStopSmooth();
+  var dir = pkAccum > 0 ? 1 : -1;
+  var target = currentPage + dir;
+  pkPhase = 'animating';
+  if (target >= 0 && target < totalPages) {
+    animateToPage(target, PK.animMs, easeOutQuart);
+  } else {
+    // 端 → snap back
+    animateToPage(currentPage, PK.snapMs);
+  }
+}
+
+function pkSnapBack() {
+  if (pkPhase !== 'peeking') return;
+  pkStopSmooth();
+  pkPhase = 'animating';
+  animateToPage(currentPage, PK.snapMs);
+}
+
+// Mouse wheel 用（従来の累積方式を維持）
+var wheelAccumX = 0;
+var wheelAccumY = 0;
+var wheelTimer = null;
 const WHEEL_PAGE_DIST = 300;
 
 document.addEventListener('wheel', function(e) {
@@ -1933,39 +2015,67 @@ document.addEventListener('wheel', function(e) {
     return;
   }
 
-  // ── 4. Normal → ページ送り ──
+  // ── 4. Normal → ページ送り（Peek-and-Commit / Mouse accumulate） ──
   e.preventDefault();
+
+  // animating → アニメ完了後 absorbing に移行（固定タイマー、リセットなし）
+  if (pkPhase === 'animating' && !isAnimating) {
+    pkPhase = 'absorbing';
+    pkAccum = 0;
+    clearTimeout(pkGapT);
+    pkGapT = setTimeout(pkReset, PK.absorbMs);
+  }
+
+  // absorbing: momentum tail を固定時間で吸収。タイマーリセットなし
+  if (pkPhase === 'absorbing') {
+    return;
+  }
+
   if (isAnimating) return;
 
   var absX = Math.abs(e.deltaX);
   var absY = Math.abs(e.deltaY);
 
-  if (absX > absY * 1.2) {
-    // 横 → ページ送り
-    wheelAccumX += e.deltaX;
-    if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
-      animateToPage(currentPage + 1);
-      wheelAccumX = 0;
-    } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
-      animateToPage(currentPage - 1);
-      wheelAccumX = 0;
-    }
-  } else if (absY > absX * 1.2) {
-    // 縦 → マウスホイールのみページ送り
-    if (isMouseWheel(e)) {
+  // ── Mouse wheel → 従来の累積方式（discrete clicks、momentum 問題なし） ──
+  if (isMouseWheel(e)) {
+    if (absY > absX * 1.2) {
       wheelAccumY += e.deltaY;
       if (wheelAccumY > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
-        animateToPage(currentPage + 1);
-        wheelAccumY = 0;
+        animateToPage(currentPage + 1); wheelAccumY = 0;
       } else if (wheelAccumY < -WHEEL_PAGE_DIST && currentPage > 0) {
-        animateToPage(currentPage - 1);
-        wheelAccumY = 0;
+        animateToPage(currentPage - 1); wheelAccumY = 0;
+      }
+    } else if (absX > absY * 1.2) {
+      wheelAccumX += e.deltaX;
+      if (wheelAccumX > WHEEL_PAGE_DIST && currentPage < totalPages - 1) {
+        animateToPage(currentPage + 1); wheelAccumX = 0;
+      } else if (wheelAccumX < -WHEEL_PAGE_DIST && currentPage > 0) {
+        animateToPage(currentPage - 1); wheelAccumX = 0;
       }
     }
+    clearTimeout(wheelTimer);
+    wheelTimer = setTimeout(function() { wheelAccumX = 0; wheelAccumY = 0; }, 200);
+    return;
   }
 
-  clearTimeout(wheelTimer);
-  wheelTimer = setTimeout(function() { wheelAccumX = 0; wheelAccumY = 0; }, 200);
+  // ── Trackpad horizontal → Peek-and-Commit ──
+  if (absX > absY * 1.2) {
+    if (pkPhase === 'idle') {
+      pkPhase = 'peeking';
+    }
+    pkAccum += e.deltaX;
+    pkApplyPeek();
+
+    // 閾値到達 → 即 commit（gap を待たない）
+    if (Math.abs(pkAccum) >= PK.commitPx) {
+      pkCommit();
+      return;
+    }
+
+    // 閾値未到達のまま入力停止 → snap back
+    clearTimeout(pkGapT);
+    pkGapT = setTimeout(pkSnapBack, PK.gapMs);
+  }
 }, { passive: false });
 
 // ══════════════════════════════════════════════
@@ -2064,6 +2174,7 @@ updateArrows();
 // ══════════════════════════════════════════════
 
 window.addEventListener('resize', function() {
+  cancelAnimation();
   if (overlayOpen) closeOverlay();
   setPageOffset(-currentPage * window.innerWidth);
 });
