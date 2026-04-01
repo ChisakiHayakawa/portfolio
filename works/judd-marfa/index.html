@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://use.typekit.net" crossorigin>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>B-Side No.001 — ジャッド｜マーファ展 / Watari-Um</title>
-<!-- v155 / 2026.04.01 — T41 dead code cleanup, T43 will-change dynamic, T46 resize safety -->
+<!-- v156 / 2026.04.01 — T41 dead code, T43 will-change dynamic, T46 resize safety, PK edge bounce -->
 <meta name="description" content="素材・光・色・空間・反復・時間の6つの視点でジャッドを読む。ワタリウム美術館 2026年2月–6月。">
 <meta name="author" content="Chisaki">
 <meta property="og:type" content="article">
@@ -944,7 +944,7 @@
 <script>
 // ══════════════════════════════════════════════
 // B-Side Booklet Engine
-// Peek-and-Commit wheel engine (v154)
+// Peek-and-Commit wheel engine (v156) — edge bounce 付き
 // ══════════════════════════════════════════════
 
 // ── 順方向到着: 暗転→フェードイン (T22: timestamp) ──
@@ -1276,7 +1276,6 @@ let animationId = 0;
 function cancelAnimation() {
   animationId++;
   isAnimating = false;
-  booklet.style.willChange = '';
   clearPageTransition();
   if (typeof pkReset === 'function') pkReset();
 }
@@ -1901,25 +1900,44 @@ function pkReset() {
   pkAccum = 0;
   clearTimeout(pkGapT);
   pkGapT = null;
+  clearTimeout(pkEdgeTimer);
+  pkEdgeTimer = null;
   pkStopSmooth();
 }
 
 var pkTarget = 0;      // peek の目標位置（px）
 var pkCurrent = 0;     // peek の現在補間位置（px）
 var pkRafId = null;    // peek 補間の RAF
+var pkEdgePeeking = false;
+var pkEdgeTimer = null; // 端 peek 自動 snap-back タイマー
 
 function pkApplyPeek() {
   var vw = window.innerWidth;
   var cap = vw * PK.peekCap;
-  pkTarget = Math.max(-cap, Math.min(cap, pkAccum * PK.peekGain));
+  var raw = pkAccum * PK.peekGain;
+
+  // 端方向: 通常と同じ cap + やや重い smooth
+  pkEdgePeeking = (currentPage === 0 && pkAccum < 0) ||
+                  (currentPage === totalPages - 1 && pkAccum > 0);
+  if (pkEdgePeeking) {
+    cap = vw * 0.12;
+    // 端 peek 開始時に自動 snap-back タイマー（留まりを防ぐ）
+    if (!pkEdgeTimer) {
+      pkEdgeTimer = setTimeout(function() {
+        pkEdgeTimer = null;
+        if (pkPhase === 'peeking') pkSnapBack();
+      }, 250);
+    }
+  }
+
+  pkTarget = Math.max(-cap, Math.min(cap, raw));
   if (!pkRafId) pkRafId = requestAnimationFrame(pkSmoothTick);
 }
 
 function pkSmoothTick() {
   pkRafId = null;
   if (pkPhase !== 'peeking') return;
-  // 補間: 現在位置を目標に向けて滑らかに追従
-  var sm = 0.25;
+  var sm = pkEdgePeeking ? 0.18 : 0.25;
   pkCurrent += (pkTarget - pkCurrent) * sm;
   if (Math.abs(pkTarget - pkCurrent) < 0.5) pkCurrent = pkTarget;
   setPageOffset(-(currentPage * window.innerWidth) - pkCurrent);
@@ -1930,6 +1948,43 @@ function pkStopSmooth() {
   if (pkRafId) { cancelAnimationFrame(pkRafId); pkRafId = null; }
   pkTarget = 0;
   pkCurrent = 0;
+  pkEdgePeeking = false;
+  clearTimeout(pkEdgeTimer);
+  pkEdgeTimer = null;
+}
+
+// ── Edge bounce: underdamped spring（弾んで戻る） ──
+function pkEdgeBounce() {
+  animationId++;
+  var myId = animationId;
+  isAnimating = true;
+  booklet.style.willChange = 'transform';
+
+  var targetX = -currentPage * window.innerWidth;
+  var cx = parseCurrentX();
+  var vel = 0;
+  // Underdamped: ゆっくり弾んで戻る
+  // critical = 2*sqrt(40) ≈ 12.6, ratio = 7/12.6 ≈ 0.56
+  var stiff = 40;
+  var damp = 7;
+
+  function tick() {
+    if (myId !== animationId) return;
+    var dt = 0.016;
+    var disp = cx - targetX;
+    vel += (-stiff * disp - damp * vel) * dt;
+    cx += vel * dt;
+    setPageOffset(cx);
+
+    if (Math.abs(disp) < 0.3 && Math.abs(vel) < 0.3) {
+      setPageOffset(targetX);
+      isAnimating = false;
+      booklet.style.willChange = '';
+      return;
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 
 function pkCommit() {
@@ -1938,20 +1993,35 @@ function pkCommit() {
   pkStopSmooth();
   var dir = pkAccum > 0 ? 1 : -1;
   var target = currentPage + dir;
-  pkPhase = 'animating';
   if (target >= 0 && target < totalPages) {
+    pkPhase = 'animating';
     animateToPage(target, PK.animMs, easeOutQuart);
   } else {
-    // 端 → snap back
-    animateToPage(currentPage, PK.snapMs);
+    // 端 → absorbing で momentum tail を吸収 + バウンスで戻る
+    pkPhase = 'absorbing';
+    pkAccum = 0;
+    pkEdgeBounce();
+    clearTimeout(pkGapT);
+    pkGapT = setTimeout(pkReset, 1000);
   }
 }
 
 function pkSnapBack() {
   if (pkPhase !== 'peeking') return;
   pkStopSmooth();
-  pkPhase = 'animating';
-  animateToPage(currentPage, PK.snapMs);
+  var dir = pkAccum > 0 ? 1 : -1;
+  var target = currentPage + dir;
+  if (target < 0 || target >= totalPages) {
+    // 端 → absorbing で momentum tail を吸収 + バウンスで戻る
+    pkPhase = 'absorbing';
+    pkAccum = 0;
+    pkEdgeBounce();
+    clearTimeout(pkGapT);
+    pkGapT = setTimeout(pkReset, 1000);
+  } else {
+    pkPhase = 'animating';
+    animateToPage(currentPage, PK.snapMs);
+  }
 }
 
 // Mouse wheel 用（従来の累積方式を維持）
@@ -2018,7 +2088,9 @@ document.addEventListener('wheel', function(e) {
     pkPhase = 'absorbing';
     pkAccum = 0;
     clearTimeout(pkGapT);
-    pkGapT = setTimeout(pkReset, PK.absorbMs);
+    // 端ページ着地は momentum tail が長いので absorb を延長
+    var atEdgePage = (currentPage === 0 || currentPage === totalPages - 1);
+    pkGapT = setTimeout(pkReset, atEdgePage ? 800 : PK.absorbMs);
   }
 
   // absorbing: momentum tail を固定時間で吸収。タイマーリセットなし
@@ -2061,8 +2133,8 @@ document.addEventListener('wheel', function(e) {
     pkAccum += e.deltaX;
     pkApplyPeek();
 
-    // 閾値到達 → 即 commit（gap を待たない）
-    if (Math.abs(pkAccum) >= PK.commitPx) {
+    // 閾値到達 → 即 commit（端方向は skip — gap timeout で snap back）
+    if (Math.abs(pkAccum) >= PK.commitPx && !pkEdgePeeking) {
       pkCommit();
       return;
     }
@@ -2174,6 +2246,7 @@ window.addEventListener('resize', function() {
   setPageOffset(-currentPage * window.innerWidth);
   setActivePage(currentPage);
   updateArrows();
+  booklet.style.willChange = '';
 });
 
 // ══════════════════════════════════════════════
